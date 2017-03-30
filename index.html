@@ -39,21 +39,6 @@
             margin: 0;
             padding: 5px;
         }
-        body {
-            padding-left: 10px;
-        }
-        form {
-            padding-bottom: 30px;
-        }
-        .results {
-            background-color: #b3d4fc;
-            padding: 10px;
-            border: solid;
-            margin-top: 25px;
-        }
-        #results_pic {
-            width: 200px;
-        }
     </style>
 
 </head>
@@ -65,151 +50,20 @@
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 <![endif]-->
 
-
-<p>Welcome to ClassTask, a to-do list made just for students.</p>
-
-<form action="#">
-    <input type="text" id="register_email_textbox" placeholder="Email address" required>
-    <input type="text" id="register_password_textbox" placeholder="password" required>
-    <button id="register_button">Register</button>
-</form>
-
-<form action="#">
-    <input type="text" id="signin_email_textbox" placeholder="Email address" required>
-    <input type="text" id="signin_password_textbox" placeholder="password" required>
-    <button id="signin_button">Sign in</button>
-</form>
-
-<button id="profile_info_button">Print profile info</button>
-<button id="sign_out_button">Sign out</button>
-
-<br /><br />
-
-<form action="#">
-    <input type="text" id="class_chosen_textbox" placeholder="class" required>
-    <input type="text" id="task_textbox" placeholder="task" required>
-    <input type="text" id="due_date_textbox" placeholder="due date">
-    <button type="submit" id="write_button">Write to database</button>
-</form>
-
-<form action="#">
-    <button id="read_button">Read from database</button>
-</form>
-
-<div class="results">
-    <p id="results_class_chosen"></p>
-    <p id="results_task"></p>
-    <p id="results_due_date"></p>
-
-</div>
-
 <img src="img/logo-extra-small.png">
 <img src="img/logo-small.png">
 <img src="img/logo-medium.png">
 <img src="img/logo-large.png">
 
+<p>Welcome to ClassTask, a to-do list made just for students.</p>
 
 <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
 <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
 <script src="js/plugins.js"></script>
 <script src="js/main.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
-<script src="https://www.gstatic.com/firebasejs/3.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/3.7.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/3.7.1/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/3.7.1/firebase-messaging.js"></script>
-<script>
-
-    // Initialize Firebase. This code should stay at the top of the <script> section
-    var config = {
-        apiKey: "AIzaSyAEPEyYJBvmqqwu4XSFitMUENdskmKp0fc",
-        authDomain: "classtask-162513.firebaseapp.com",
-        databaseURL: "https://classtask-162513.firebaseio.com",
-        storageBucket: "classtask-162513.appspot.com",
-        messagingSenderId: "453189316211"
-    };
-    firebase.initializeApp(config);
-
-    // Get a reference to the database service
-    var database = firebase.database();
-
-    document.getElementById("write_button").addEventListener("click", function(){
-        writeUserData();
-    });
-
-    function writeUserData() {
-        var userId = firebase.auth().currentUser.uid;
-        firebase.database().ref('users/' + userId).set({
-            classChosen: document.getElementById("class_chosen_textbox").value,
-            task: document.getElementById("task_textbox").value,
-            dueDate : document.getElementById("due_date_textbox").value
-        });
-    }
-
-    document.getElementById("read_button").addEventListener("click", function(){
-        readUserData();
-    });
-
-    function readUserData() {
-        var userId = firebase.auth().currentUser.uid;
-        return firebase.database().ref('/users/' + userId).on('value', (function(snapshot) {
-            var classChosen = snapshot.val().classChosen;
-            var task = snapshot.val().task;
-            var dueDate = snapshot.val().dueDate;
-
-            document.getElementById("results_class_chosen").textContent = classChosen;
-            document.getElementById("results_task").textContent = task;
-            document.getElementById("results_due_date").textContent = dueDate;
-        }));
-    }
-
-    document.getElementById("register_button").addEventListener("click", function() {
-        var email = document.getElementById("register_email_textbox").value;
-        var password = document.getElementById("register_password_textbox").value;
-        firebase.auth().createUserWithEmailAndPassword(email, password).catch(function (error) {
-            // Handle Errors here.
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            alert("Registration error occurred \n" + "Error code: " + errorCode + "\nError message: " + errorMessage);
-        });
-    });
-
-    document.getElementById("signin_button").addEventListener("click", function() {
-        var email = document.getElementById("signin_email_textbox").value;
-        var password = document.getElementById("signin_password_textbox").value;
-        firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
-            // Handle Errors here.
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            alert("Sign-in error occurred \n" + "Error code: " + errorCode + "\nError message: " + errorMessage);
-        });
-    });
-
-    document.getElementById("profile_info_button").addEventListener("click", function() {
-        var user = firebase.auth().currentUser;
-
-        if (user != null) {
-            user.providerData.forEach(function (profile) {
-                alert("Email: " + profile.email + "\nUID: " + user.uid);
-            });
-        }
-        else {
-            alert("Not signed in!");
-        }
-    });
-
-    document.getElementById("sign_out_button").addEventListener("click", function() {
-        firebase.auth().signOut().then(function() {
-            // Sign-out successful.
-        }).catch(function(error) {
-            // An error happened.
-            alert("Sign-out error occurred \n" + "Error code: " + errorCode + "\nError message: " + errorMessage);
-        });
-    });
-
-
 <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+<script>
     (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
         function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
         e=o.createElement(i);r=o.getElementsByTagName(i)[0];

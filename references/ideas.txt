@@ -1,0 +1,22 @@
+General criteria
+- takes ~ 2 weeks
+- something we'd both be interested in making
+- addresses a need
+- technically possible for us
+- drastically different from what I've already done
+- Fills a specific niche
+
+
+Technical criteria
+- search algorithm
+- dynamic layout
+- pulls from some sort of database
+- 
+
+
+To-do List idea
+- user login system (OAuth)
+- store to-do items in Google Cloud SQL
+- animated entry/deletion of to-do items
+- help with parking?
++--

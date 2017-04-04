@@ -3,10 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>ClassTask To-Do List for students</title>
+    <title>Firebase test</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
 
     <!-- start favicon stuff -->
     <link rel="apple-touch-icon" sizes="57x57" href="img/favicons/apple-icon-57x57.png">
@@ -28,48 +27,344 @@
     <meta name="theme-color" content="#ffffff">
     <!-- end favicon stuff -->
 
-
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/main.css">
     <script src="js/vendor/modernizr-2.8.3.min.js"></script>
 
     <style>
-        img {
-            line-height: 1.2;
-            margin: 0;
-            padding: 5px;
+        body {
+            padding-left: 10px;
         }
-    </style>
+        form {
+            padding-bottom: 30px;
+        }
+        .results {
+            background-color: #B3D4FC;
+            padding: 10px;
+            border: solid;
+            margin-top: 25px;
+            margin-bottom: 25px;
+        }
+        .day_div {
+            background-color: #EEEEEE;
+            padding: 10px;
+            border: solid;
+            margin-top: 25px;
+        }
+        #results_pic {
+            width: 200px;
+        }
 
+    </style>
 </head>
 <body>
-
-<!-- The following lines perform a special browser check that only IE recognizes.
-     See here for more info: http://stackoverflow.com/a/9433484/7434090 -->
 <!--[if lt IE 8]>
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 <![endif]-->
 
-<img src="img/logo-extra-small.png">
-<img src="img/logo-small.png">
-<img src="img/logo-medium.png">
-<img src="img/logo-large.png">
+<p>Firebase Read/Write Test</p>
 
-<p>Welcome to ClassTask, a to-do list made just for students.</p>
+<button id="signin_button">Sign in</button>
+<button id="profile_info_button">Print profile info</button>
+<button id="sign_out_button">Sign out</button>
+
+<br /><br />
+
+<form action="#">
+    <button id="read_button">Read from database</button>
+</form>
+
+<button id="previous_week">Previous week</button>
+<button id="next_week">Next week</button>
+
+
+<!---------------------------------------->
+<!--------START JAVASCRIPT IMPORTS-------->
+<!---------------------------------------->
+<script type="text/javascript" src="js/date.js"></script>
 
 <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
 <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
 <script src="js/plugins.js"></script>
 <script src="js/main.js"></script>
 
-<!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+<script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.7.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.7.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.7.1/firebase-messaging.js"></script>
+<!---------------------------------------->
+<!---------END JAVASCRIPT IMPORTS--------->
+<!---------------------------------------->
+
+
+
 <script>
-    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
-        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
-        e=o.createElement(i);r=o.getElementsByTagName(i)[0];
-        e.src='https://www.google-analytics.com/analytics.js';
-        r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
-    ga('create','UA-XXXXX-X','auto');ga('send','pageview');
+
+
+    // Initialize Firebase. This code should stay at the top of the <script> section
+    var config = {
+        apiKey: "AIzaSyAEPEyYJBvmqqwu4XSFitMUENdskmKp0fc",
+        authDomain: "classtask-162513.firebaseapp.com",
+        databaseURL: "https://classtask-162513.firebaseio.com",
+        storageBucket: "classtask-162513.appspot.com",
+        messagingSenderId: "453189316211"
+    };
+    firebase.initializeApp(config);
+
+    var appInitialized = false;
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (user && !appInitialized) {
+            appInitialized = true;
+            readUserData();
+        } else {
+            // No user is signed in.
+        }
+    });
+
+    //var database = firebase.database();  //gets a reference to the database service
+    var nextTodoItemId = 10;  //this is a global variable for the item ID that will get assigned to new to-do items. This gets synced to Firebase inside the writeUserData() function
+    var provider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization
+
+
+    var dayDivArray = new Array(7); //dayDivArray[] will hold the 7 dayDiv objects. Each dayDiv is a div that houses the tasks for a given weekday. So there are 7 dayDivs corresponding to 7 days of the week.
+
+    //creates dayDiv elements and saves them in dayDivArray[]
+    for (var i=0; i<7; i++) {
+        (function () {   //wrapping the contents of the FOR loop in this function solves closure problem described here: http://stackoverflow.com/questions/19586137/addeventlistener-using-for-loop-and-passing-values
+
+            var dayDiv = document.createElement("div");
+            dayDiv.className = "day_div";
+            var dayLabel = document.createElement("p");
+            dayDiv.appendChild(dayLabel);
+            var addTaskButton = document.createElement("button");
+            addTaskButton.textContent = "Add task";
+            dayDiv.appendChild(addTaskButton);
+
+            addTaskButton.addEventListener("click", function() {
+                addTaskButton.style.display = "none";  //make addTaskButton that was clicked disappear
+                var newTaskDiv = document.createElement("div");
+                dayDiv.appendChild(newTaskDiv);
+
+                var newTaskInput = document.createElement("input");
+                newTaskInput.type = "text";
+                newTaskInput.placeholder = "task";
+                newTaskDiv.appendChild(newTaskInput);
+
+                var newTaskSaveButton = document.createElement("button");
+                newTaskSaveButton.textContent = "Save task";
+                newTaskDiv.appendChild(newTaskSaveButton);
+                newTaskSaveButton.addEventListener("click", function() {
+                    var addedTask = document.createElement("p"); //Creates a <p> element to house a newly added task
+                    addedTask.textContent = newTaskInput.value;  //Sets the textContent of the newly added task to be equal to what the user typed into the textbox
+                    dayDiv.insertBefore(addedTask, newTaskDiv);  //Inserts addedTask <p> element before the newTaskDiv <div> element. This ensures tasks are added to the page in the order the user enters them.
+                    writeUserData("Math", newTaskInput.value, dayLabel.textContent);
+                    newTaskInput.value = "";  //Removes existing text from newTaskInput textbox
+                });
+
+                var newTaskCancelButton = document.createElement("button");
+                newTaskCancelButton.textContent = "Cancel";
+                newTaskDiv.appendChild(newTaskCancelButton);
+                newTaskCancelButton.addEventListener("click", function() {
+                    addTaskButton.style.display = "block";  //Makes addTaskButton reappear
+                    newTaskDiv.style.display = "none";      //Makes newTaskDiv disappear
+                });
+
+            });  //end of addTaskButton.addEventListener anonymous function
+            dayDivArray[i] = dayDiv;  //Sets the dayDiv we just built to be equal to the ith element of the dayDivArray[]
+            document.body.appendChild(dayDivArray[i]);   //Makes the dayDiv appear on the page
+
+        }()); //end of function that exists solely to solve closure problem
+    } //end of FOR loop
+
+
+
+    /*****************************************/
+    /*********START DATE HANDLING CODE********/
+    /*****************************************/
+
+
+    initializeDates();
+
+    var currentlyVisibleWeekDates; //stores an array of the dates for the currently visible week
+
+    //When user first loads the page, this sets the currentlyVisibleWeekDates[] array to the current week and then sets the dates to the page elements
+    function initializeDates() {
+
+        //TODO: When the current day is Sunday, we only see Monday through next Sunday. So if it's Sunday, April 2, we get boxes for Monday, April 3 through Sunday, April 9
+        currentlyVisibleWeekDates = [
+            Date.parse("Monday"),
+            Date.parse("Tuesday"),
+            Date.parse("Wednesday"),
+            Date.parse("Thursday"),
+            Date.parse("Friday"),
+            Date.parse("Saturday"),
+            Date.parse("Saturday").add(1).days() //this is a fix to get Sunday of the current week, since weeks in date.js start on Sunday but we want our weeks to start on Monday
+        ];
+
+        setDaysOfWeek(currentlyVisibleWeekDates);
+    }
+
+    //sets the dates to the dayLabel elements in each dayDivArray[] element
+    function setDaysOfWeek() {
+        for (i=0; i<dayDivArray.length; i++) {
+            //Gets firstChild of each dayDivArray, which is the dayLabel element. Then it sets it to the current corresponding value in the dates[] array.
+            dayDivArray[i].firstChild.textContent = currentlyVisibleWeekDates[i].toString("dddd, MMMM dd, yyyy");
+        }
+    }
+
+    //handles the user pressing the "Previous week" button
+    document.getElementById("previous_week").addEventListener("click", function () {
+        for (i=0; i<currentlyVisibleWeekDates.length; i++) {
+            //subtract 7 days from each element of the currentlyVisibleWeekDates[] array
+            currentlyVisibleWeekDates[i] = currentlyVisibleWeekDates[i].add(-7).days();
+        }
+
+        setDaysOfWeek(currentlyVisibleWeekDates);
+    });
+
+    //handles the user pressing the "Next week" button
+    document.getElementById("next_week").addEventListener("click", function () {
+        for (i=0; i<currentlyVisibleWeekDates.length; i++) {
+            //add 7 days to each element of the currentlyVisibleWeekDates[] array
+            currentlyVisibleWeekDates[i] = currentlyVisibleWeekDates[i].add(7).days();
+        }
+
+        setDaysOfWeek(currentlyVisibleWeekDates);
+    });
+
+    /*****************************************/
+    /**********END DATE HANDLING CODE*********/
+    /*****************************************/
+
+
+
+
+    /*****************************************/
+    /**********START FIREBASE CODE ***********/
+    /*****************************************/
+
+    //write new task to database
+    function writeUserData(taskClass, taskText, taskDueDate) {
+
+
+        var userId = firebase.auth().currentUser.uid;
+
+        //write task data
+        firebase.database().ref('users/' + userId + "/" + taskDueDate + "/" + nextTodoItemId).set({
+            classChosen: taskClass,
+            task: taskText
+            //timeTaskAdded:  firebase.database.ServerValue.TIMESTAMP
+        });
+
+        // Increment nextTodoItemId by 1
+        var nextTodoItemIdRef = firebase.database().ref('users/' + userId + "/nextTodoItemId");
+        nextTodoItemIdRef.transaction(function(nextId) {
+            if (nextId !== null) {
+                nextTodoItemId = nextId + 1;
+            }
+            else {
+                nextTodoItemId = 11;
+            }
+            return nextTodoItemId;
+        });
+
+    }
+
+    document.getElementById("read_button").addEventListener("click", function(){
+        readUserData();
+    });
+
+    function readUserData() {
+
+        var userId = firebase.auth().currentUser.uid;
+        // Gets the current value of nextTodoItemId from Firebase
+        var nextTodoItemIdRef = firebase.database().ref('users/' + userId + "/nextTodoItemId");
+        nextTodoItemIdRef.transaction(function(nextId) {
+            if (nextId !== null) {
+                nextTodoItemId = nextId;
+            }
+            else {
+                nextTodoItemId = 10;
+            }
+            return nextTodoItemId;
+        });
+
+
+        for (var i=0; i<currentlyVisibleWeekDates.length; i++) {
+
+            (function(i) { //This is an anonymous function that's here just to solve the problem of using an asynchronous function inside a FOR loop. We have to pass in i as an argument to this function or else the asynchronous Firebase function below won't keep track of the different values of i as we iterate through the FOR loop.
+                //the below code will execute every time the database entry at /users/userId changes
+
+                firebase.database().ref('/users/' + userId + "/" + currentlyVisibleWeekDates[i].toString("dddd, MMMM dd, yyyy")).once('value', (function(snapshot) {
+                        if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
+                            var currentDayJson = snapshot.val();  //retrieves the JSON object containing all the current day's tasks from Firebase
+
+                            for (individualTask in currentDayJson) {   // This is a FOR...IN loop. This turns each day's tasks (saved as objects) into an array currentDayJson[individualTask] .
+                                var addedTask = document.createElement("p"); //Creates a <p> element to house a newly added task
+                                addedTask.textContent = currentDayJson[individualTask].task;  //Sets the textContent of the newly added task to be equal to what the user typed into the textbox
+                                //alert(addedTask.textContent);
+                                dayDivArray[i].insertBefore(addedTask, dayDivArray[i].childNodes[dayDivArray[i].childElementCount-1]);
+                            }
+
+                            //TODO: should I use on or once?
+                            //TODO: should I store each day's or class's tasks as arrays? Populate them at read and add to them at write
+                            //TODO: problem with duplicate entries is that the above code executes every time a new task is added, so rather than just inserting the new task it insert every task again
+
+                        }
+                    }
+                ));
+
+            }(i));  // This is where we actually pass in the current value of i to the anonymous function. It's also where we end the anonymous function.
+        }
+
+
+    }
+
+
+    document.getElementById("signin_button").addEventListener("click", function() {
+        firebase.auth().signInWithPopup(provider).then(function(result) {
+            // This gives you a Google Access Token. You can use it to access the Google API.
+            var token = result.credential.accessToken;
+            // The signed-in user info.
+            var user = result.user;
+            // ...
+        }).catch(function(error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // The email of the user's account used.
+            var email = error.email;
+            // The firebase.auth.AuthCredential type that was used.
+            var credential = error.credential;
+            alert("Sign-in error occurred: \n" + "Error code: " + errorCode + "\Error message: " + errorMessage);
+        });
+    });
+
+    document.getElementById("profile_info_button").addEventListener("click", function() {
+        var user = firebase.auth().currentUser;
+
+        if (user !== null) {
+            user.providerData.forEach(function (profile) {
+                alert("Email: " + profile.email + "\nUID: " + user.uid);
+            });
+        }
+        else {
+            alert("Not signed in!");
+        }
+    });
+
+    document.getElementById("sign_out_button").addEventListener("click", function() {
+        firebase.auth().signOut().then(function() {
+        }).catch(function(error) {
+            // An error happened.
+            alert("Sign-out error occurred \n" + "Error code: " + errorCode + "\nError message: " + errorMessage);
+        });
+    });
+    /*****************************************/
+    /**********END FIREBASE CODE *************/
+    /*****************************************/
+
 
 </script>
 </body>

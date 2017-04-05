@@ -193,7 +193,6 @@
     //When user first loads the page, this sets the currentlyVisibleWeekDates[] array to the current week and then sets the dates to the page elements
     function initializeDates() {
 
-        //TODO: When the current day is Sunday, we only see Monday through next Sunday. So if it's Sunday, April 2, we get boxes for Monday, April 3 through Sunday, April 9
         currentlyVisibleWeekDates = [
             Date.parse("Monday"),
             Date.parse("Tuesday"),
@@ -201,7 +200,7 @@
             Date.parse("Thursday"),
             Date.parse("Friday"),
             Date.parse("Saturday"),
-            Date.parse("Saturday").add(1).days() //this is a fix to get Sunday of the current week, since weeks in date.js start on Sunday but we want our weeks to start on Monday
+            Date.parse("Sunday")
         ];
 
         setDaysOfWeek(currentlyVisibleWeekDates);

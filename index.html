@@ -66,15 +66,11 @@
 
 <p>Welcome to ClassTask, a to-do list for students</p>
 
-<button id="signin_button">Sign in</button>
+<button id="sign_in_button">Sign in</button>
 <button id="profile_info_button">Print profile info</button>
 <button id="sign_out_button">Sign out</button>
 
 <br /><br />
-
-<form action="#">
-    <button id="read_button">Read from database</button>
-</form>
 
 <button id="previous_week">Previous week</button>
 <button id="next_week">Next week</button>
@@ -97,7 +93,6 @@
 <script src="js/plugins.js"></script>
 <script src="js/main.js"></script>
 
-
 <!---------------------------------------->
 <!---------END JAVASCRIPT IMPORTS--------->
 <!---------------------------------------->
@@ -105,8 +100,6 @@
 
 
 <script>
-
-
 
 
     // Initialize Firebase. This code should stay at the top of the <script> section
@@ -119,24 +112,29 @@
     };
     firebase.initializeApp(config);
 
-    var database = firebase.database().ref();
-
-    var appInitialized = false;
     firebase.auth().onAuthStateChanged(function(user) {
-        if (user && !appInitialized) {
-            appInitialized = true;
+        if (user) {
+            // User is signed in
             readUserData();
+            document.getElementById("sign_in_button").style.display = "none";
+            document.getElementById("sign_out_button").style.display = "inline";
         } else {
             // No user is signed in.
+            document.getElementById("sign_in_button").style.display = "inline";
+            document.getElementById("sign_out_button").style.display = "none";
         }
     });
 
-    //var database = firebase.database();  //gets a reference to the database service
     var nextTodoItemId = 10;  //this is a global variable for the item ID that will get assigned to new to-do items. This gets synced to Firebase inside the writeUserData() function
     var provider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization
-
-
+    var currentlyVisibleWeekDates; //stores an array of the dates for the currently visible week
     var dayDivArray = new Array(7); //dayDivArray[] will hold the 7 dayDiv objects. Each dayDiv is a div that houses the tasks for a given weekday. So there are 7 dayDivs corresponding to 7 days of the week.
+
+
+
+    /****************************************************/
+    /*********START DYNAMIC DIV GENERATION CODE**********/
+    /****************************************************/
 
     //creates dayDiv elements and saves them in dayDivArray[]
     for (var i=0; i<7; i++) {
@@ -187,6 +185,10 @@
     } //end of FOR loop
 
 
+    /****************************************************/
+    /**********END DYNAMIC DIV GENERATION CODE***********/
+    /****************************************************/
+
 
     /*****************************************/
     /*********START DATE HANDLING CODE********/
@@ -194,8 +196,6 @@
 
 
     initializeDates();
-
-    var currentlyVisibleWeekDates; //stores an array of the dates for the currently visible week
 
     //When user first loads the page, this sets the currentlyVisibleWeekDates[] array to the current week and then sets the dates to the page elements
     function initializeDates() {
@@ -279,10 +279,6 @@
 
     }
 
-    document.getElementById("read_button").addEventListener("click", function(){
-        readUserData();
-    });
-
     function readUserData() {
 
         var userId = firebase.auth().currentUser.uid;
@@ -317,7 +313,7 @@
 
                             //TODO: should I use on or once?
                             //TODO: should I store each day's or class's tasks as arrays? Populate them at read and add to them at write
-                            //TODO: problem with duplicate entries is that the above code executes every time a new task is added, so rather than just inserting the new task it insert every task again
+                            //TODO: problem with duplicate entries is that the above code executes every time a new task is added, so rather than just inserting the new task it inserts every task again
 
                         }
                     }
@@ -330,7 +326,7 @@
     }
 
 
-    document.getElementById("signin_button").addEventListener("click", function() {
+    document.getElementById("sign_in_button").addEventListener("click", function() {
         firebase.auth().signInWithPopup(provider).then(function(result) {
             // This gives you a Google Access Token. You can use it to access the Google API.
             var token = result.credential.accessToken;

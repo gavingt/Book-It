@@ -1,4 +1,4 @@
-//TODO: add other federated login methods
+
 //TODO: should we get rid of the pencil icon for editing tasks and make it so you just click on the task text and it turns into an editable text field?
 
 

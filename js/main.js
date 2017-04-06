@@ -68,7 +68,14 @@ for (var i=0; i<7; i++) {
             var newTaskInput = document.createElement("input");
             newTaskInput.type = "text";
             newTaskInput.placeholder = "task";
+            newTaskInput.addEventListener("keyup", function(event) {  //this eventListener simulates pressing the newTaskSaveButton after you type into newTaskInput and press Enter.
+                event.preventDefault();
+                if (event.keyCode === 13) {
+                    newTaskSaveButton.click();
+                }
+            });
             newTaskDiv.appendChild(newTaskInput);
+            newTaskInput.focus();
 
             var newTaskSaveButton = document.createElement("button");
             newTaskSaveButton.textContent = "Save task";
@@ -78,6 +85,7 @@ for (var i=0; i<7; i++) {
 
                 var markTaskFinishedImage = document.createElement("img");
                 markTaskFinishedImage.src = "img/checkbox.png";
+                markTaskFinishedImage.addEventListener("click", function() {alert("clicked")}); //TODO: add functionality to button
                 addedTaskDiv.appendChild(markTaskFinishedImage);
 
                 var addedTaskTextSpan = document.createElement("span");
@@ -87,6 +95,7 @@ for (var i=0; i<7; i++) {
 
                 var editTaskImage = document.createElement("img");
                 editTaskImage.src = "img/edit_pencil.png";
+                editTaskImage.addEventListener("click", function() {alert("clicked")}); //TODO: add functionality to button
                 addedTaskDiv.appendChild(editTaskImage);
 
                 dayDiv.insertBefore(addedTaskDiv, newTaskDiv);  //Inserts addedTask <p> element before the newTaskDiv <div> element. This ensures tasks are added to the page in the order the user enters them.

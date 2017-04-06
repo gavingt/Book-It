@@ -101,6 +101,7 @@
 
 <script>
 
+
     var provider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization
     var currentlyVisibleWeekDates = new Array(7); //stores an array of the dates for the currently visible week
     var dayDivArray = new Array(7); //dayDivArray[] will hold the 7 dayDiv objects. Each dayDiv is a div that houses the tasks for a given weekday. So there are 7 dayDivs corresponding to 7 days of the week.
@@ -288,12 +289,11 @@
                         if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
 
                             dayTaskJsonArray[i] = snapshot.val();
-                            //alert(dayTaskjsonArray[i])
 
-                            for (var j=0; j<currentDayJson.length; j++) {
+                            for (var j=0; j<dayTaskJsonArray[i].length; j++) {
                                 var addedTaskDiv = document.createElement("div"); //Creates a <p> element to house a newly added task
-                                addedTask.textContent = dayTaskJsonArray[i][j].taskText;  //Sets the textContent of the newly added task to be equal to what the user typed into the textbox
-                                dayDivArray[i].insertBefore(addedTask, dayDivArray[i].childNodes[dayDivArray[i].childElementCount-1]);
+                                addedTaskDiv.textContent = dayTaskJsonArray[i][j].taskText;  //Sets the textContent of the newly added task to be equal to what the user typed into the textbox
+                                dayDivArray[i].insertBefore(addedTaskDiv, dayDivArray[i].childNodes[dayDivArray[i].childElementCount-1]);
                             }
 
 

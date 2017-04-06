@@ -33,15 +33,13 @@
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
 
     <style>
-        body {
-            padding-left: 10px;
-            padding-right: 10px;
-        }
         .day_div {
             background-color: #EEEEEE;
             padding: 10px;
+
             border: solid;
-            margin-top: 25px;
+            margin: 25px 10px 0px 10px;
+
         }
 
     </style>
@@ -51,13 +49,20 @@
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 <![endif]-->
 
-<img src="img/logo-small.png">
+<div id="header">
 
-<p>Welcome to ClassTask, a to-do list for students</p>
+    <img id="logo" src="img/logo-extra-small.png" height="72" width="113"/>
 
-<button id="sign_in_button">Sign in</button>
-<button id="profile_info_button">Print profile info</button>
-<button id="sign_out_button">Sign out</button>
+
+    <button id="profile_info_button">Print profile info</button>
+
+    <button id="sign_in_button">Sign in</button>
+
+    <button id="sign_out_button">Sign out</button>
+
+</div>
+
+<p>Welcome to ClassTask, a to-do list for students.</p>
 
 <br /><br />
 
@@ -90,6 +95,8 @@
 
 
 <script>
+
+    //TODO: add other federated login methods
 
 
     var provider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization

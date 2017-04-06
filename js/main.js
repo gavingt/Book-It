@@ -30,10 +30,12 @@ firebase.auth().onAuthStateChanged(function(user) {
         // User is signed in
         readUserData();
         document.getElementById("sign_in_google_button").style.display = "none";
+        document.getElementById("sign_in_facebook_button").style.display = "none";
         document.getElementById("sign_out_button").style.display = "inline";
     } else {
         // No user is signed in.
         document.getElementById("sign_in_google_button").style.display = "inline";
+        document.getElementById("sign_in_facebook_button").style.display = "inline";
         document.getElementById("sign_out_button").style.display = "none";
     }
 });
@@ -51,9 +53,10 @@ for (var i=0; i<7; i++) {
 
         var dayDiv = document.createElement("div");
         dayDiv.className = "day_div";
-        var dayLabel = document.createElement("p");
+        var dayLabel = document.createElement("span");
         dayDiv.appendChild(dayLabel);
         var addTaskButton = document.createElement("button");
+        addTaskButton.style.display = "block";
         addTaskButton.textContent = "Add task";
         dayDiv.appendChild(addTaskButton);
 

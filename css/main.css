@@ -146,12 +146,18 @@ html, body {margin: 0; padding: 0;}
     -moz-border-radius: 5px;
     border-radius: 5px;
 }*/
-#sign_in_button{
+#sign_in_facebook_button{
     float: right;
     margin-right: 1%;
     margin-top: 1%;
-
 }
+
+#sign_in_google_button{
+    float: right;
+    margin-right: 1%;
+    margin-top: 1%;
+}
+
 #sign_out_button{
     float: right;
     margin-right: 1%;

@@ -14,9 +14,6 @@ html {
     color: #222;
     font-size: 1em;
     line-height: 1.4;
-
-
-
 }
 
 /*
@@ -285,9 +282,9 @@ html, body {margin: 0; padding: 0;}
 }
 
 @media print,
-(-webkit-min-device-pixel-ratio: 1.25),
-(min-resolution: 1.25dppx),
-(min-resolution: 120dpi) {
+       (-webkit-min-device-pixel-ratio: 1.25),
+       (min-resolution: 1.25dppx),
+       (min-resolution: 120dpi) {
     /* Style adjustments for high resolution devices */
 }
 
@@ -370,4 +367,3 @@ html, body {margin: 0; padding: 0;}
     }
 
 }
-

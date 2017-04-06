@@ -56,7 +56,9 @@
 
     <button id="profile_info_button">Print profile info</button>
 
-    <button id="sign_in_button">Sign in</button>
+    <button id="sign_in_google_button">Sign in (Google)</button>
+
+    <button id="sign_in_facebook_button">Sign in (Facebook)</button>
 
     <button id="sign_out_button">Sign out</button>
 
@@ -97,9 +99,11 @@
 <script>
 
     //TODO: add other federated login methods
+    //TODO: should we get rid of the pencil icon for editing tasks and make it so you just click on the task text and it turns into an editable text field?
 
 
-    var provider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization
+    var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
+    var googleProvider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization
     var currentlyVisibleWeekDates = new Array(7); //stores an array of the dates for the currently visible week
     var dayDivArray = new Array(7); //dayDivArray[] will hold the 7 dayDiv objects. Each dayDiv is a div that houses the tasks for a given weekday. So there are 7 dayDivs corresponding to 7 days of the week.
     var taskDivArray = new Array(7); //This will be an array of arrays that holds the task divs for each day of the currently visible week
@@ -125,11 +129,11 @@
         if (user) {
             // User is signed in
             readUserData();
-            document.getElementById("sign_in_button").style.display = "none";
+            document.getElementById("sign_in_google_button").style.display = "none";
             document.getElementById("sign_out_button").style.display = "inline";
         } else {
             // No user is signed in.
-            document.getElementById("sign_in_button").style.display = "inline";
+            document.getElementById("sign_in_google_button").style.display = "inline";
             document.getElementById("sign_out_button").style.display = "none";
         }
     });
@@ -192,6 +196,7 @@
                 newTaskCancelButton.textContent = "Cancel";
                 newTaskDiv.appendChild(newTaskCancelButton);
                 newTaskCancelButton.addEventListener("click", function() {
+                    dayDiv.appendChild(addTaskButton);      //Moves addTaskButton back to the bottom of dayDiv
                     addTaskButton.style.display = "block";  //Makes addTaskButton reappear
                     newTaskDiv.style.display = "none";      //Makes newTaskDiv disappear
                 });
@@ -245,6 +250,7 @@
         for (i=0; i<currentlyVisibleWeekDates.length; i++) {
             //subtract 7 days from each element of the currentlyVisibleWeekDates[] array
             currentlyVisibleWeekDates[i] = currentlyVisibleWeekDates[i].add(-7).days();
+            //TODO: remove existing taskDivArrays before reading
             readUserData();
         }
 
@@ -256,9 +262,9 @@
         for (i=0; i<currentlyVisibleWeekDates.length; i++) {
             //add 7 days to each element of the currentlyVisibleWeekDates[] array
             currentlyVisibleWeekDates[i] = currentlyVisibleWeekDates[i].add(7).days();
+            //TODO: remove existing taskDivArrays before reading
             readUserData();
         }
-
         setDaysOfWeek(currentlyVisibleWeekDates);
     });
 
@@ -288,6 +294,7 @@
 
     }
 
+    //Reads data from Firebase. This only gets called at the initial page load or when the user switches between weeks.
     function readUserData() {
 
         var userId = firebase.auth().currentUser.uid;
@@ -302,13 +309,13 @@
                             dayTaskJsonArray[i] = snapshot.val();
 
                             for (var j=0; j<dayTaskJsonArray[i].length; j++) {
-                                var addedTaskDiv = document.createElement("div"); //Creates a <p> element to house a newly added task
+                                var addedTaskDiv = document.createElement("div"); //Creates a <div> element to house a newly added task
                                 addedTaskDiv.textContent = dayTaskJsonArray[i][j].taskText;  //Sets the textContent of the newly added task to be equal to what the user typed into the textbox
                                 dayDivArray[i].insertBefore(addedTaskDiv, dayDivArray[i].childNodes[dayDivArray[i].childElementCount-1]);
                             }
 
-                            //add edit and complete task buttons
-
+                            //TODO: make edit and complete task buttons show up for entries being read
+                            //TODO: store read tasks into the taskDivArray[] 2d array
                         }
                     }
                 ));
@@ -319,13 +326,12 @@
     }
 
 
-    document.getElementById("sign_in_button").addEventListener("click", function() {
-        firebase.auth().signInWithPopup(provider).then(function(result) {
+    document.getElementById("sign_in_google_button").addEventListener("click", function() {
+        firebase.auth().signInWithPopup(googleProvider).then(function(result) {
             // This gives you a Google Access Token. You can use it to access the Google API.
             var token = result.credential.accessToken;
             // The signed-in user info.
             var user = result.user;
-            // ...
         }).catch(function(error) {
             // Handle Errors here.
             var errorCode = error.code;
@@ -335,6 +341,34 @@
             // The firebase.auth.AuthCredential type that was used.
             var credential = error.credential;
             alert("Sign-in error occurred: \n" + "Error code: " + errorCode + "\Error message: " + errorMessage);
+        });
+    });
+
+    
+    document.getElementById("sign_in_facebook_button").addEventListener("click", function() {
+        firebase.auth().signInWithPopup(facebookProvider).then(function(result) {
+            // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+            var token = result.credential.accessToken;
+            // The signed-in user info.
+            var user = result.user;
+        }).catch(function(error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // The email of the user's account used.
+            var email = error.email;
+            // The firebase.auth.AuthCredential type that was used.
+            var credential = error.credential;
+            alert("Sign-in error occurred: \n" + "Error code: " + errorCode + "\Error message: " + errorMessage);
+        });
+    });
+
+
+    document.getElementById("sign_out_button").addEventListener("click", function() {
+        firebase.auth().signOut().then(function() {
+        }).catch(function(error) {
+            // An error happened.
+            alert("Sign-out error occurred \n" + "Error code: " + errorCode + "\nError message: " + errorMessage);
         });
     });
 
@@ -351,13 +385,7 @@
         }
     });
 
-    document.getElementById("sign_out_button").addEventListener("click", function() {
-        firebase.auth().signOut().then(function() {
-        }).catch(function(error) {
-            // An error happened.
-            alert("Sign-out error occurred \n" + "Error code: " + errorCode + "\nError message: " + errorMessage);
-        });
-    });
+
     /*****************************************/
     /**********END FIREBASE CODE *************/
     /*****************************************/

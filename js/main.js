@@ -40,68 +40,99 @@ firebase.auth().onAuthStateChanged(function(user) {
     }
 });
 
-
+createDayDivs(); //calls createDayDivs() function when user first loads page
 
 /****************************************************/
 /*********START DYNAMIC DIV GENERATION CODE**********/
 /****************************************************/
 
+
 //creates dayDiv elements and saves them in dayDivArray[]
-for (var i=0; i<7; i++) {
-    (function(i) {   //Solves closure problem described here: http://stackoverflow.com/questions/13343340/calling-an-asynchronous-function-within-a-for-loop-in-javascript.
-        //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
+function createDayDivs () {
+    for (var i = 0; i < 7; i++) {
+        (function (i) {   //Solves closure problem described here: http://stackoverflow.com/questions/13343340/calling-an-asynchronous-function-within-a-for-loop-in-javascript.
+            //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
 
-        var dayDiv = document.createElement("div");
-        dayDiv.className = "day_div";
-        var dayLabel = document.createElement("span");
-        dayDiv.appendChild(dayLabel);
-        var addTaskButton = document.createElement("button");
-        addTaskButton.style.display = "block";
-        addTaskButton.textContent = "Add task";
-        dayDiv.appendChild(addTaskButton);
+            var dayDiv = document.createElement("div");
+            dayDiv.className = "day_div";
+            var dayLabel = document.createElement("span");
+            dayDiv.appendChild(dayLabel);
+            var addTaskButton = document.createElement("button");
+            addTaskButton.style.display = "block";
+            addTaskButton.textContent = "Add task";
+            dayDiv.appendChild(addTaskButton);
 
-        addTaskButton.addEventListener("click", function() {
-            addTaskButton.style.display = "none";  //Makes addTaskButton that was clicked disappear.
-            var newTaskDiv = document.createElement("div"); //Creates a div to house the UI for adding a new task. This holds a textbox, Submit button, and Cancel button.
-            dayDiv.appendChild(newTaskDiv);
+            addTaskButton.addEventListener("click", function () {
+                addTaskButton.style.display = "none";  //Makes addTaskButton that was clicked disappear.
+                var newTaskDiv = document.createElement("div"); //Creates a div to house the UI for adding a new task. This holds a textbox, Submit button, and Cancel button.
+                dayDiv.appendChild(newTaskDiv);
 
-            var newTaskInput = document.createElement("input");
-            newTaskInput.type = "text";
-            newTaskInput.placeholder = "task";
-            newTaskInput.addEventListener("keyup", function(event) {  //this eventListener simulates pressing the newTaskSaveButton after you type into newTaskInput and press Enter.
-                event.preventDefault();
-                if (event.keyCode === 13) {
-                    newTaskSaveButton.click();
-                }
-            });
-            newTaskDiv.appendChild(newTaskInput);
-            newTaskInput.focus();
+                var newTaskInput = document.createElement("input");
+                newTaskInput.type = "text";
+                newTaskInput.placeholder = "task";
+                newTaskInput.addEventListener("keyup", function (event) {  //this eventListener simulates pressing the newTaskSaveButton after you type into newTaskInput and press Enter.
+                    event.preventDefault();
+                    if (event.keyCode === 13) {
+                        newTaskSaveButton.click();
+                    }
+                });
+                newTaskDiv.appendChild(newTaskInput);
+                newTaskInput.focus();
 
-            var newTaskSaveButton = document.createElement("button");
-            newTaskSaveButton.textContent = "Save task";
-            newTaskDiv.appendChild(newTaskSaveButton);
-            newTaskSaveButton.addEventListener("click", function() {
-                var addedTaskDiv = createAddedTaskDiv(newTaskInput.value, i); //call function createAddedTaskDiv and pass in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
-                dayDiv.insertBefore(addedTaskDiv, newTaskDiv);  //Inserts addedTask <p> element before the newTaskDiv <div> element. This ensures tasks are added to the page in the order the user enters them.
-                writeUserData("Math", newTaskInput.value, i);
-                newTaskInput.value = "";  //Removes existing text from newTaskInput textbox
-            });
+                var newTaskSaveButton = document.createElement("button");
+                newTaskSaveButton.textContent = "Save task";
+                newTaskDiv.appendChild(newTaskSaveButton);
+                newTaskSaveButton.addEventListener("click", function () {
+                    var addedTaskDiv = createAddedTaskDiv(newTaskInput.value, i); //call function createAddedTaskDiv and pass in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
+                    dayDiv.insertBefore(addedTaskDiv, newTaskDiv);  //Inserts addedTask <p> element before the newTaskDiv <div> element. This ensures tasks are added to the page in the order the user enters them.
+                    writeUserData("Math", newTaskInput.value, i);
+                    newTaskInput.value = "";  //Removes existing text from newTaskInput textbox
+                });
 
-            var newTaskCancelButton = document.createElement("button");
-            newTaskCancelButton.textContent = "Cancel";
-            newTaskDiv.appendChild(newTaskCancelButton);
-            newTaskCancelButton.addEventListener("click", function() {
-                dayDiv.appendChild(addTaskButton);      //Moves addTaskButton back to the bottom of dayDiv
-                addTaskButton.style.display = "block";  //Makes addTaskButton reappear
-                newTaskDiv.style.display = "none";      //Makes newTaskDiv disappear
-            });
+                var newTaskCancelButton = document.createElement("button");
+                newTaskCancelButton.textContent = "Cancel";
+                newTaskDiv.appendChild(newTaskCancelButton);
+                newTaskCancelButton.addEventListener("click", function () {
+                    dayDiv.appendChild(addTaskButton);      //Moves addTaskButton back to the bottom of dayDiv
+                    addTaskButton.style.display = "block";  //Makes addTaskButton reappear
+                    newTaskDiv.style.display = "none";      //Makes newTaskDiv disappear
+                });
 
-        });  //end of addTaskButton.addEventListener anonymous function
-        dayDivArray[i] = dayDiv;  //Sets the dayDiv we just built to be equal to the ith element of the dayDivArray[]
-        document.body.appendChild(dayDivArray[i]);   //Makes the dayDiv appear on the page
+            });  //end of addTaskButton.addEventListener anonymous function
+            dayDivArray[i] = dayDiv;  //Sets the dayDiv we just built to be equal to the ith element of the dayDivArray[]
+            document.body.appendChild(dayDivArray[i]);   //Makes the dayDiv appear on the page
 
-    }(i)); //This is the end of the function that exists solely to solve closure problem. It's also where we pass in the value of i so that it's accessible within the above code.
-} //end of FOR loop
+        }(i)); //This is the end of the function that exists solely to solve closure problem. It's also where we pass in the value of i so that it's accessible within the above code.
+    } //end of FOR loop
+}
+
+
+function createAddedTaskDiv(addedTaskText, dayIndex) {
+    var addedTaskDiv = document.createElement("div"); //Creates a <div> element to house a newly added task
+
+    var markTaskFinishedImage = document.createElement("img");
+    markTaskFinishedImage.src = "img/checkbox.png";
+    markTaskFinishedImage.addEventListener("click", function() {alert("clicked")}); //TODO: add functionality to button
+    addedTaskDiv.appendChild(markTaskFinishedImage);
+
+    var addedTaskTextSpan = document.createElement("span");
+    addedTaskTextSpan.textContent = addedTaskText; //Sets the textContent of the newly added task to be equal to what the user typed into the textbox
+    addedTaskTextSpan.style.padding = "5px 10px 5px 10px";
+    addedTaskDiv.appendChild(addedTaskTextSpan);
+
+    var addedTaskIndex = addedTaskDivArray[dayIndex].push(addedTaskDiv);
+    addedTaskTextSpan.addEventListener("click", function() {
+
+
+        //TODO: hide addedTaskDiv associated with addedTaskSpan that was clicked on, and also hide addTaskButton
+        //TODO: in its place, put a newTaskInput box, with Save and Cancel buttons (create a function like createAddedTaskDiv so that code isn't repeated)
+
+    });
+
+    return addedTaskDiv;
+}
+
+
 
 
 /****************************************************/
@@ -211,33 +242,6 @@ function readUserData() {
         }(i));
     }
 }
-
-
-function createAddedTaskDiv(addedTaskText, dayIndex) {
-    var addedTaskDiv = document.createElement("div"); //Creates a <div> element to house a newly added task
-
-    var markTaskFinishedImage = document.createElement("img");
-    markTaskFinishedImage.src = "img/checkbox.png";
-    markTaskFinishedImage.addEventListener("click", function() {alert("clicked")}); //TODO: add functionality to button
-    addedTaskDiv.appendChild(markTaskFinishedImage);
-
-    var addedTaskTextSpan = document.createElement("span");
-    addedTaskTextSpan.textContent = addedTaskText; //Sets the textContent of the newly added task to be equal to what the user typed into the textbox
-    addedTaskTextSpan.style.padding = "5px 10px 5px 10px";
-    addedTaskDiv.appendChild(addedTaskTextSpan);
-
-    var editTaskImage = document.createElement("img");
-    editTaskImage.src = "img/edit_pencil.png";
-    editTaskImage.addEventListener("click", function() {alert("clicked")}); //TODO: add functionality to button
-    addedTaskDiv.appendChild(editTaskImage);
-
-    addedTaskDivArray[dayIndex].push(addedTaskDiv);
-    return addedTaskDiv;
-}
-
-document.getElementById("test").addEventListener("click", function() {
-    console.log(addedTaskDivArray);
-});
 
 
 document.getElementById("sign_in_google_button").addEventListener("click", function() {

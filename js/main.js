@@ -6,12 +6,12 @@ var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for F
 var googleProvider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization
 var currentlyVisibleWeekDates = new Array(7); //stores an array of the dates for the currently visible week
 var dayDivArray = new Array(7); //dayDivArray[] will hold the 7 dayDiv objects. Each dayDiv is a div that houses the tasks for a given weekday. So there are 7 dayDivs corresponding to 7 days of the week.
-var taskDivArray = new Array(7); //This will be an array of arrays that holds the task divs for each day of the currently visible week
+var addedTaskDivArray = new Array(7); //This will be an array of arrays that holds the addedTaskDiv objects for each day of the currently visible week
 var dayTaskJsonArray = new Array(7); //This will be an array of arrays that holds the Json data for the tasks of each day of the currently visible week
 
 //Turns tasDivArray and dayTaskJsonArray into 2D arrays (each of their elements stores its own array)
 for (var k=0; k<7; k++) {
-    taskDivArray[k] = [];
+    addedTaskDivArray[k] = [];
     dayTaskJsonArray[k] = [];
 }
 
@@ -227,7 +227,8 @@ function readUserData() {
                         }
 
                         //TODO: make edit and complete task buttons show up for entries being read
-                        //TODO: store read tasks into the taskDivArray[] 2d array
+                        //TODO: store read tasks into the addedTaskDivArray[] 2d array
+                        //TODO: for completed tasks, don't actually delete them from Firebase
                     }
                 }
             ));
@@ -236,6 +237,12 @@ function readUserData() {
     }
 
 }
+
+
+function createAddedTaskDiv() {
+
+}
+
 
 
 document.getElementById("sign_in_google_button").addEventListener("click", function() {

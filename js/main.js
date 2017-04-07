@@ -25,6 +25,8 @@ var config = {
 };
 firebase.initializeApp(config);
 
+createDayDivs(); //calls createDayDivs() function when user first loads page
+
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
         // User is signed in
@@ -40,7 +42,6 @@ firebase.auth().onAuthStateChanged(function(user) {
     }
 });
 
-createDayDivs(); //calls createDayDivs() function when user first loads page
 
 /****************************************************/
 /*********START DYNAMIC DIV GENERATION CODE**********/
@@ -83,7 +84,9 @@ function createDayDivs () {
                 newTaskSaveButton.textContent = "Save task";
                 newTaskDiv.appendChild(newTaskSaveButton);
                 newTaskSaveButton.addEventListener("click", function () {
-                    var addedTaskDiv = createAddedTaskDiv(newTaskInput.value, i); //call function createAddedTaskDiv and pass in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
+
+                    var addedTaskDiv = createAddedTaskDiv(newTaskInput.value, i, addTaskButton); //call function createAddedTaskDiv and pass in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
+
                     dayDiv.insertBefore(addedTaskDiv, newTaskDiv);  //Inserts addedTask <p> element before the newTaskDiv <div> element. This ensures tasks are added to the page in the order the user enters them.
                     writeUserData("Math", newTaskInput.value, i);
                     newTaskInput.value = "";  //Removes existing text from newTaskInput textbox
@@ -97,8 +100,7 @@ function createDayDivs () {
                     addTaskButton.style.display = "block";  //Makes addTaskButton reappear
                     newTaskDiv.style.display = "none";      //Makes newTaskDiv disappear
                 });
-
-            });  //end of addTaskButton.addEventListener anonymous function
+            });
             dayDivArray[i] = dayDiv;  //Sets the dayDiv we just built to be equal to the ith element of the dayDivArray[]
             document.body.appendChild(dayDivArray[i]);   //Makes the dayDiv appear on the page
 
@@ -107,12 +109,21 @@ function createDayDivs () {
 }
 
 
-function createAddedTaskDiv(addedTaskText, dayIndex) {
+function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
+
+
+
+    //addTaskButton being successfully passed in to this point of code
+
     var addedTaskDiv = document.createElement("div"); //Creates a <div> element to house a newly added task
 
     var markTaskFinishedImage = document.createElement("img");
     markTaskFinishedImage.src = "img/checkbox.png";
-    markTaskFinishedImage.addEventListener("click", function() {alert("clicked")}); //TODO: add functionality to button
+    markTaskFinishedImage.addEventListener("click", function() {
+        addedTaskDiv.style.display = "none";
+        //TODO: write changes to Firebase here (need a new property indicating task is hidden?)
+
+    });
     addedTaskDiv.appendChild(markTaskFinishedImage);
 
     var addedTaskTextSpan = document.createElement("span");
@@ -122,8 +133,10 @@ function createAddedTaskDiv(addedTaskText, dayIndex) {
 
     var addedTaskIndex = addedTaskDivArray[dayIndex].push(addedTaskDiv);
     addedTaskTextSpan.addEventListener("click", function() {
+        addedTaskDiv.style.display = "none";
 
-
+        //TODO: switch to ECMAScript 6 to avoid this problem?
+        //TODO: it's hard to pass objects in here because of all the asynch functions
         //TODO: hide addedTaskDiv associated with addedTaskSpan that was clicked on, and also hide addTaskButton
         //TODO: in its place, put a newTaskInput box, with Save and Cancel buttons (create a function like createAddedTaskDiv so that code isn't repeated)
 
@@ -232,7 +245,7 @@ function readUserData() {
 
                         dayTaskJsonArray[i] = snapshot.val();
                         for (var j=0; j<dayTaskJsonArray[i].length; j++) {
-                            var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i); //call function createAddedTaskDiv and pass in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
+                            var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayDivArray[i].lastElementChild); //call function createAddedTaskDiv and pass in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
                             dayDivArray[i].insertBefore(addedTaskDiv, dayDivArray[i].childNodes[dayDivArray[i].childElementCount-1]); //Inserts addedTaskDiv <div> element before the newTaskDiv <div> element (which is the last child element in dayDivArray[i] ). This ensures tasks are added to the page in the order the user enters them.
                         }
                     }

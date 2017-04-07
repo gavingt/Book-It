@@ -81,25 +81,8 @@ for (var i=0; i<7; i++) {
             newTaskSaveButton.textContent = "Save task";
             newTaskDiv.appendChild(newTaskSaveButton);
             newTaskSaveButton.addEventListener("click", function() {
-                var addedTaskDiv = document.createElement("div"); //Creates a <div> element to house a newly added task
-
-                var markTaskFinishedImage = document.createElement("img");
-                markTaskFinishedImage.src = "img/checkbox.png";
-                markTaskFinishedImage.addEventListener("click", function() {alert("clicked")}); //TODO: add functionality to button
-                addedTaskDiv.appendChild(markTaskFinishedImage);
-
-                var addedTaskTextSpan = document.createElement("span");
-                addedTaskTextSpan.textContent = newTaskInput.value; //Sets the textContent of the newly added task to be equal to what the user typed into the textbox
-                addedTaskTextSpan.style.padding = "5px 10px 5px 10px";
-                addedTaskDiv.appendChild(addedTaskTextSpan);
-
-                var editTaskImage = document.createElement("img");
-                editTaskImage.src = "img/edit_pencil.png";
-                editTaskImage.addEventListener("click", function() {alert("clicked")}); //TODO: add functionality to button
-                addedTaskDiv.appendChild(editTaskImage);
-
+                var addedTaskDiv = createAddedTaskDiv(newTaskInput.value, i); //call function createAddedTaskDiv and pass in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
                 dayDiv.insertBefore(addedTaskDiv, newTaskDiv);  //Inserts addedTask <p> element before the newTaskDiv <div> element. This ensures tasks are added to the page in the order the user enters them.
-
                 writeUserData("Math", newTaskInput.value, i);
                 newTaskInput.value = "";  //Removes existing text from newTaskInput textbox
             });
@@ -213,36 +196,48 @@ function readUserData() {
     for (var i=0; i<currentlyVisibleWeekDates.length; i++) {
 
         (function(i) {
-            //the below code will execute every time the database entry at /users/userId changes
-
             firebase.database().ref('/users/' + userId + "/" + currentlyVisibleWeekDates[i].toString("dddd, MMMM dd, yyyy")).once('value', (function(snapshot) {
                     if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
 
                         dayTaskJsonArray[i] = snapshot.val();
-
                         for (var j=0; j<dayTaskJsonArray[i].length; j++) {
-                            var addedTaskDiv = document.createElement("div"); //Creates a <div> element to house a newly added task
-                            addedTaskDiv.textContent = dayTaskJsonArray[i][j].taskText;  //Sets the textContent of the newly added task to be equal to what the user typed into the textbox
-                            dayDivArray[i].insertBefore(addedTaskDiv, dayDivArray[i].childNodes[dayDivArray[i].childElementCount-1]);
+                            var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i); //call function createAddedTaskDiv and pass in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
+                            dayDivArray[i].insertBefore(addedTaskDiv, dayDivArray[i].childNodes[dayDivArray[i].childElementCount-1]); //Inserts addedTaskDiv <div> element before the newTaskDiv <div> element (which is the last child element in dayDivArray[i] ). This ensures tasks are added to the page in the order the user enters them.
                         }
-
-                        //TODO: make edit and complete task buttons show up for entries being read
-                        //TODO: store read tasks into the addedTaskDivArray[] 2d array
-                        //TODO: for completed tasks, don't actually delete them from Firebase
                     }
                 }
             ));
 
         }(i));
     }
-
 }
 
 
-function createAddedTaskDiv() {
+function createAddedTaskDiv(addedTaskText, dayIndex) {
+    var addedTaskDiv = document.createElement("div"); //Creates a <div> element to house a newly added task
 
+    var markTaskFinishedImage = document.createElement("img");
+    markTaskFinishedImage.src = "img/checkbox.png";
+    markTaskFinishedImage.addEventListener("click", function() {alert("clicked")}); //TODO: add functionality to button
+    addedTaskDiv.appendChild(markTaskFinishedImage);
+
+    var addedTaskTextSpan = document.createElement("span");
+    addedTaskTextSpan.textContent = addedTaskText; //Sets the textContent of the newly added task to be equal to what the user typed into the textbox
+    addedTaskTextSpan.style.padding = "5px 10px 5px 10px";
+    addedTaskDiv.appendChild(addedTaskTextSpan);
+
+    var editTaskImage = document.createElement("img");
+    editTaskImage.src = "img/edit_pencil.png";
+    editTaskImage.addEventListener("click", function() {alert("clicked")}); //TODO: add functionality to button
+    addedTaskDiv.appendChild(editTaskImage);
+
+    addedTaskDivArray[dayIndex].push(addedTaskDiv);
+    return addedTaskDiv;
 }
 
+document.getElementById("test").addEventListener("click", function() {
+    console.log(addedTaskDivArray);
+});
 
 
 document.getElementById("sign_in_google_button").addEventListener("click", function() {

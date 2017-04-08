@@ -5,7 +5,6 @@
 //TODO: hide newTaskDivs and editTaskDivs and show addTaskButtons when you press Previous or Next Week
 //TODO: make an "undated tasks" section
 //TODO: remove elements from the DOM rather than hiding them (memory leaks!)
-//TODO: if a day has a task entered and then you click addTaskButton, then switch weeks and switch back, addTaskButton is above task
 
 
 
@@ -248,6 +247,7 @@ function resetDomElements(resetNewTaskDivs, resetEditTaskDivs, resetAddTaskButto
     if (resetAddTaskButtons) {
         var addTaskButtonsToShow = document.getElementsByClassName("add_task_button");
         for (i = 0; i < addTaskButtonsToShow.length; i++) {
+            dayDivArray[i].appendChild(addTaskButtonsToShow[i]);
             addTaskButtonsToShow[i].style.display = "block";
         }
     }
@@ -298,7 +298,6 @@ function setDaysOfWeek() {
 document.getElementById("previous_week").addEventListener("click", function () {
 
     snackbar.style.visibility = "hidden";
-    resetDomElements(true, true, true);
 
     for (i=0; i<currentlyVisibleWeekDates.length; i++) {
         //subtract 7 days from each element of the currentlyVisibleWeekDates[] array
@@ -313,13 +312,14 @@ document.getElementById("previous_week").addEventListener("click", function () {
 
     readUserData();  //read user data for new week
     setDaysOfWeek(currentlyVisibleWeekDates);
+
+    resetDomElements(true, true, true);
 });
 
 //handles the user pressing the "Next week" button
 document.getElementById("next_week").addEventListener("click", function () {
 
     snackbar.style.visibility = "hidden";
-    resetDomElements(true, true, true);
 
     for (i=0; i<currentlyVisibleWeekDates.length; i++) {
         //add 7 days to each element of the currentlyVisibleWeekDates[] array
@@ -334,6 +334,8 @@ document.getElementById("next_week").addEventListener("click", function () {
     }
     readUserData();  //read user data for new week
     setDaysOfWeek(currentlyVisibleWeekDates);
+
+    resetDomElements(true, true, true);
 });
 
 /*****************************************/

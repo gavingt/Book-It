@@ -1,5 +1,5 @@
-
-//TODO: should we get rid of the pencil icon for editing tasks and make it so you just click on the task text and it turns into an editable text field?
+//TODO: don't allow blank tasks to be entered (don't add it as an addedTaskDiv and show addTaskButton)
+//TODO: 
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -107,6 +107,7 @@ function createDayDivs () {
 }
 
 
+
 function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
 
     var addedTaskDiv = document.createElement("div"); //creates a <div> element to house a newly added task
@@ -128,22 +129,20 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
         snackbar.parentNode.replaceChild(newSnackbar, snackbar);
         snackbar = newSnackbar;
 
-        snackbar.className = "show";
+        snackbar.style.visibility = "visible";
         clearTimeout(timeoutId);
-        timeoutId = setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, 10500); //hides snackbar after waiting 500 ms for fadeout animation to run
-
-        //TODO: bug occurs where UNDO button undoes all completed tasks rather than just the last one
+        timeoutId = setTimeout(function(){ snackbar.style.visibility = "hidden"; }, 10500); //hides snackbar after waiting 500 ms for fadeout animation to run
 
         document.getElementById("snackbar_undo_button").addEventListener("click", function() {
 
+            snackbar.style.visibility = "hidden";
             undoRemoveUserData(completedTaskJson, completedTaskIndex, dayIndex);
             addedTaskDiv.style.display = "block";
             addedTaskDivArray[dayIndex].splice(completedTaskIndex, 0, addedTaskDiv);
-
         });
 
         document.getElementById("snackbar_hide_button").addEventListener("click", function() {
-            snackbar.className = snackbar.className.replace("show", ""); //replace "show" class with nothing, causing snackbar to disappear
+            snackbar.style.visibility = "hidden";
         });
 
     });
@@ -174,7 +173,6 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
             }
         });
         newTaskDiv.appendChild(newTaskInput);
-        newTaskInput.focus();
 
         var newTaskSaveButton = document.createElement("button");
         newTaskSaveButton.textContent = "Save task";
@@ -196,10 +194,12 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
         newTaskCancelButton.addEventListener("click", function () {
             dayDivArray[dayIndex].appendChild(addTaskButton);      //Moves addTaskButton back to the bottom of dayDiv
             addTaskButton.style.display = "block";  //Makes addTaskButton reappear
+            addedTaskDiv.style.display = "block";
             newTaskDiv.style.display = "none";      //Makes newTaskDiv disappear
         });
 
         dayDivArray[dayIndex].insertBefore(newTaskDiv, addedTaskDiv);
+        newTaskInput.focus();
 
     });
 

@@ -8,7 +8,8 @@ var currentlyVisibleWeekDates = new Array(7); //stores an array of the dates for
 var dayDivArray = new Array(7); //dayDivArray[] will hold the 7 dayDiv objects. Each dayDiv is a div that houses the tasks for a given weekday. So there are 7 dayDivs corresponding to 7 days of the week.
 var addedTaskDivArray = new Array(7); //This will be an array of arrays that holds the addedTaskDiv objects for each day of the currently visible week
 var dayTaskJsonArray = new Array(7); //This will be an array of arrays that holds the Json data for the tasks of each day of the currently visible week
-
+var timeoutId;
+var snackbar = document.getElementById("snackbar"); //get a reference to the snackbar div
 
 
 // Initialize Firebase. This code should stay at the top of the <script> section
@@ -49,7 +50,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 function createDayDivs () {
     for (var i = 0; i < 7; i++) {
         (function (i) {   //Solves closure problem described here: http://stackoverflow.com/questions/13343340/calling-an-asynchronous-function-within-a-for-loop-in-javascript.
-                          //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
+            //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
 
             var dayDiv = document.createElement("div");
             dayDiv.className = "day_div";
@@ -108,7 +109,6 @@ function createDayDivs () {
 
 function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
 
-
     var addedTaskDiv = document.createElement("div"); //creates a <div> element to house a newly added task
     addedTaskDiv.className = "added_task_div";
 
@@ -117,18 +117,33 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
     markTaskFinishedImage.addEventListener("click", function() {
         addedTaskDiv.style.display = "none";
 
-        //TODO: write changes to Firebase here (need a new property indicating task is hidden?)
+        var completedTaskIndex = addedTaskDivArray[dayIndex].indexOf(markTaskFinishedImage.parentNode);
+        var completedTaskJson = dayTaskJsonArray[dayIndex][completedTaskIndex];
+        addedTaskDivArray[dayIndex].splice(completedTaskIndex, 1);
+        removeUserData(dayIndex, completedTaskIndex);
 
-        var snackbar = document.getElementById("snackbar"); //get a reference to the snackbar div
-        snackbar.className = "show";  //add the "show" class to snackbar div
+
+        //I have to clone the snackbar to remove its event listeners so that the UNDO button doesn't undo multiple completed tasks
+        var newSnackbar = snackbar.cloneNode(true);
+        snackbar.parentNode.replaceChild(newSnackbar, snackbar);
+        snackbar = newSnackbar;
+
+        snackbar.className = "show";
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, 10500); //hides snackbar after waiting 500 ms for fadeout animation to run
+
+        //TODO: bug occurs where UNDO button undoes all completed tasks rather than just the last one
 
         document.getElementById("snackbar_undo_button").addEventListener("click", function() {
-           alert("hey");
+
+            undoRemoveUserData(completedTaskJson, completedTaskIndex, dayIndex);
+            addedTaskDiv.style.display = "block";
+            addedTaskDivArray[dayIndex].splice(completedTaskIndex, 0, addedTaskDiv);
+
         });
 
         document.getElementById("snackbar_hide_button").addEventListener("click", function() {
-            snackbar.className = snackbar.className.replace("show", "hide"); //change class from 'show' to 'hide', which triggers fadeout animation
-            setTimeout(function(){ snackbar.className = snackbar.className.replace("hide", ""); }, 500); //hides snackbar after waiting 500 ms for fadeout animation to run
+            snackbar.className = snackbar.className.replace("show", ""); //replace "show" class with nothing, causing snackbar to disappear
         });
 
     });
@@ -282,6 +297,7 @@ document.getElementById("next_week").addEventListener("click", function () {
 /**********START FIREBASE CODE ***********/
 /*****************************************/
 
+
 //edit existing task in database
 function editUserData(taskClass, taskText, dayIndex, taskIndex) {
 
@@ -298,6 +314,31 @@ function editUserData(taskClass, taskText, dayIndex, taskIndex) {
 }
 
 
+//remove existing task in database
+function removeUserData(dayIndex, taskIndex) {
+
+    dayTaskJsonArray[dayIndex].splice(taskIndex,1);
+
+    var userId = firebase.auth().currentUser.uid;
+
+    //saves a given day's tasks with the completed task removed
+    firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex].toString("dddd, MMMM dd, yyyy")).set(dayTaskJsonArray[dayIndex]);
+
+}
+
+
+//write a task back into the database if it was marked complete and then the UNDO button in snackbar was pressed
+function undoRemoveUserData(completedTaskJson, taskIndex, dayIndex) {
+
+    dayTaskJsonArray[dayIndex].splice(taskIndex, 0, completedTaskJson);
+
+    var userId = firebase.auth().currentUser.uid;
+
+    //write new task data
+    firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex].toString("dddd, MMMM dd, yyyy")).set(dayTaskJsonArray[dayIndex]);
+}
+
+
 //write new task to database
 function writeUserData(taskClass, taskText, dayIndex) {
 
@@ -310,7 +351,6 @@ function writeUserData(taskClass, taskText, dayIndex) {
 
     //write new task data
     firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex].toString("dddd, MMMM dd, yyyy")).set(dayTaskJsonArray[dayIndex]);
-
 }
 
 

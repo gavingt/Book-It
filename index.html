@@ -56,6 +56,24 @@
             bottom: 30px; /* 30px from the bottom */
         }
 
+        #snackbar_text {
+            padding-right: 15px;
+        }
+
+        #snackbar_undo_button {
+            color: red;
+            background-color: #333;
+            border: none;
+            outline: none;
+        }
+
+        #snackbar_hide_button {
+            color: #c4c4c4;
+            background-color: #333;
+            border: none;
+            outline: none;
+        }
+
     </style>
 </head>
 <body>
@@ -87,9 +105,9 @@
 
 <!-- snackbar -->
 <div id="snackbar">
-    <span>Task completed</span>
-    <button id="snackbar_undo_button">UNDO</button>
-    <button id="snackbar_hide_button">HIDE</button>
+    <span id="snackbar_text">Task completed</span>
+    <button id="snackbar_undo_button" class="snackbar_buttons">UNDO</button>
+    <button id="snackbar_hide_button" class="snackbar_buttons">HIDE</button>
 </div>
 
 <!---------------------------------------->

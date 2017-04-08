@@ -1,5 +1,8 @@
 //TODO: don't allow blank tasks to be entered (don't add it as an addedTaskDiv and show addTaskButton)
-//TODO: 
+//TODO: move tasks from past days into "past due" section
+//TODO: progress spinner for fetching data?
+//TODO: separate sections in each dayDiv for different classes
+//TODO: make snackbar look good
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization

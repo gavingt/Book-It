@@ -2,7 +2,11 @@
 //TODO: move tasks from past days into "past due" section
 //TODO: progress spinner for fetching data?
 //TODO: separate sections in each dayDiv for different classes
-//TODO: make snackbar look good
+//TODO: hide newTaskDivs and editTaskDivs and show addTaskButtons when you press Previous or Next Week
+//TODO: make an "undated tasks" section
+//TODO: remove elements from the DOM rather than hiding them (memory leaks!)
+//TODO: if a day has a task entered and then you click addTaskButton, then switch weeks and switch back, addTaskButton is above task
+
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -15,7 +19,7 @@ var timeoutId;
 var snackbar = document.getElementById("snackbar"); //get a reference to the snackbar div
 
 
-// Initialize Firebase. This code should stay at the top of the <script> section
+// Initialize Firebase. This code should stay at the top of main.js
 var config = {
     apiKey: "AIzaSyAEPEyYJBvmqqwu4XSFitMUENdskmKp0fc",
     authDomain: "classtask-162513.firebaseapp.com",
@@ -56,10 +60,11 @@ function createDayDivs () {
             //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
 
             var dayDiv = document.createElement("div");
-            dayDiv.className = "day_div";
+            dayDiv.className = "day_div"; //Gives every dayDiv a class name so they can be referenced later in the JavaScript code
             var dayLabel = document.createElement("span");
             dayDiv.appendChild(dayLabel);
             var addTaskButton = document.createElement("button");
+            addTaskButton.className = "add_task_button"; //Gives every addTaskButton a class name so they can be referenced later in the JavaScript code
             addTaskButton.style.display = "block";
             addTaskButton.textContent = "Add task";
             dayDiv.appendChild(addTaskButton);
@@ -67,6 +72,7 @@ function createDayDivs () {
             addTaskButton.addEventListener("click", function () {
                 addTaskButton.style.display = "none";  //Makes addTaskButton that was clicked disappear.
                 var newTaskDiv = document.createElement("div"); //Creates a div to house the UI for adding a new task. This holds a textbox, Submit button, and Cancel button.
+                newTaskDiv.className = "new_task_div";  //Gives every newTaskDiv a class name so they can be referenced later in the JavaScript code
                 dayDiv.appendChild(newTaskDiv);
 
                 var newTaskInput = document.createElement("input");
@@ -127,7 +133,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
         removeUserData(dayIndex, completedTaskIndex);
 
 
-        //I have to clone the snackbar to remove its event listeners so that the UNDO button doesn't undo multiple completed tasks
+        //We have to clone the snackbar to remove its event listeners so that the UNDO button doesn't undo multiple completed tasks
         var newSnackbar = snackbar.cloneNode(true);
         snackbar.parentNode.replaceChild(newSnackbar, snackbar);
         snackbar = newSnackbar;
@@ -160,49 +166,53 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
 
     //task editing is handled in the eventListener below
     addedTaskTextSpan.addEventListener("click", function() {
+
+        resetDomElements (true, false, true);
+
         addedTaskDiv.style.display = "none";
         addTaskButton.style.display = "none";
 
-        var newTaskDiv = document.createElement("div"); //Creates a div to house the UI for adding a new task. This holds a textbox, Submit button, and Cancel button.
+        var editTaskDiv = document.createElement("div"); //Creates a div to house the UI for editing a task. This holds a textbox, Save button, and Cancel button.
+        editTaskDiv.className = "edit_task_div";  //Gives every editTaskDiv a class name so they can be referenced later in the JavaScript code
 
-        var newTaskInput = document.createElement("input");
-        newTaskInput.type = "text";
-        newTaskInput.placeholder = "task";
-        newTaskInput.value = addedTaskTextSpan.textContent; //sets text of the newTaskInput to be equal to the added text of the addedTaskTextSpan that was clicked on
-        newTaskInput.addEventListener("keyup", function (event) {  //this eventListener simulates pressing the newTaskSaveButton after you type into newTaskInput and press Enter.
+        var editTaskInput = document.createElement("input");
+        editTaskInput.type = "text";
+        editTaskInput.placeholder = "task";
+        editTaskInput.value = addedTaskTextSpan.textContent; //sets text of the editTaskInput to be equal to the added text of the addedTaskTextSpan that was clicked on
+        editTaskInput.addEventListener("keyup", function (event) {  //this eventListener simulates pressing the editTaskSaveButton after you type into editTaskInput and press Enter.
             event.preventDefault();
             if (event.keyCode === 13) {
-                newTaskSaveButton.click();
+                editTaskSaveButton.click();
             }
         });
-        newTaskDiv.appendChild(newTaskInput);
+        editTaskDiv.appendChild(editTaskInput);
 
-        var newTaskSaveButton = document.createElement("button");
-        newTaskSaveButton.textContent = "Save task";
-        newTaskDiv.appendChild(newTaskSaveButton);
-        newTaskSaveButton.addEventListener("click", function () {
+        var editTaskSaveButton = document.createElement("button");
+        editTaskSaveButton.textContent = "Save";
+        editTaskDiv.appendChild(editTaskSaveButton);
+        editTaskSaveButton.addEventListener("click", function () {
 
-            addedTaskTextSpan.textContent = newTaskInput.value; //set the addedTaskTextSpan's text equal to the newly edited text value from newTaskInput
+            addedTaskTextSpan.textContent = editTaskInput.value; //set the addedTaskTextSpan's text equal to the newly edited text value from newTaskInput
             addedTaskDiv.style.display = "block"; //make the addedTaskDiv visible again after we hid it earlier
-            newTaskDiv.style.display = "none";
+            editTaskDiv.style.display = "none";
             addTaskButton.style.display = "block";
 
             editUserData("math", addedTaskTextSpan.textContent, dayIndex, addedTaskDivIndex);
 
         });
 
-        var newTaskCancelButton = document.createElement("button");
-        newTaskCancelButton.textContent = "Cancel";
-        newTaskDiv.appendChild(newTaskCancelButton);
-        newTaskCancelButton.addEventListener("click", function () {
+        var editTaskCancelButton = document.createElement("button");
+        editTaskCancelButton.textContent = "Cancel";
+        editTaskDiv.appendChild(editTaskCancelButton);
+        editTaskCancelButton.addEventListener("click", function () {
             dayDivArray[dayIndex].appendChild(addTaskButton);      //Moves addTaskButton back to the bottom of dayDiv
             addTaskButton.style.display = "block";  //Makes addTaskButton reappear
             addedTaskDiv.style.display = "block";
-            newTaskDiv.style.display = "none";      //Makes newTaskDiv disappear
+            editTaskDiv.style.display = "none";      //Makes editTaskDiv disappear
         });
 
-        dayDivArray[dayIndex].insertBefore(newTaskDiv, addedTaskDiv);
-        newTaskInput.focus();
+        dayDivArray[dayIndex].insertBefore(editTaskDiv, addedTaskDiv);
+        editTaskInput.focus();
 
     });
 
@@ -217,6 +227,35 @@ function initialize2dArrays() {
         dayTaskJsonArray[k] = [];
     }
 }
+
+//Resets the three DOM elements to their original states. The three input parameters are Boolean values, so if you pass in true for one it will reset all of that class's elements.
+function resetDomElements(resetNewTaskDivs, resetEditTaskDivs, resetAddTaskButtons) {
+
+    if (resetNewTaskDivs) {
+        var newTaskDivsToHide = document.getElementsByClassName("new_task_div");
+        for (i = 0; i < newTaskDivsToHide.length; i++) {
+            newTaskDivsToHide[i].style.display = "none";
+        }
+    }
+
+    if (resetEditTaskDivs) {
+        var editTaskDivsToShow = document.getElementsByClassName("edit_task_div");
+        for (i = 0; i < editTaskDivsToShow.length; i++) {
+            editTaskDivsToShow[i].style.display = "none";
+        }
+    }
+
+    if (resetAddTaskButtons) {
+        var addTaskButtonsToShow = document.getElementsByClassName("add_task_button");
+        for (i = 0; i < addTaskButtonsToShow.length; i++) {
+            addTaskButtonsToShow[i].style.display = "block";
+        }
+    }
+}
+
+document.getElementById("test").addEventListener("click", function() {
+   console.log(dayDivArray[3]);
+});
 
 
 /****************************************************/
@@ -257,6 +296,10 @@ function setDaysOfWeek() {
 
 //handles the user pressing the "Previous week" button
 document.getElementById("previous_week").addEventListener("click", function () {
+
+    snackbar.style.visibility = "hidden";
+    resetDomElements(true, true, true);
+
     for (i=0; i<currentlyVisibleWeekDates.length; i++) {
         //subtract 7 days from each element of the currentlyVisibleWeekDates[] array
         currentlyVisibleWeekDates[i] = currentlyVisibleWeekDates[i].add(-7).days();
@@ -274,6 +317,10 @@ document.getElementById("previous_week").addEventListener("click", function () {
 
 //handles the user pressing the "Next week" button
 document.getElementById("next_week").addEventListener("click", function () {
+
+    snackbar.style.visibility = "hidden";
+    resetDomElements(true, true, true);
+
     for (i=0; i<currentlyVisibleWeekDates.length; i++) {
         //add 7 days to each element of the currentlyVisibleWeekDates[] array
         currentlyVisibleWeekDates[i] = currentlyVisibleWeekDates[i].add(7).days();

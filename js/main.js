@@ -9,11 +9,7 @@ var dayDivArray = new Array(7); //dayDivArray[] will hold the 7 dayDiv objects. 
 var addedTaskDivArray = new Array(7); //This will be an array of arrays that holds the addedTaskDiv objects for each day of the currently visible week
 var dayTaskJsonArray = new Array(7); //This will be an array of arrays that holds the Json data for the tasks of each day of the currently visible week
 
-//Turns tasDivArray and dayTaskJsonArray into 2D arrays (each of their elements stores its own array)
-for (var k=0; k<7; k++) {
-    addedTaskDivArray[k] = [];
-    dayTaskJsonArray[k] = [];
-}
+
 
 // Initialize Firebase. This code should stay at the top of the <script> section
 var config = {
@@ -25,7 +21,8 @@ var config = {
 };
 firebase.initializeApp(config);
 
-createDayDivs(); //calls createDayDivs() function when user first loads page
+initialize2dArrays(); //calls initialize2dArrays() function when user first loads page
+createDayDivs();  //calls createDayDivs() function when user first loads page
 
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
@@ -81,7 +78,7 @@ function createDayDivs () {
                 newTaskInput.focus();
 
                 var newTaskSaveButton = document.createElement("button");
-                newTaskSaveButton.textContent = "Save task";
+                newTaskSaveButton.textContent = "Add task";
                 newTaskDiv.appendChild(newTaskSaveButton);
                 newTaskSaveButton.addEventListener("click", function () {
 
@@ -112,10 +109,8 @@ function createDayDivs () {
 function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
 
 
-
-    //addTaskButton being successfully passed in to this point of code
-
     var addedTaskDiv = document.createElement("div"); //Creates a <div> element to house a newly added task
+    addedTaskDiv.className = "added_task_div";
 
     var markTaskFinishedImage = document.createElement("img");
     markTaskFinishedImage.src = "img/checkbox.png";
@@ -131,14 +126,52 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
     addedTaskTextSpan.style.padding = "5px 10px 5px 10px";
     addedTaskDiv.appendChild(addedTaskTextSpan);
 
-    var addedTaskIndex = addedTaskDivArray[dayIndex].push(addedTaskDiv);
+    var addedTaskDivIndex = addedTaskDivArray[dayIndex].push(addedTaskDiv) - 1; //push returns new length of the array, so we subtract 1 to get the index of the new addedTaskDiv
+
+    //task editing is handled in the eventListener below
     addedTaskTextSpan.addEventListener("click", function() {
         addedTaskDiv.style.display = "none";
+        addTaskButton.style.display = "none";
 
-        //TODO: switch to ECMAScript 6 to avoid this problem?
-        //TODO: it's hard to pass objects in here because of all the asynch functions
-        //TODO: hide addedTaskDiv associated with addedTaskSpan that was clicked on, and also hide addTaskButton
-        //TODO: in its place, put a newTaskInput box, with Save and Cancel buttons (create a function like createAddedTaskDiv so that code isn't repeated)
+        var newTaskDiv = document.createElement("div"); //Creates a div to house the UI for adding a new task. This holds a textbox, Submit button, and Cancel button.
+
+        var newTaskInput = document.createElement("input");
+        newTaskInput.type = "text";
+        newTaskInput.placeholder = "task";
+        newTaskInput.value = addedTaskTextSpan.textContent; //sets text of the newTaskInput to be equal to the added text of the addedTaskTextSpan that was clicked on
+        newTaskInput.addEventListener("keyup", function (event) {  //this eventListener simulates pressing the newTaskSaveButton after you type into newTaskInput and press Enter.
+            event.preventDefault();
+            if (event.keyCode === 13) {
+                newTaskSaveButton.click();
+            }
+        });
+        newTaskDiv.appendChild(newTaskInput);
+        newTaskInput.focus();
+
+        var newTaskSaveButton = document.createElement("button");
+        newTaskSaveButton.textContent = "Save task";
+        newTaskDiv.appendChild(newTaskSaveButton);
+        newTaskSaveButton.addEventListener("click", function () {
+
+            addedTaskTextSpan.textContent = newTaskInput.value; //set the addedTaskTextSpan's text equal to the newly edited text value from newTaskInput
+            addedTaskDiv.style.display = "block"; //make the addedTaskDiv visible again after we hid it earlier
+            newTaskDiv.style.display = "none";
+            addTaskButton.style.display = "block";
+
+            editUserData("math", addedTaskTextSpan.textContent, dayIndex, addedTaskDivIndex);
+
+        });
+
+        var newTaskCancelButton = document.createElement("button");
+        newTaskCancelButton.textContent = "Cancel";
+        newTaskDiv.appendChild(newTaskCancelButton);
+        newTaskCancelButton.addEventListener("click", function () {
+            dayDivArray[dayIndex].appendChild(addTaskButton);      //Moves addTaskButton back to the bottom of dayDiv
+            addTaskButton.style.display = "block";  //Makes addTaskButton reappear
+            newTaskDiv.style.display = "none";      //Makes newTaskDiv disappear
+        });
+
+        dayDivArray[dayIndex].insertBefore(newTaskDiv, addedTaskDiv);
 
     });
 
@@ -146,6 +179,13 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
 }
 
 
+//Turns tasDivArray and dayTaskJsonArray into 2D arrays (each of their elements stores its own array)
+function initialize2dArrays() {
+    for (var k = 0; k < 7; k++) {
+        addedTaskDivArray[k] = [];
+        dayTaskJsonArray[k] = [];
+    }
+}
 
 
 /****************************************************/
@@ -189,10 +229,15 @@ document.getElementById("previous_week").addEventListener("click", function () {
     for (i=0; i<currentlyVisibleWeekDates.length; i++) {
         //subtract 7 days from each element of the currentlyVisibleWeekDates[] array
         currentlyVisibleWeekDates[i] = currentlyVisibleWeekDates[i].add(-7).days();
-        //TODO: remove existing taskDivArrays before reading
-        readUserData();
+
+        initialize2dArrays(); //clear 2d arrays before populating them with elements from the new week
+        var nodesToRemove = document.querySelectorAll(".added_task_div"); //find all addedTaskDiv elements and save them in nodesToRemove[] array
+        for (var j=0; j<nodesToRemove.length; j++) {    //iterate through nodesToRemove[] array and remove each element
+            nodesToRemove[j].parentNode.removeChild(nodesToRemove[j]);
+        }
     }
 
+    readUserData();  //read user data for new week
     setDaysOfWeek(currentlyVisibleWeekDates);
 });
 
@@ -201,9 +246,15 @@ document.getElementById("next_week").addEventListener("click", function () {
     for (i=0; i<currentlyVisibleWeekDates.length; i++) {
         //add 7 days to each element of the currentlyVisibleWeekDates[] array
         currentlyVisibleWeekDates[i] = currentlyVisibleWeekDates[i].add(7).days();
-        //TODO: remove existing taskDivArrays before reading
-        readUserData();
+
+        initialize2dArrays(); //clear 2d arrays before populating them with elements from the new week
+        var nodesToRemove = document.querySelectorAll(".added_task_div"); //find all addedTaskDiv elements and save them in nodesToRemove[] array
+        for (var j=0; j<nodesToRemove.length; j++) {    //iterate through nodesToRemove[] array and remove each element
+            nodesToRemove[j].parentNode.removeChild(nodesToRemove[j]);
+        }
+
     }
+    readUserData();  //read user data for new week
     setDaysOfWeek(currentlyVisibleWeekDates);
 });
 
@@ -218,6 +269,22 @@ document.getElementById("next_week").addEventListener("click", function () {
 /**********START FIREBASE CODE ***********/
 /*****************************************/
 
+//edit existing task in database
+function editUserData(taskClass, taskText, dayIndex, taskIndex) {
+
+    dayTaskJsonArray[dayIndex][taskIndex] = {
+        taskClass: taskClass,
+        taskText: taskText
+    };
+
+    var userId = firebase.auth().currentUser.uid;
+
+    //write edited task data
+    firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex].toString("dddd, MMMM dd, yyyy") + "/" + taskIndex).set(dayTaskJsonArray[dayIndex][taskIndex]);
+
+}
+
+
 //write new task to database
 function writeUserData(taskClass, taskText, dayIndex) {
 
@@ -228,7 +295,7 @@ function writeUserData(taskClass, taskText, dayIndex) {
 
     var userId = firebase.auth().currentUser.uid;
 
-    //write task data
+    //write new task data
     firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex].toString("dddd, MMMM dd, yyyy")).set(dayTaskJsonArray[dayIndex]);
 
 }

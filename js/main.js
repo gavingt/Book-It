@@ -49,7 +49,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 function createDayDivs () {
     for (var i = 0; i < 7; i++) {
         (function (i) {   //Solves closure problem described here: http://stackoverflow.com/questions/13343340/calling-an-asynchronous-function-within-a-for-loop-in-javascript.
-            //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
+                          //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
 
             var dayDiv = document.createElement("div");
             dayDiv.className = "day_div";
@@ -109,14 +109,27 @@ function createDayDivs () {
 function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
 
 
-    var addedTaskDiv = document.createElement("div"); //Creates a <div> element to house a newly added task
+    var addedTaskDiv = document.createElement("div"); //creates a <div> element to house a newly added task
     addedTaskDiv.className = "added_task_div";
 
     var markTaskFinishedImage = document.createElement("img");
     markTaskFinishedImage.src = "img/checkbox.png";
     markTaskFinishedImage.addEventListener("click", function() {
         addedTaskDiv.style.display = "none";
+
         //TODO: write changes to Firebase here (need a new property indicating task is hidden?)
+
+        var snackbar = document.getElementById("snackbar"); //get a reference to the snackbar div
+        snackbar.className = "show";  //add the "show" class to snackbar div
+
+        document.getElementById("snackbar_undo_button").addEventListener("click", function() {
+           alert("hey");
+        });
+
+        document.getElementById("snackbar_hide_button").addEventListener("click", function() {
+            snackbar.className = snackbar.className.replace("show", "hide"); //change class from 'show' to 'hide', which triggers fadeout animation
+            setTimeout(function(){ snackbar.className = snackbar.className.replace("hide", ""); }, 500); //hides snackbar after waiting 500 ms for fadeout animation to run
+        });
 
     });
     addedTaskDiv.appendChild(markTaskFinishedImage);
@@ -299,6 +312,7 @@ function writeUserData(taskClass, taskText, dayIndex) {
     firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex].toString("dddd, MMMM dd, yyyy")).set(dayTaskJsonArray[dayIndex]);
 
 }
+
 
 //Reads data from Firebase. This only gets called at the initial page load or when the user switches between weeks.
 function readUserData() {

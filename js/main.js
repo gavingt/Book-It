@@ -3,6 +3,7 @@
 //TODO: progress spinner for fetching data?
 //TODO: separate sections in each dayDiv for different classes
 //TODO: make an "undated tasks" section
+//TODO: should I store dates in Firebase in their full form? That way I know which days are past and should be put into "past due" section
 
 
 
@@ -14,7 +15,7 @@ var addedTaskDivArray = new Array(7); //This will be an array of arrays that hol
 var dayTaskJsonArray = new Array(7); //This will be an array of arrays that holds the JSON data for the tasks of each day of the currently visible week
 var snackbarTimeoutId;  //stores the timeout ID associated with the timeout function used for the snackbar
 var snackbar = document.getElementById("snackbar"); //gets a reference to the snackbar div
-var todaysDate; //stores today's date
+var todaysDateIndex; //Stores a number from 0-6, corresponding to the 7 days Sunday through Saturday, indicating which day of the week is today. For instance, if today is Sunday it equals 0, and if it's Tuesday it equals 2.
 var currentlyVisibleWeekIndex = 0; //this tracks which week is currently being viewed. It starts at 0 and increments if user hits Next week button, and decrements when user hits Previous week button
 var initialReadComplete = false; //boolean value that stores whether or not we've done the initial reading of data at page load (or at login, if not logged in already at page load)
 
@@ -36,6 +37,7 @@ image.src = "img/checkbox.png";
 initialize2dArrays(); //calls initialize2dArrays() function when user first loads page
 createDayDivs();  //creates a dayDiv for each day when user first loads page
 initializeDates(); //gets the dates for the current week when user first loads page
+hideOrShowDayDivs();
 
 
 firebase.auth().onAuthStateChanged(function(user) {
@@ -58,7 +60,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 
 
 /****************************************************/
-/*********START DYNAMIC DIV GENERATION CODE**********/
+/************START DOM MANIPULATION CODE*************/
 /****************************************************/
 
 
@@ -235,6 +237,18 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
     return addedTaskDiv;
 }
 
+//Hides or shows dayDivs based on the week that's visible. If it's the current week, we hide the dayDivs for days that have already passed.
+function hideOrShowDayDivs () {
+    todaysDateIndex = 2;
+    if (currentlyVisibleWeekIndex === 0) {
+        for(var i=0; i<todaysDateIndex; i++) {
+            dayDivArray[i].style.display = "none";
+        }
+    }
+}
+
+
+
 
 //Turns taskDivArray and dayTaskJsonArray into 2D arrays (each of their elements stores its own array)
 function initialize2dArrays() {
@@ -273,7 +287,7 @@ function resetDomElements() {
 
 
 /****************************************************/
-/**********END DYNAMIC DIV GENERATION CODE***********/
+/*************END DOM MANIPULATION CODE**************/
 /****************************************************/
 
 
@@ -297,7 +311,9 @@ function initializeDates() {
         Date.parse("Saturday")
     ];
 
-    todaysDate = Date.parse("today");
+    todaysDateIndex = Date.getDayNumberFromName(Date.parse("today").toString().split(" ", 1)[0]);
+
+
 
     setDaysOfWeek(currentlyVisibleWeekDates);
 }

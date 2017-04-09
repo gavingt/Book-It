@@ -11,11 +11,12 @@ var googleProvider = new firebase.auth.GoogleAuthProvider(); //this is for Googl
 var currentlyVisibleWeekDates = new Array(7); //stores an array of the dates for the currently visible week
 var dayDivArray = new Array(7); //dayDivArray[] will hold the 7 dayDiv objects. Each dayDiv is a div that houses the tasks for a given weekday. So there are 7 dayDivs corresponding to 7 days of the week.
 var addedTaskDivArray = new Array(7); //This will be an array of arrays that holds the addedTaskDiv objects for each day of the currently visible week
-var dayTaskJsonArray = new Array(7); //This will be an array of arrays that holds the Json data for the tasks of each day of the currently visible week
-var timeoutId;
+var dayTaskJsonArray = new Array(7); //This will be an array of arrays that holds the JSON data for the tasks of each day of the currently visible week
+var snackbarTimeoutId;  //stores the timeout ID associated with the timeout function used for the snackbar.
 var snackbar = document.getElementById("snackbar"); //get a reference to the snackbar div
 var todaysDate; //stores today's date
 var currentlyVisibleWeekIndex = 0; //this tracks which week is currently being viewed. It starts at 0 and increments if user hits Next week button, and decrements when user hits Previous week button
+var initialReadComplete = false;
 
 
 // Initialize Firebase. This code should stay at the top of main.js
@@ -33,13 +34,17 @@ var image = new Image();
 image.src = "img/checkbox.png";
 
 initialize2dArrays(); //calls initialize2dArrays() function when user first loads page
-createDayDivs();  //calls createDayDivs() function when user first loads page
+createDayDivs();  //creates a dayDiv for each day when user first loads page
+initializeDates(); //gets the dates for the current week when user first loads page
 
 
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
         // User is signed in
-        readUserData();
+        if (initialReadComplete === false) {  //Doing this check ensures that Firebase's hourly token refreshes don't cause re-reading of data (and thus duplicate tasks, since readUserData() generates addedTaskDiv elements).
+            readUserData(); //as soon as user is signed in, read existing data from Firebase and populate addedTaskDivs with tasks
+            initialReadComplete = true;
+        }
         document.getElementById("sign_in_google_button").style.display = "none";
         document.getElementById("sign_in_facebook_button").style.display = "none";
         document.getElementById("sign_out_button").style.display = "inline";
@@ -123,7 +128,9 @@ function createDayDivs () {
 }
 
 
-
+//Creates addedTaskDiv elements. This function gets called in two places:
+                                                         // 1) in createDayDivs(), to generate an addedTaskDiv when the user adds a new task
+                                                         // 2) in readUserData(), to generate addedTaskDivs from existing tasks stored in Firebase
 function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
 
     var addedTaskDiv = document.createElement("div"); //creates a <div> element to house a newly added task
@@ -144,10 +151,9 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
         var newSnackbar = snackbar.cloneNode(true);
         snackbar.parentNode.replaceChild(newSnackbar, snackbar);
         snackbar = newSnackbar;
-
         snackbar.style.visibility = "visible";
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(function(){ snackbar.style.visibility = "hidden"; }, 10500); //hides snackbar after waiting 500 ms for fadeout animation to run
+        clearTimeout(snackbarTimeoutId);
+        snackbarTimeoutId = setTimeout(function(){ snackbar.style.visibility = "hidden"; }, 10500); //hides snackbar after waiting 500 ms for fadeout animation to run
 
         document.getElementById("snackbar_undo_button").addEventListener("click", function() {
 
@@ -227,7 +233,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
 }
 
 
-//Turns tasDivArray and dayTaskJsonArray into 2D arrays (each of their elements stores its own array)
+//Turns taskDivArray and dayTaskJsonArray into 2D arrays (each of their elements stores its own array)
 function initialize2dArrays() {
     for (var k = 0; k < 7; k++) {
         addedTaskDivArray[k] = [];
@@ -268,12 +274,12 @@ function resetDomElements() {
 /****************************************************/
 
 
-/*****************************************/
-/*********START DATE HANDLING CODE********/
-/*****************************************/
 
 
-initializeDates();
+/****************************************************/
+/**************START DATE HANDLING CODE**************/
+/****************************************************/
+
 
 //When user first loads the page, this sets the currentlyVisibleWeekDates[] array to the current week and then sets the dates to the page elements
 function initializeDates() {
@@ -350,16 +356,16 @@ document.getElementById("next_week_button").addEventListener("click", function (
     resetDomElements();
 });
 
-/*****************************************/
-/**********END DATE HANDLING CODE*********/
-/*****************************************/
+/****************************************************/
+/***************END DATE HANDLING CODE***************/
+/****************************************************/
 
 
 
 
-/*****************************************/
-/**********START FIREBASE CODE ***********/
-/*****************************************/
+/****************************************************/
+/*****************START FIREBASE CODE ***************/
+/****************************************************/
 
 
 //edit existing task in database
@@ -502,6 +508,6 @@ document.getElementById("profile_info_button").addEventListener("click", functio
 });
 
 
-/*****************************************/
-/**********END FIREBASE CODE *************/
-/*****************************************/
+/******************************************************/
+/*****************END FIREBASE CODE********************/
+/******************************************************/

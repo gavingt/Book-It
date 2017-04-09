@@ -239,7 +239,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
 
 //Hides or shows dayDivs based on the week that's visible. If it's the current week, we hide the dayDivs for days that have already passed.
 function hideOrShowDayDivs () {
-    todaysDateIndex = 2;
+    todaysDateIndex = 6;
     if (currentlyVisibleWeekIndex === 0) {
         for(var i=0; i<todaysDateIndex; i++) {
             dayDivArray[i].style.display = "none";
@@ -301,6 +301,8 @@ function resetDomElements() {
 //When user first loads the page, this sets the currentlyVisibleWeekDates[] array to the current week and then sets the dates to the page elements
 function initializeDates() {
 
+    todaysDateIndex = Date.getDayNumberFromName(Date.parse("today").toString().split(" ", 1)[0]);
+
     currentlyVisibleWeekDates = [
         Date.parse("Sunday"),
         Date.parse("Monday"),
@@ -311,8 +313,10 @@ function initializeDates() {
         Date.parse("Saturday")
     ];
 
-    todaysDateIndex = Date.getDayNumberFromName(Date.parse("today").toString().split(" ", 1)[0]);
 
+
+
+    alert(Date.parse("Sunday"));
 
 
     setDaysOfWeek(currentlyVisibleWeekDates);

@@ -75,7 +75,7 @@ function createDayDivs () {
 
             addTaskButton.addEventListener("click", function () {
 
-                resetDomElements(true, true, true);
+                resetDomElements();
                 addTaskButton.style.display = "none";  //Makes addTaskButton that was clicked disappear.
                 var newTaskDiv = document.createElement("div"); //Creates a div to house the UI for adding a new task. This holds a textbox, Submit button, and Cancel button.
                 newTaskDiv.className = "new_task_div";  //Gives every newTaskDiv a class name so they can be referenced later in the JavaScript code
@@ -174,7 +174,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
     //task editing is handled in the eventListener below
     addedTaskTextSpan.addEventListener("click", function() {
 
-        resetDomElements (true, false, true);
+        resetDomElements ();
 
         addedTaskDiv.style.display = "none";
         addTaskButton.style.display = "none";
@@ -235,31 +235,31 @@ function initialize2dArrays() {
     }
 }
 
-//Resets the three DOM elements to their original states. The three input parameters are Boolean values, so if you pass in true for one it will reset all of that class's elements.
-function resetDomElements(resetNewTaskDivs, resetEditTaskDivs, resetAddTaskButtons) {
+//Resets various DOM elements to their original states.
+function resetDomElements() {
 
-    if (resetNewTaskDivs) {
+    var addedTaskDivsToShow = document.getElementsByClassName("added_task_div");
+    for (i = 0; i < addedTaskDivsToShow.length; i++) {
+        dayDivArray[i].appendChild(addedTaskDivsToShow[i]);
+        addedTaskDivsToShow[i].style.display = "block";
+    }
+
         var newTaskDivsToHide = document.getElementsByClassName("new_task_div");
         for (i = 0; i < newTaskDivsToHide.length; i++) {
-            //newTaskDivsToHide[i].style.display = "none";
             newTaskDivsToHide[i].parentNode.removeChild(newTaskDivsToHide[i]);
         }
-    }
 
-    if (resetEditTaskDivs) {
-        var editTaskDivsToShow = document.getElementsByClassName("edit_task_div");
-        for (i = 0; i < editTaskDivsToShow.length; i++) {
-            editTaskDivsToShow[i].style.display = "none";
+        var editTaskDivsToHide = document.getElementsByClassName("edit_task_div");
+        for (i = 0; i < editTaskDivsToHide.length; i++) {
+            editTaskDivsToHide[i].parentNode.removeChild(editTaskDivsToHide[i]);
         }
-    }
 
-    if (resetAddTaskButtons) {
         var addTaskButtonsToShow = document.getElementsByClassName("add_task_button");
         for (i = 0; i < addTaskButtonsToShow.length; i++) {
             dayDivArray[i].appendChild(addTaskButtonsToShow[i]);
             addTaskButtonsToShow[i].style.display = "block";
         }
-    }
+
 }
 
 
@@ -290,8 +290,6 @@ function initializeDates() {
 
     todaysDate = Date.parse("today");
 
-    //TODO: at page load, find which element of currentlyVisibleWeekDates = todaysDate and hide all dayDivs lower than that index
-
     setDaysOfWeek(currentlyVisibleWeekDates);
 }
 
@@ -318,14 +316,14 @@ document.getElementById("previous_week_button").addEventListener("click", functi
 
         initialize2dArrays(); //clear 2d arrays before populating them with elements from the new week
         var nodesToRemove = document.querySelectorAll(".added_task_div"); //find all addedTaskDiv elements and save them in nodesToRemove[] array
-        for (var j=0; j<nodesToRemove.length; j++) {    //iterate through nodesToRemove[] array and remove each element
+        for (var j=0; j<nodesToRemove.length; j++) {   //iterate through nodesToRemove[] array and remove each element
             nodesToRemove[j].parentNode.removeChild(nodesToRemove[j]);
         }
     }
 
     readUserData();  //read user data for new week
     setDaysOfWeek(currentlyVisibleWeekDates);
-    resetDomElements(true, true, true);
+    resetDomElements();
 });
 
 //handles the user pressing the "Next week" button
@@ -349,7 +347,7 @@ document.getElementById("next_week_button").addEventListener("click", function (
     }
     readUserData();  //read user data for new week
     setDaysOfWeek(currentlyVisibleWeekDates);
-    resetDomElements(true, true, true);
+    resetDomElements();
 });
 
 /*****************************************/

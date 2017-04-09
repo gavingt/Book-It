@@ -1,9 +1,10 @@
-//TODO: don't allow blank tasks to be entered (don't add it as an addedTaskDiv and show addTaskButton)
+//TODO: snackbar not centered on mobile
 //TODO: move tasks from past days into "past due" section
 //TODO: progress spinner for fetching data?
 //TODO: separate sections in each dayDiv for different classes
-//TODO: hide newTaskDivs and editTaskDivs and show addTaskButtons when you press Previous or Next Week
 //TODO: make an "undated tasks" section
+//TODO: disable Previous week button when you're on the current week (those tasks go into Past Due section)
+
 //TODO: remove elements from the DOM rather than hiding them (memory leaks!)
 
 
@@ -16,6 +17,8 @@ var addedTaskDivArray = new Array(7); //This will be an array of arrays that hol
 var dayTaskJsonArray = new Array(7); //This will be an array of arrays that holds the Json data for the tasks of each day of the currently visible week
 var timeoutId;
 var snackbar = document.getElementById("snackbar"); //get a reference to the snackbar div
+var todaysDate; //stores today's date
+var currentlyVisibleWeekIndex = 0; //this tracks which week is currently being viewed. It starts at 0 and increments if user hits Next week button, and decrements when user hits Previous week button
 
 
 // Initialize Firebase. This code should stay at the top of main.js
@@ -30,6 +33,7 @@ firebase.initializeApp(config);
 
 initialize2dArrays(); //calls initialize2dArrays() function when user first loads page
 createDayDivs();  //calls createDayDivs() function when user first loads page
+
 
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
@@ -69,6 +73,8 @@ function createDayDivs () {
             dayDiv.appendChild(addTaskButton);
 
             addTaskButton.addEventListener("click", function () {
+
+                resetDomElements(true, true, true);
                 addTaskButton.style.display = "none";  //Makes addTaskButton that was clicked disappear.
                 var newTaskDiv = document.createElement("div"); //Creates a div to house the UI for adding a new task. This holds a textbox, Submit button, and Cancel button.
                 newTaskDiv.className = "new_task_div";  //Gives every newTaskDiv a class name so they can be referenced later in the JavaScript code
@@ -90,12 +96,12 @@ function createDayDivs () {
                 newTaskSaveButton.textContent = "Add task";
                 newTaskDiv.appendChild(newTaskSaveButton);
                 newTaskSaveButton.addEventListener("click", function () {
-
-                    var addedTaskDiv = createAddedTaskDiv(newTaskInput.value, i, addTaskButton); //call function createAddedTaskDiv and pass in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
-
-                    dayDiv.insertBefore(addedTaskDiv, newTaskDiv);  //Inserts addedTask <p> element before the newTaskDiv <div> element. This ensures tasks are added to the page in the order the user enters them.
-                    writeUserData("Math", newTaskInput.value, i);
-                    newTaskInput.value = "";  //Removes existing text from newTaskInput textbox
+                    if (newTaskInput.value !== "") {  //don't save task if text field is left blank
+                        var addedTaskDiv = createAddedTaskDiv(newTaskInput.value, i, addTaskButton); //call function createAddedTaskDiv and pass in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
+                        dayDiv.insertBefore(addedTaskDiv, newTaskDiv);  //Inserts addedTask <p> element before the newTaskDiv <div> element. This ensures tasks are added to the page in the order the user enters them.
+                        writeUserData("Math", newTaskInput.value, i);
+                        newTaskInput.value = "";  //Removes existing text from newTaskInput textbox
+                    }
                 });
 
                 var newTaskCancelButton = document.createElement("button");
@@ -274,14 +280,18 @@ initializeDates();
 function initializeDates() {
 
     currentlyVisibleWeekDates = [
+        Date.parse("Sunday"),
         Date.parse("Monday"),
         Date.parse("Tuesday"),
         Date.parse("Wednesday"),
         Date.parse("Thursday"),
         Date.parse("Friday"),
-        Date.parse("Saturday"),
-        Date.parse("Sunday")
+        Date.parse("Saturday")
     ];
+
+    todaysDate = Date.parse("today");
+
+    //TODO: at page load, find which element of currentlyVisibleWeekDates = todaysDate and hide all dayDivs lower than that index
 
     setDaysOfWeek(currentlyVisibleWeekDates);
 }
@@ -295,8 +305,12 @@ function setDaysOfWeek() {
 }
 
 //handles the user pressing the "Previous week" button
-document.getElementById("previous_week").addEventListener("click", function () {
+document.getElementById("previous_week_button").addEventListener("click", function () {
 
+    currentlyVisibleWeekIndex--; //decrement currentlyVisibleWeekIndex
+    if (currentlyVisibleWeekIndex === 0) {
+        document.getElementById("previous_week_button").disabled = true;  //If user is viewing the current week, disable Previous week button.
+    }
     snackbar.style.visibility = "hidden";
 
     for (i=0; i<currentlyVisibleWeekDates.length; i++) {
@@ -312,12 +326,14 @@ document.getElementById("previous_week").addEventListener("click", function () {
 
     readUserData();  //read user data for new week
     setDaysOfWeek(currentlyVisibleWeekDates);
-
     resetDomElements(true, true, true);
 });
 
 //handles the user pressing the "Next week" button
-document.getElementById("next_week").addEventListener("click", function () {
+document.getElementById("next_week_button").addEventListener("click", function () {
+
+    currentlyVisibleWeekIndex++; //increment currentlyVisibleWeekIndex
+    document.getElementById("previous_week_button").disabled = false;
 
     snackbar.style.visibility = "hidden";
 
@@ -334,7 +350,6 @@ document.getElementById("next_week").addEventListener("click", function () {
     }
     readUserData();  //read user data for new week
     setDaysOfWeek(currentlyVisibleWeekDates);
-
     resetDomElements(true, true, true);
 });
 

@@ -74,6 +74,23 @@
             outline: none;
         }
 
+
+        .week_switcher_buttons
+        {
+            cursor:pointer;
+        }
+
+        .week_switcher_buttons:disabled
+        {
+            background:white;
+            color:gray;
+            cursor:default;
+            opacity:0.2;
+
+        }
+
+        #preload-01 { background: url(img/checkbox.png) no-repeat -9999px -9999px; } /*This will hopefully preload the checkbox.png image so it doesn't pop in jarringly after user adds a task. */
+
     </style>
 </head>
 <body>
@@ -99,8 +116,8 @@
 <p>Welcome to ClassTask, a to-do list for students.</p>
 
 <div class="day_div">
-    <button id="previous_week">Previous week</button>
-    <button id="next_week">Next week</button>
+    <button id="previous_week_button" class="week_switcher_buttons" disabled>Previous week</button>
+    <button id="next_week_button" class="week_switcher_buttons">Next week</button>
 </div>
 
 <!-- snackbar -->

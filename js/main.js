@@ -4,6 +4,7 @@
 //TODO: separate sections in each dayDiv for different classes
 //TODO: make an "undated tasks" section
 
+//TODO: bug occurs if I mark a task completed and then click addTaskButton within 10 seconds
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -140,6 +141,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
     markTaskFinishedImage.src = "img/checkbox.png";
     markTaskFinishedImage.addEventListener("click", function() {
         addedTaskDiv.style.display = "none";
+        addedTaskDiv.className = ""; //We hide this particular addedTaskDiv from the resetDomElements() function by removing its className, since otherwise it could get brought back if user clicks addTaskButton within 10 seconds
 
         var completedTaskIndex = addedTaskDivArray[dayIndex].indexOf(markTaskFinishedImage.parentNode);
         var completedTaskJson = dayTaskJsonArray[dayIndex][completedTaskIndex];
@@ -153,6 +155,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
         snackbar = newSnackbar;
         snackbar.style.visibility = "visible";
         clearTimeout(snackbarTimeoutId);
+
         snackbarTimeoutId = setTimeout(function(){ snackbar.style.visibility = "hidden"; }, 10500); //hides snackbar after waiting 500 ms for fadeout animation to run
 
         document.getElementById("snackbar_undo_button").addEventListener("click", function() {
@@ -160,6 +163,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
             snackbar.style.visibility = "hidden";
             undoRemoveUserData(completedTaskJson, completedTaskIndex, dayIndex);
             addedTaskDiv.style.display = "block";
+            addedTaskDiv.className = "added_task_div";  //We unhide this addedTaskDiv from the resetDomElements() function.
             addedTaskDivArray[dayIndex].splice(completedTaskIndex, 0, addedTaskDiv);
         });
 
@@ -243,7 +247,6 @@ function initialize2dArrays() {
 
 //Resets various DOM elements to their original states.
 function resetDomElements() {
-
 
     var addedTaskDivsToShow = document.getElementsByClassName("added_task_div");
     for (i = 0; i < addedTaskDivsToShow.length; i++) {

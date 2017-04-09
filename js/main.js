@@ -3,9 +3,6 @@
 //TODO: progress spinner for fetching data?
 //TODO: separate sections in each dayDiv for different classes
 //TODO: make an "undated tasks" section
-//TODO: disable Previous week button when you're on the current week (those tasks go into Past Due section)
-
-//TODO: remove elements from the DOM rather than hiding them (memory leaks!)
 
 
 
@@ -114,7 +111,8 @@ function createDayDivs () {
                 newTaskCancelButton.addEventListener("click", function () {
                     dayDiv.appendChild(addTaskButton);      //Moves addTaskButton back to the bottom of dayDiv
                     addTaskButton.style.display = "block";  //Makes addTaskButton reappear
-                    newTaskDiv.style.display = "none";      //Makes newTaskDiv disappear
+                    newTaskDiv.parentNode.removeChild(newTaskDiv); //Removes newTaskDiv from the DOM
+
                 });
             });
             dayDivArray[i] = dayDiv;  //Sets the dayDiv we just built to be equal to the ith element of the dayDivArray[]
@@ -203,7 +201,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
 
             addedTaskTextSpan.textContent = editTaskInput.value; //set the addedTaskTextSpan's text equal to the newly edited text value from newTaskInput
             addedTaskDiv.style.display = "block"; //make the addedTaskDiv visible again after we hid it earlier
-            editTaskDiv.style.display = "none";
+            editTaskDiv.parentNode.removeChild(editTaskDiv); //Removes editTaskDiv from the DOM
             addTaskButton.style.display = "block";
 
             editUserData("math", addedTaskTextSpan.textContent, dayIndex, addedTaskDivIndex);
@@ -217,7 +215,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
             dayDivArray[dayIndex].appendChild(addTaskButton);      //Moves addTaskButton back to the bottom of dayDiv
             addTaskButton.style.display = "block";  //Makes addTaskButton reappear
             addedTaskDiv.style.display = "block";
-            editTaskDiv.style.display = "none";      //Makes editTaskDiv disappear
+            editTaskDiv.parentNode.removeChild(editTaskDiv);  //Removes editTaskDiv from the DOM
         });
 
         dayDivArray[dayIndex].insertBefore(editTaskDiv, addedTaskDiv);
@@ -243,7 +241,8 @@ function resetDomElements(resetNewTaskDivs, resetEditTaskDivs, resetAddTaskButto
     if (resetNewTaskDivs) {
         var newTaskDivsToHide = document.getElementsByClassName("new_task_div");
         for (i = 0; i < newTaskDivsToHide.length; i++) {
-            newTaskDivsToHide[i].style.display = "none";
+            //newTaskDivsToHide[i].style.display = "none";
+            newTaskDivsToHide[i].parentNode.removeChild(newTaskDivsToHide[i]);
         }
     }
 
@@ -262,10 +261,6 @@ function resetDomElements(resetNewTaskDivs, resetEditTaskDivs, resetAddTaskButto
         }
     }
 }
-
-document.getElementById("test").addEventListener("click", function() {
-   console.log(dayDivArray[3]);
-});
 
 
 /****************************************************/

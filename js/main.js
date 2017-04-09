@@ -31,6 +31,10 @@ var config = {
 };
 firebase.initializeApp(config);
 
+//The below two lines force checkbox.png to be preloaded so that it doesn't load after the tasks themselves arrive from Firebase
+var image = new Image();
+image.src = "img/checkbox.png";
+
 initialize2dArrays(); //calls initialize2dArrays() function when user first loads page
 createDayDivs();  //calls createDayDivs() function when user first loads page
 

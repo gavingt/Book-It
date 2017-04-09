@@ -4,7 +4,6 @@
 //TODO: separate sections in each dayDiv for different classes
 //TODO: make an "undated tasks" section
 
-//TODO: bug occurs if I mark a task completed and then click addTaskButton within 10 seconds
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -13,11 +12,11 @@ var currentlyVisibleWeekDates = new Array(7); //stores an array of the dates for
 var dayDivArray = new Array(7); //dayDivArray[] will hold the 7 dayDiv objects. Each dayDiv is a div that houses the tasks for a given weekday. So there are 7 dayDivs corresponding to 7 days of the week.
 var addedTaskDivArray = new Array(7); //This will be an array of arrays that holds the addedTaskDiv objects for each day of the currently visible week
 var dayTaskJsonArray = new Array(7); //This will be an array of arrays that holds the JSON data for the tasks of each day of the currently visible week
-var snackbarTimeoutId;  //stores the timeout ID associated with the timeout function used for the snackbar.
-var snackbar = document.getElementById("snackbar"); //get a reference to the snackbar div
+var snackbarTimeoutId;  //stores the timeout ID associated with the timeout function used for the snackbar
+var snackbar = document.getElementById("snackbar"); //gets a reference to the snackbar div
 var todaysDate; //stores today's date
 var currentlyVisibleWeekIndex = 0; //this tracks which week is currently being viewed. It starts at 0 and increments if user hits Next week button, and decrements when user hits Previous week button
-var initialReadComplete = false;
+var initialReadComplete = false; //boolean value that stores whether or not we've done the initial reading of data at page load (or at login, if not logged in already at page load)
 
 
 // Initialize Firebase. This code should stay at the top of main.js
@@ -249,25 +248,25 @@ function initialize2dArrays() {
 function resetDomElements() {
 
     var addedTaskDivsToShow = document.getElementsByClassName("added_task_div");
-    for (i = 0; i < addedTaskDivsToShow.length; i++) {
+    for (var i = 0; i < addedTaskDivsToShow.length; i++) {
         addedTaskDivsToShow[i].parentNode.appendChild(addedTaskDivsToShow[i]);
         addedTaskDivsToShow[i].style.display = "block";
     }
 
     var newTaskDivsToHide = document.getElementsByClassName("new_task_div");
-    for (i = 0; i < newTaskDivsToHide.length; i++) {
-        newTaskDivsToHide[i].parentNode.removeChild(newTaskDivsToHide[i]);
+    for (var j = 0; j < newTaskDivsToHide.length; j++) {
+        newTaskDivsToHide[j].parentNode.removeChild(newTaskDivsToHide[j]);
     }
 
     var editTaskDivsToHide = document.getElementsByClassName("edit_task_div");
-    for (i = 0; i < editTaskDivsToHide.length; i++) {
-        editTaskDivsToHide[i].parentNode.removeChild(editTaskDivsToHide[i]);
+    for (var k = 0; k < editTaskDivsToHide.length; k++) {
+        editTaskDivsToHide[k].parentNode.removeChild(editTaskDivsToHide[k]);
     }
 
     var addTaskButtonsToShow = document.getElementsByClassName("add_task_button");
-    for (i = 0; i < addTaskButtonsToShow.length; i++) {
-        dayDivArray[i].appendChild(addTaskButtonsToShow[i]);
-        addTaskButtonsToShow[i].style.display = "block";
+    for (var m = 0; m < addTaskButtonsToShow.length; m++) {
+        dayDivArray[m].appendChild(addTaskButtonsToShow[m]);
+        addTaskButtonsToShow[m].style.display = "block";
     }
 
 }
@@ -305,7 +304,7 @@ function initializeDates() {
 
 //sets the dates to the dayLabel elements in each dayDivArray[] element
 function setDaysOfWeek() {
-    for (i=0; i<dayDivArray.length; i++) {
+    for (var i=0; i<dayDivArray.length; i++) {
         //Gets firstChild of each dayDivArray, which is the dayLabel element. Then it sets it to the current corresponding value in the dates[] array.
         dayDivArray[i].firstChild.textContent = currentlyVisibleWeekDates[i].toString("dddd, MMMM dd, yyyy");
     }
@@ -320,7 +319,7 @@ document.getElementById("previous_week_button").addEventListener("click", functi
     }
     snackbar.style.visibility = "hidden";
 
-    for (i=0; i<currentlyVisibleWeekDates.length; i++) {
+    for (var i=0; i<currentlyVisibleWeekDates.length; i++) {
         //subtract 7 days from each element of the currentlyVisibleWeekDates[] array
         currentlyVisibleWeekDates[i] = currentlyVisibleWeekDates[i].add(-7).days();
 
@@ -344,7 +343,7 @@ document.getElementById("next_week_button").addEventListener("click", function (
 
     snackbar.style.visibility = "hidden";
 
-    for (i=0; i<currentlyVisibleWeekDates.length; i++) {
+    for (var i=0; i<currentlyVisibleWeekDates.length; i++) {
         //add 7 days to each element of the currentlyVisibleWeekDates[] array
         currentlyVisibleWeekDates[i] = currentlyVisibleWeekDates[i].add(7).days();
 

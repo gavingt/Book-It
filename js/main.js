@@ -244,27 +244,28 @@ function initialize2dArrays() {
 //Resets various DOM elements to their original states.
 function resetDomElements() {
 
+
     var addedTaskDivsToShow = document.getElementsByClassName("added_task_div");
     for (i = 0; i < addedTaskDivsToShow.length; i++) {
-        dayDivArray[i].appendChild(addedTaskDivsToShow[i]);
+        addedTaskDivsToShow[i].parentNode.appendChild(addedTaskDivsToShow[i]);
         addedTaskDivsToShow[i].style.display = "block";
     }
 
-        var newTaskDivsToHide = document.getElementsByClassName("new_task_div");
-        for (i = 0; i < newTaskDivsToHide.length; i++) {
-            newTaskDivsToHide[i].parentNode.removeChild(newTaskDivsToHide[i]);
-        }
+    var newTaskDivsToHide = document.getElementsByClassName("new_task_div");
+    for (i = 0; i < newTaskDivsToHide.length; i++) {
+        newTaskDivsToHide[i].parentNode.removeChild(newTaskDivsToHide[i]);
+    }
 
-        var editTaskDivsToHide = document.getElementsByClassName("edit_task_div");
-        for (i = 0; i < editTaskDivsToHide.length; i++) {
-            editTaskDivsToHide[i].parentNode.removeChild(editTaskDivsToHide[i]);
-        }
+    var editTaskDivsToHide = document.getElementsByClassName("edit_task_div");
+    for (i = 0; i < editTaskDivsToHide.length; i++) {
+        editTaskDivsToHide[i].parentNode.removeChild(editTaskDivsToHide[i]);
+    }
 
-        var addTaskButtonsToShow = document.getElementsByClassName("add_task_button");
-        for (i = 0; i < addTaskButtonsToShow.length; i++) {
-            dayDivArray[i].appendChild(addTaskButtonsToShow[i]);
-            addTaskButtonsToShow[i].style.display = "block";
-        }
+    var addTaskButtonsToShow = document.getElementsByClassName("add_task_button");
+    for (i = 0; i < addTaskButtonsToShow.length; i++) {
+        dayDivArray[i].appendChild(addTaskButtonsToShow[i]);
+        addTaskButtonsToShow[i].style.display = "block";
+    }
 
 }
 

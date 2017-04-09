@@ -1,4 +1,4 @@
-//TODO: snackbar not centered on mobile
+
 //TODO: move tasks from past days into "past due" section
 //TODO: progress spinner for fetching data?
 //TODO: separate sections in each dayDiv for different classes

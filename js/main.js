@@ -237,12 +237,21 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
     return addedTaskDiv;
 }
 
+
+
 //Hides or shows dayDivs based on the week that's visible. If it's the current week, we hide the dayDivs for days that have already passed.
 function hideOrShowDayDivs () {
 
-        for(var i=0; i<todaysDateIndex; i++) {
+    if (currentlyVisibleWeekIndex === 0) {
+        for (var i = 0; i < todaysDateIndex; i++) {
             dayDivArray[i].style.display = "none";
         }
+    }
+    else {
+        for (var j = 0; j < todaysDateIndex; j++) {
+            dayDivArray[j].style.display = "block";
+        }
+    }
 }
 
 
@@ -255,6 +264,8 @@ function initialize2dArrays() {
         dayTaskJsonArray[k] = [];
     }
 }
+
+
 
 //Resets various DOM elements to their original states.
 function resetDomElements() {
@@ -303,7 +314,7 @@ function initializeDates() {
         currentlyVisibleWeekDates[i] = moment().startOf('isoWeek').add(i, 'days').format("dddd, MMMM D, YYYY");
     }
 
-    todaysDateIndex = moment().isoWeekday() - 1;  //Stores a number 0-6 indicating the current day of the week from Monday to Sunday. For instance, Monday = 0 and Thursday = 3.
+    todaysDateIndex = moment().isoWeekday() - 1;  //Stores  a number 0-6 indicating the current day of the week from Monday to Sunday. For instance, Monday = 0 and Thursday = 3.
 
     setDaysOfWeek(currentlyVisibleWeekDates);
 }
@@ -328,7 +339,7 @@ document.getElementById("previous_week_button").addEventListener("click", functi
 
     for (var i=0; i<currentlyVisibleWeekDates.length; i++) {
         //subtract 7 days from each element of the currentlyVisibleWeekDates[] array
-        currentlyVisibleWeekDates[i] = currentlyVisibleWeekDates[i].add(-7, 'days');
+        currentlyVisibleWeekDates[i] = moment(currentlyVisibleWeekDates[i], "dddd, MMMM D, YYYY").add(-7, 'days').format("dddd, MMMM D, YYYY");
 
         initialize2dArrays(); //clear 2d arrays before populating them with elements from the new week
         var nodesToRemove = document.querySelectorAll(".added_task_div"); //find all addedTaskDiv elements and save them in nodesToRemove[] array
@@ -340,6 +351,7 @@ document.getElementById("previous_week_button").addEventListener("click", functi
     readUserData();  //read user data for new week
     setDaysOfWeek(currentlyVisibleWeekDates);
     resetDomElements();
+    hideOrShowDayDivs();
 });
 
 //handles the user pressing the "Next week" button
@@ -352,7 +364,7 @@ document.getElementById("next_week_button").addEventListener("click", function (
 
     for (var i=0; i<currentlyVisibleWeekDates.length; i++) {
         //add 7 days to each element of the currentlyVisibleWeekDates[] array
-        currentlyVisibleWeekDates[i] = currentlyVisibleWeekDates[i].add(7, 'days');
+        currentlyVisibleWeekDates[i] = moment(currentlyVisibleWeekDates[i], "dddd, MMMM D, YYYY").add(7, 'days').format("dddd, MMMM D, YYYY");
 
         initialize2dArrays(); //clear 2d arrays before populating them with elements from the new week
         var nodesToRemove = document.querySelectorAll(".added_task_div"); //find all addedTaskDiv elements and save them in nodesToRemove[] array
@@ -364,6 +376,7 @@ document.getElementById("next_week_button").addEventListener("click", function (
     readUserData();  //read user data for new week
     setDaysOfWeek(currentlyVisibleWeekDates);
     resetDomElements();
+    hideOrShowDayDivs();
 });
 
 
@@ -447,7 +460,7 @@ function readUserData() {
 
                         dayTaskJsonArray[i] = snapshot.val();
                         for (var j=0; j<dayTaskJsonArray[i].length; j++) {
-                            var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayDivArray[i].lastElementChild); //call function createAddedTaskDiv and pass in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
+                            var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayDivArray[i].lastElementChild); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
                             dayDivArray[i].insertBefore(addedTaskDiv, dayDivArray[i].childNodes[dayDivArray[i].childElementCount-1]); //Inserts addedTaskDiv <div> element before the newTaskDiv <div> element (which is the last child element in dayDivArray[i] ). This ensures tasks are added to the page in the order the user enters them.
                         }
                     }

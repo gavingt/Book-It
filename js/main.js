@@ -72,8 +72,8 @@ function createDayDivs () {
 
             var dayDiv = document.createElement("div");
             dayDiv.className = "day_div"; //Gives every dayDiv a class name so they can be referenced later in the JavaScript code
-            var dayLabel = document.createElement("span");
-            dayDiv.appendChild(dayLabel);
+            var dateLabel = document.createElement("span");
+            dayDiv.appendChild(dateLabel);
             var addTaskButton = document.createElement("button");
             addTaskButton.className = "add_task_button"; //Gives every addTaskButton a class name so they can be referenced later in the JavaScript code
             addTaskButton.style.display = "block";
@@ -320,11 +320,19 @@ function initializeDates() {
 }
 
 
-//sets the dates to the dayLabel elements in each dayDivArray[] element
+//sets the dates to the dateLabel elements in each dayDivArray[] element
 function setDaysOfWeek() {
     for (var i=0; i<dayDivArray.length; i++) {
-        //Gets firstChild of each dayDivArray, which is the dayLabel element. Then it sets it to the current corresponding value in the dates[] array.
-        dayDivArray[i].firstChild.textContent = currentlyVisibleWeekDates[i];
+
+        if (currentlyVisibleWeekDates[i] === moment().format("dddd, MMMM D, YYYY")) {
+            dayDivArray[i].firstChild.textContent = currentlyVisibleWeekDates[i] + " (Today)";  //if currentlyVisibleWeekDates[i] is storing today's date, append " (Today)" at the end.
+        }
+        else if (currentlyVisibleWeekDates[i] === moment().add(1, 'days').format("dddd, MMMM D, YYYY")) {
+            dayDivArray[i].firstChild.textContent = currentlyVisibleWeekDates[i] + " (Tomorrow)";  //if currentlyVisibleWeekDates[i] is storing tomorrow's date, append " (Tomorrow)" at the end.
+        }
+        else {
+            dayDivArray[i].firstChild.textContent = currentlyVisibleWeekDates[i]; //Get firstChild of each dayDivArray, which is the dateLabel element. Then we set its textContent equal to the corresponding entry in the currentlyVisibleWeekDates[] array.
+        }
     }
 }
 

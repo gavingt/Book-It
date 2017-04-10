@@ -3,7 +3,7 @@
 //TODO: progress spinner for fetching data?
 //TODO: separate sections in each dayDiv for different classes
 //TODO: make an "undated tasks" section
-//TODO: should I store dates in Firebase in their full form? That way I know which days are past and should be put into "past due" section
+//TODO: When I make Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyVisibleWeekDates[1], "dddd, MMMM D, YYYY"));
 
 
 
@@ -239,12 +239,10 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
 
 //Hides or shows dayDivs based on the week that's visible. If it's the current week, we hide the dayDivs for days that have already passed.
 function hideOrShowDayDivs () {
-    todaysDateIndex = 6;
-    if (currentlyVisibleWeekIndex === 0) {
+
         for(var i=0; i<todaysDateIndex; i++) {
             dayDivArray[i].style.display = "none";
         }
-    }
 }
 
 
@@ -301,32 +299,21 @@ function resetDomElements() {
 //When user first loads the page, this sets the currentlyVisibleWeekDates[] array to the current week and then sets the dates to the page elements
 function initializeDates() {
 
-    todaysDateIndex = Date.getDayNumberFromName(Date.parse("today").toString().split(" ", 1)[0]);
+    for (var i=0; i<7; i++) {
+        currentlyVisibleWeekDates[i] = moment().startOf('isoWeek').add(i, 'days').format("dddd, MMMM D, YYYY");
+    }
 
-    currentlyVisibleWeekDates = [
-        Date.parse("Sunday"),
-        Date.parse("Monday"),
-        Date.parse("Tuesday"),
-        Date.parse("Wednesday"),
-        Date.parse("Thursday"),
-        Date.parse("Friday"),
-        Date.parse("Saturday")
-    ];
-
-
-
-
-    alert(Date.parse("Sunday"));
-
+    todaysDateIndex = moment().isoWeekday() - 1;  //Stores a number 0-6 indicating the current day of the week from Monday to Sunday. For instance, Monday = 0 and Thursday = 3.
 
     setDaysOfWeek(currentlyVisibleWeekDates);
 }
+
 
 //sets the dates to the dayLabel elements in each dayDivArray[] element
 function setDaysOfWeek() {
     for (var i=0; i<dayDivArray.length; i++) {
         //Gets firstChild of each dayDivArray, which is the dayLabel element. Then it sets it to the current corresponding value in the dates[] array.
-        dayDivArray[i].firstChild.textContent = currentlyVisibleWeekDates[i].toString("dddd, MMMM dd, yyyy");
+        dayDivArray[i].firstChild.textContent = currentlyVisibleWeekDates[i];
     }
 }
 
@@ -341,7 +328,7 @@ document.getElementById("previous_week_button").addEventListener("click", functi
 
     for (var i=0; i<currentlyVisibleWeekDates.length; i++) {
         //subtract 7 days from each element of the currentlyVisibleWeekDates[] array
-        currentlyVisibleWeekDates[i] = currentlyVisibleWeekDates[i].add(-7).days();
+        currentlyVisibleWeekDates[i] = currentlyVisibleWeekDates[i].add(-7, 'days');
 
         initialize2dArrays(); //clear 2d arrays before populating them with elements from the new week
         var nodesToRemove = document.querySelectorAll(".added_task_div"); //find all addedTaskDiv elements and save them in nodesToRemove[] array
@@ -365,7 +352,7 @@ document.getElementById("next_week_button").addEventListener("click", function (
 
     for (var i=0; i<currentlyVisibleWeekDates.length; i++) {
         //add 7 days to each element of the currentlyVisibleWeekDates[] array
-        currentlyVisibleWeekDates[i] = currentlyVisibleWeekDates[i].add(7).days();
+        currentlyVisibleWeekDates[i] = currentlyVisibleWeekDates[i].add(7, 'days');
 
         initialize2dArrays(); //clear 2d arrays before populating them with elements from the new week
         var nodesToRemove = document.querySelectorAll(".added_task_div"); //find all addedTaskDiv elements and save them in nodesToRemove[] array
@@ -378,6 +365,7 @@ document.getElementById("next_week_button").addEventListener("click", function (
     setDaysOfWeek(currentlyVisibleWeekDates);
     resetDomElements();
 });
+
 
 /****************************************************/
 /***************END DATE HANDLING CODE***************/
@@ -402,7 +390,7 @@ function editUserData(taskClass, taskText, dayIndex, taskIndex) {
     var userId = firebase.auth().currentUser.uid;
 
     //write edited task data
-    firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex].toString("dddd, MMMM dd, yyyy") + "/" + taskIndex).set(dayTaskJsonArray[dayIndex][taskIndex]);
+    firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex] + "/" + taskIndex).set(dayTaskJsonArray[dayIndex][taskIndex]);
 
 }
 
@@ -415,7 +403,7 @@ function removeUserData(dayIndex, taskIndex) {
     var userId = firebase.auth().currentUser.uid;
 
     //saves a given day's tasks with the completed task removed
-    firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex].toString("dddd, MMMM dd, yyyy")).set(dayTaskJsonArray[dayIndex]);
+    firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);
 
 }
 
@@ -428,7 +416,7 @@ function undoRemoveUserData(completedTaskJson, taskIndex, dayIndex) {
     var userId = firebase.auth().currentUser.uid;
 
     //write new task data
-    firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex].toString("dddd, MMMM dd, yyyy")).set(dayTaskJsonArray[dayIndex]);
+    firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);
 }
 
 
@@ -443,7 +431,7 @@ function writeUserData(taskClass, taskText, dayIndex) {
     var userId = firebase.auth().currentUser.uid;
 
     //write new task data
-    firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex].toString("dddd, MMMM dd, yyyy")).set(dayTaskJsonArray[dayIndex]);
+    firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);
 }
 
 
@@ -454,7 +442,7 @@ function readUserData() {
     for (var i=0; i<currentlyVisibleWeekDates.length; i++) {
 
         (function(i) {
-            firebase.database().ref('/users/' + userId + "/" + currentlyVisibleWeekDates[i].toString("dddd, MMMM dd, yyyy")).once('value', (function(snapshot) {
+            firebase.database().ref('/users/' + userId + "/" + currentlyVisibleWeekDates[i]).once('value', (function(snapshot) {
                     if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
 
                         dayTaskJsonArray[i] = snapshot.val();

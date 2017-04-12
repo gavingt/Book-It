@@ -191,7 +191,7 @@ html, body *{
 }
 
 #snackbar_text {
-    padding-right: 15px;
+    padding-right: 12px;
 }
 
 #snackbar_undo_button {
@@ -199,6 +199,7 @@ html, body *{
     background-color: #333;
     border: none;
     outline: none;
+    padding-right:7px;
 }
 
 #snackbar_hide_button {

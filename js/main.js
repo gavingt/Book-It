@@ -157,7 +157,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
         snackbar.style.visibility = "visible";
         clearTimeout(snackbarTimeoutId);
 
-        snackbarTimeoutId = setTimeout(function(){ snackbar.style.visibility = "hidden"; }, 10500); //hides snackbar after waiting 500 ms for fadeout animation to run
+        snackbarTimeoutId = setTimeout(function(){ snackbar.style.visibility = "hidden"; }, 10000); //hides snackbar after waiting 500 ms for fadeout animation to run
 
         document.getElementById("snackbar_undo_button").addEventListener("click", function() {
 

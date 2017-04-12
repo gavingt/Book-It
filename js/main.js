@@ -84,11 +84,6 @@ function createDayDivs () {
             dayDivHeader.className = "day_div_header";
             dayDiv.appendChild(dayDivHeader);
 
-            /*
-            dayDiv.appendChild(createClassDiv("lightblue", "MAT 330"));
-            dayDiv.appendChild(createClassDiv("#ffa197", "ECE 110"));
-            dayDiv.appendChild(createClassDiv("palegreen", "MUS 432"));
-            */
 
             var addTaskButton = document.createElement("button");
             addTaskButton.className = "add_task_button"; //Gives every addTaskButton a class name so they can be referenced later in the JavaScript code
@@ -253,7 +248,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
             editTaskDiv.parentNode.removeChild(editTaskDiv); //Removes editTaskDiv from the DOM
             addTaskButton.style.display = "block";
 
-            editUserData("math", addedTaskTextSpan.textContent, dayIndex, addedTaskDivIndex);
+            editUserData("BIO 220", addedTaskTextSpan.textContent, dayIndex, addedTaskDivIndex);
 
         });
 
@@ -588,18 +583,6 @@ document.getElementById("sign_out_button").addEventListener("click", function() 
     });
 });
 
-document.getElementById("profile_info_button").addEventListener("click", function() {
-    var user = firebase.auth().currentUser;
-
-    if (user !== null) {
-        user.providerData.forEach(function (profile) {
-            alert("Email: " + profile.email + "\nUID: " + user.uid);
-        });
-    }
-    else {
-        alert("Not signed in!");
-    }
-});
 
 
 /******************************************************/

@@ -29,85 +29,13 @@
 
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/main.css">
-    <script src="js/vendor/modernizr-2.8.3.min.js"></script>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 
     <style>
-        .day_div {
-            background-color: #EEEEEE;
-            border: solid;
-            margin: 25px 10px 0px 10px;
-        }
 
-        .day_div_header {
-            background-color: beige;
-            border-bottom: solid;
-            padding: 1px 4px 1px 4px;
-        }
-
-        .day_div_class {
-            border-top-width: thin;
-            border-top: solid;
-
-        }
-
-        .class_name_div {
-            border-right: solid;
-            border-bottom: solid;
-            display: inline-block;
-            background-color: white;
-            padding: 1px 4px 1px 4px;
-        }
-
-
-        /* The snackbar is the box that appears at the bottom when the user marks a task as completed. It gives them 10 seconds to undo this action. */
-        #snackbar {
-            visibility: hidden; /* Hidden by default. Visible on click */
-            min-width: 250px; /* Set a default minimum width */
-            transform: translateX(-50%); /*this centers the snackbar horizontally, and even works on mobile where other methods failed*/
-            background-color: #333; /* Black background color */
-            color: #fff; /* White text color */
-            text-align: center; /* Centered text */
-            border-radius: 2px; /* Rounded borders */
-            padding: 16px; /* Padding */
-            position: fixed; /* Sit on top of the screen */
-            z-index: 1; /* Add a z-index if needed */
-            left: 50%; /* Center the snackbar */
-            bottom: 30px; /* 30px from the bottom */
-        }
-
-        #snackbar_text {
-            padding-right: 15px;
-        }
-
-        #snackbar_undo_button {
-            color: red;
-            background-color: #333;
-            border: none;
-            outline: none;
-        }
-
-        #snackbar_hide_button {
-            color: #c4c4c4;
-            background-color: #333;
-            border: none;
-            outline: none;
-        }
-
-
-        .week_switcher_buttons
-        {
-            cursor:pointer;
-        }
-
-        .week_switcher_buttons:disabled
-        {
-            background:white;
-            color:gray;
-            cursor:default;
-            opacity:0.2;
-
-        }
 
     </style>
 </head>
@@ -118,20 +46,26 @@
 
 <div id="header">
 
-    <img id="logo" src="img/logo-extra-small.png" height="72" width="113"/>
+    <img id="logo" src="img/logo-extra-small.png"/>
+    <div id = "button_group">
 
 
-    <button id="sign_in_google_button">Sign in (Google)</button>
+        <img id="sign_in_facebook_button" src="img/fb_sign_in.png"></img>
 
-    <button id="sign_in_facebook_button">Sign in (Facebook)</button>
+        <img id="sign_in_google_button" src="img/google_sign_in.png"></img>
+        <button id="sign_out_button">Sign out</button>
+    </div>
 
-    <button id="sign_out_button">Sign out</button>
+
+
+
+
 
 </div>
 
-<p>Welcome to ClassTask, a to-do list for students.</p>
+<p id="greeting">Welcome to ClassTask, a to-do list for students.</p>
 
-<div class="day_div">
+<div class="day_div container">
     <button id="previous_week_button" class="week_switcher_buttons" disabled>Previous week</button>
     <button id="next_week_button" class="week_switcher_buttons">Next week</button>
 </div>
@@ -154,10 +88,16 @@
 <script src="https://www.gstatic.com/firebasejs/3.7.1/firebase-database.js"></script>
 <script src="https://www.gstatic.com/firebasejs/3.7.1/firebase-messaging.js"></script>
 
+<script src="js/vendor/modernizr-2.8.3.min.js"></script>
+
 <script src="js/moment.min.js"></script> <!-- this needs to go after the firebase.js import or it'll cause problems with Firebase constantly sending refresh tokens-->
 
-<!-- <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
-<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script> -->
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
 
 <script src="js/plugins.js"></script>
 <script src="js/main.js"></script>

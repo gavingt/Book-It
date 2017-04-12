@@ -12,8 +12,8 @@
 
 html {
     color: #222;
-    font-size: 1em;
     line-height: 1.4;
+
 }
 
 /*
@@ -95,81 +95,61 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
-html, body {margin: 0; padding: 0;}
+html, body *{
+    margin: 0;
+    padding: 0;
+    font-family: "Roboto", sans-serif;
+    font-size: 16px;
+}
 
 #header {
-    margin:0 auto;
     background: #eee;
-    height: 70px;
-    padding: 20px 0;
-    /*font: 12px arial, sans-serif;*/
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    padding: 20px;
+    font: 12px arial, sans-serif;
 }
 
-/*#header h1 {
-    margin-left: 30px;
-    float: left;
-    width: 197px;
-    height: 85px;
-    background: url(https://raw.githubusercontent.com/gavingt/ClassTask/master/img/logo-extra-small.png) no-repeat 0 0;
-    text-indent: -9999px;
-}*/
-
-/*#header form {
-    float: right;
-    margin-right: 30px;
-    height: 60px;
-    padding-top: 8px;
-}*/
-
-/*#header form label {
-    display: inline-block;
-    margin: 0 2px;
-}*/
-
-/*#header form input {}
-
-#header form #s-user,
-#header form #s-pass {
-    display: block;
-    width: 250px;
-    border: 1px solid #eee;
-    padding: 3px 0 3px 0;
-    margin-bottom: -1px;
-}
-
-#header form .submit {
-    height: 23px;
-    vertical-align: bottom;
-    background: #d743ae;
-    color: #fff;
-    border: 1px solid #ddd;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-}*/
 #sign_in_facebook_button{
-    float: right;
+
     margin-right: 1%;
-    margin-top: 1%;
+    display:block;
+    margin-top: 4%;
 }
 
 #sign_in_google_button{
-    float: right;
+
+    display:block;
     margin-right: 1%;
-    margin-top: 1%;
+    margin-top: 15%;
 }
 
-#sign_out_button{
+#button_group {
     float: right;
+    max-width: 100px;
+    margin-right: 50px;
+    text-align: right;
+}
+
+
+#greeting {
+    margin-top: 2%;
+    font-size: 20px;
+    margin-left: 25px;
+}
+
+
+#sign_out_button{
     margin-right: 1%;
     margin-top: 1%;
-
 }
 
 #logo {
     line-height: 1;
     margin: 0;
     padding-left: 2px;
+    max-width: 110px;
     padding-top: 2px;
+
 }
 #boxed {
     text-indent: 1%;
@@ -185,7 +165,63 @@ html, body {margin: 0; padding: 0;}
     background-color: #1de53c;
 }
 
+.day_div {
+    background-color: #EEEEEE;
+    padding: 4px;
+    border: solid;
+    border-width: 1px;
+    margin: 25px 10px 0px 10px;
+    width: 70%;
+}
 
+/* The snackbar is the box that appears at the bottom when the user marks a task as completed. It gives them 10 seconds to undo this action. */
+#snackbar {
+    visibility: hidden; /* Hidden by default. Visible on click */
+    min-width: 250px; /* Set a default minimum width */
+    transform: translateX(-50%); /*this centers the snackbar horizontally, and even works on mobile where other methods failed*/
+    background-color: #333; /* Black background color */
+    color: #fff; /* White text color */
+    text-align: center; /* Centered text */
+    border-radius: 2px; /* Rounded borders */
+    padding: 16px; /* Padding */
+    position: fixed; /* Sit on top of the screen */
+    z-index: 1; /* Add a z-index if needed */
+    left: 50%; /* Center the snackbar */
+    bottom: 30px; /* 30px from the bottom */
+}
+
+#snackbar_text {
+    padding-right: 15px;
+}
+
+#snackbar_undo_button {
+    color: red;
+    background-color: #333;
+    border: none;
+    outline: none;
+}
+
+#snackbar_hide_button {
+    color: #c4c4c4;
+    background-color: #333;
+    border: none;
+    outline: none;
+}
+
+
+.week_switcher_buttons
+{
+    cursor:pointer;
+}
+
+.week_switcher_buttons:disabled
+{
+    background:white;
+    color:gray;
+    cursor:default;
+    opacity:0.2;
+
+}
 
 
 

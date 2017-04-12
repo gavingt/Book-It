@@ -71,7 +71,7 @@ function createDayDivs () {
             //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
 
             var dayDiv = document.createElement("div");
-            dayDiv.className = "day_div"; //Gives every dayDiv a class name so they can be referenced later in the JavaScript code
+            dayDiv.className = "day_div container"; //Gives every dayDiv a class name so they can be referenced later in the JavaScript code
             var dateLabel = document.createElement("span");
             dayDiv.appendChild(dateLabel);
             var addTaskButton = document.createElement("button");
@@ -526,18 +526,6 @@ document.getElementById("sign_out_button").addEventListener("click", function() 
     });
 });
 
-document.getElementById("profile_info_button").addEventListener("click", function() {
-    var user = firebase.auth().currentUser;
-
-    if (user !== null) {
-        user.providerData.forEach(function (profile) {
-            alert("Email: " + profile.email + "\nUID: " + user.uid);
-        });
-    }
-    else {
-        alert("Not signed in!");
-    }
-});
 
 
 /******************************************************/

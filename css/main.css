@@ -109,18 +109,20 @@ html, body *{
     font: 12px arial, sans-serif;
 }
 
-#sign_in_facebook_button{
+#sign_in_facebook_button {
 
     margin-right: 1%;
     display:block;
     margin-top: 4%;
+    cursor : pointer;
 }
 
-#sign_in_google_button{
+#sign_in_google_button {
 
     display:block;
     margin-right: 1%;
     margin-top: 15%;
+    cursor : pointer;
 }
 
 #button_group {
@@ -151,27 +153,29 @@ html, body *{
     padding-top: 2px;
 
 }
-#boxed {
-    text-indent: 1%;
-    border: 1px solid black;
-    padding-bottom: 5px;
-    padding-top: 5px;
-    margin-left: 270px;
-    margin-right: 270px;
-    margin-bottom: 7px;
-    background-color: #c1c1d0;
-}
-#taskOne {
-    background-color: #1de53c;
-}
 
 .day_div {
     background-color: #EEEEEE;
-    padding: 4px;
     border: solid;
     border-width: 1px;
     margin: 25px 10px 0px 10px;
     width: 70%;
+}
+
+
+.day_div_class {
+    border-top-width: thin;
+    border-top: solid;
+
+}
+
+.class_name_div {
+    border-right: solid;
+    border-bottom: solid;
+    border-width: 1px;
+    display: inline-block;
+    background-color: white;
+    padding: 1px 4px 1px 4px;
 }
 
 /* The snackbar is the box that appears at the bottom when the user marks a task as completed. It gives them 10 seconds to undo this action. */

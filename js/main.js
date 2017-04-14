@@ -1,23 +1,28 @@
 
-//TODO: move tasks from past days into "past due" section
 //TODO: progress spinner for fetching data?
 //TODO: separate sections in each dayDiv for different classes
-//TODO: make an "undated tasks" section
-//TODO: When I make Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyVisibleWeekDates[1], "dddd, MMMM D, YYYY"));
+//TODO: When I make Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyActiveWeekDates[1], "dddd, MMMM D, YYYY"));
+//TODO: Look into local storage
+//TODO: hide all content until data is read from Firebase. Also hide if user not signed in or user signed up but hasn't completed initial setup wizard.
+//TODO: use <hr> elements between tasks?
+//TODO: create a temporary section at top of page for entering class info and writing it
+//TODO: Remove all addedTaskDivs before calling readUserData(). Then we can use .on instead of .once and token refreshes won't cause duplicate entries. Also, remove bbInitialReadComplete variable.
 
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
 var googleProvider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization
-var currentlyVisibleWeekDates = new Array(7); //stores an array of the dates for the currently visible week
+var currentlyActiveWeekDates = new Array(7); //stores an array of the dates for the currently visible week
 var dayDivArray = new Array(7); //dayDivArray[] will hold the 7 dayDiv objects. Each dayDiv is a div that houses the tasks for a given weekday. So there are 7 dayDivs corresponding to 7 days of the week.
 var addedTaskDivArray = new Array(7); //This will be an array of arrays that holds the addedTaskDiv objects for each day of the currently visible week
 var dayTaskJsonArray = new Array(7); //This will be an array of arrays that holds the JSON data for the tasks of each day of the currently visible week
-var snackbarTimeoutId;  //stores the timeout ID associated with the timeout function used for the snackbar
+var classDivArray = []; //This will be an array of arrays that stores the classDivs inside each dayDiv.
+var classJsonArray = []; //Stores the JSON data for each class the user added in the initial setup wizard.
+var snackbarTimeoutId;  //Stores the timeout ID associated with the timeout function used for the snackbar.
 var snackbar = document.getElementById("snackbar"); //gets a reference to the snackbar div
 var todaysDateIndex; //Stores a number from 0-6, corresponding to the 7 days Sunday through Saturday, indicating which day of the week is today. For instance, if today is Sunday it equals 0, and if it's Tuesday it equals 2.
-var currentlyVisibleWeekIndex = 0; //this tracks which week is currently being viewed. It starts at 0 and increments if user hits Next week button, and decrements when user hits Previous week button
-var initialReadComplete = false; //boolean value that stores whether or not we've done the initial reading of data at page load (or at login, if not logged in already at page load)
+var currentlyActiveWeekIndex = 0; //this tracks which week is currently being viewed. It starts at 0 and increments if user hits Next week button, and decrements when user hits Previous week button
+var bInitialReadComplete = false; //boolean value that stores whether or not we've done the initial reading of data at page load (or at login, if not logged in already at page load)
 
 
 // Initialize Firebase. This code should stay at the top of main.js
@@ -43,9 +48,9 @@ hideOrShowDayDivs();
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
         // User is signed in
-        if (initialReadComplete === false) {  //Doing this check ensures that Firebase's hourly token refreshes don't cause re-reading of data (and thus duplicate tasks, since readUserData() generates addedTaskDiv elements).
+        if (bInitialReadComplete === false) {  //Doing this check ensures that Firebase's hourly token refreshes don't cause re-reading of data (and thus duplicate tasks, since readUserData() generates addedTaskDiv elements).
             readUserData(); //as soon as user is signed in, read existing data from Firebase and populate addedTaskDivs with tasks
-            initialReadComplete = true;
+            bInitialReadComplete = true;
         }
         document.getElementById("sign_in_google_button").style.display = "none";
         document.getElementById("sign_in_facebook_button").style.display = "none";
@@ -71,9 +76,13 @@ function createDayDivs () {
             //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
 
             var dayDiv = document.createElement("div");
-            dayDiv.className = "day_div container"; //Gives every dayDiv a class name so they can be referenced later in the JavaScript code
-            var dateLabel = document.createElement("span");
-            dayDiv.appendChild(dateLabel);
+            dayDiv.className = "day_div"; //Gives every dayDiv a class name so they can be referenced later in the JavaScript code
+
+            var dayDivHeader = document.createElement("div");
+            dayDivHeader.className = "day_div_header";
+            dayDiv.appendChild(dayDivHeader);
+
+
             var addTaskButton = document.createElement("button");
             addTaskButton.className = "add_task_button"; //Gives every addTaskButton a class name so they can be referenced later in the JavaScript code
             addTaskButton.style.display = "block";
@@ -107,7 +116,7 @@ function createDayDivs () {
                     if (newTaskInput.value !== "") {  //don't save task if text field is left blank
                         var addedTaskDiv = createAddedTaskDiv(newTaskInput.value, i, addTaskButton); //call function createAddedTaskDiv and pass in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
                         dayDiv.insertBefore(addedTaskDiv, newTaskDiv);  //Inserts addedTask <p> element before the newTaskDiv <div> element. This ensures tasks are added to the page in the order the user enters them.
-                        writeUserData("Math", newTaskInput.value, i);
+                        writeUserData("1", newTaskInput.value, i);
                         newTaskInput.value = "";  //Removes existing text from newTaskInput textbox
                     }
                 });
@@ -128,6 +137,28 @@ function createDayDivs () {
         }(i)); //This is the end of the function that exists solely to solve closure problem. It's also where we pass in the value of i so that it's accessible within the above code.
     } //end of FOR loop
 }
+
+
+//Creates classDiv elements. This function gets called in readUserData(), to generate classDivs based on the classes the user added in the initial setup wizard.
+function createClassDiv(classColor, classDays, classLocation, className, classTime, dayIndex) {
+    var dayDivClass = document.createElement("div");
+    dayDivClass.className = "day_div_class";
+    dayDivClass.style.backgroundColor = classColor;
+
+    var classNameDiv = document.createElement("div");
+    classNameDiv.className = "class_name_div";
+    classNameDiv.textContent = className;
+    dayDivClass.appendChild(classNameDiv);
+
+    var task = document.createElement("div");
+    task.style.padding = "2px";
+    task.textContent = "do worksheet";
+    dayDivClass.appendChild(task);
+
+    classDivArray[dayIndex].push(dayDivClass);
+    return dayDivClass;
+}
+
 
 
 //Creates addedTaskDiv elements. This function gets called in two places:
@@ -242,7 +273,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton) {
 //Hides or shows dayDivs based on the week that's visible. If it's the current week, we hide the dayDivs for days that have already passed.
 function hideOrShowDayDivs () {
 
-    if (currentlyVisibleWeekIndex === 0) {
+    if (currentlyActiveWeekIndex === 0) {
         for (var i = 0; i < todaysDateIndex; i++) {
             dayDivArray[i].style.display = "none";
         }
@@ -257,11 +288,12 @@ function hideOrShowDayDivs () {
 
 
 
-//Turns taskDivArray and dayTaskJsonArray into 2D arrays (each of their elements stores its own array)
+//Turns taskDivArray, dayTaskJsonArray, and classDivArray into 2D arrays (each of their elements stores its own array)
 function initialize2dArrays() {
-    for (var k = 0; k < 7; k++) {
-        addedTaskDivArray[k] = [];
-        dayTaskJsonArray[k] = [];
+    for (var i = 0; i < 7; i++) {
+        addedTaskDivArray[i] = [];
+        dayTaskJsonArray[i] = [];
+        classDivArray[i] = [];
     }
 }
 
@@ -307,16 +339,16 @@ function resetDomElements() {
 /****************************************************/
 
 
-//When user first loads the page, this sets the currentlyVisibleWeekDates[] array to the current week and then sets the dates to the page elements
+//When user first loads the page, this sets the currentlyActiveWeekDates[] array to the current week and then sets the dates to the page elements
 function initializeDates() {
 
     for (var i=0; i<7; i++) {
-        currentlyVisibleWeekDates[i] = moment().startOf('isoWeek').add(i, 'days').format("dddd, MMMM D, YYYY");
+        currentlyActiveWeekDates[i] = moment().startOf('isoWeek').add(i, 'days').format("dddd, MMMM D, YYYY");
     }
 
     todaysDateIndex = moment().isoWeekday() - 1;  //Stores  a number 0-6 indicating the current day of the week from Monday to Sunday. For instance, Monday = 0 and Thursday = 3.
 
-    setDaysOfWeek(currentlyVisibleWeekDates);
+    setDaysOfWeek(currentlyActiveWeekDates);
 }
 
 
@@ -324,14 +356,14 @@ function initializeDates() {
 function setDaysOfWeek() {
     for (var i=0; i<dayDivArray.length; i++) {
 
-        if (currentlyVisibleWeekDates[i] === moment().format("dddd, MMMM D, YYYY")) {
-            dayDivArray[i].firstChild.textContent = currentlyVisibleWeekDates[i] + " (Today)";  //if currentlyVisibleWeekDates[i] is storing today's date, append " (Today)" at the end.
+        if (currentlyActiveWeekDates[i] === moment().format("dddd, MMMM D, YYYY")) {
+            dayDivArray[i].firstChild.textContent = currentlyActiveWeekDates[i] + " (Today)";  //if currentlyActiveWeekDates[i] is storing today's date, append " (Today)" at the end.
         }
-        else if (currentlyVisibleWeekDates[i] === moment().add(1, 'days').format("dddd, MMMM D, YYYY")) {
-            dayDivArray[i].firstChild.textContent = currentlyVisibleWeekDates[i] + " (Tomorrow)";  //if currentlyVisibleWeekDates[i] is storing tomorrow's date, append " (Tomorrow)" at the end.
+        else if (currentlyActiveWeekDates[i] === moment().add(1, 'days').format("dddd, MMMM D, YYYY")) {
+            dayDivArray[i].firstChild.textContent = currentlyActiveWeekDates[i] + " (Tomorrow)";  //if currentlyActiveWeekDates[i] is storing tomorrow's date, append " (Tomorrow)" at the end.
         }
         else {
-            dayDivArray[i].firstChild.textContent = currentlyVisibleWeekDates[i]; //Get firstChild of each dayDivArray, which is the dateLabel element. Then we set its textContent equal to the corresponding entry in the currentlyVisibleWeekDates[] array.
+            dayDivArray[i].firstChild.textContent = currentlyActiveWeekDates[i]; //Get firstChild of each dayDivArray, which is the dateLabel element. Then we set its textContent equal to the corresponding entry in the currentlyActiveWeekDates[] array.
         }
     }
 }
@@ -339,15 +371,15 @@ function setDaysOfWeek() {
 //handles the user pressing the "Previous week" button
 document.getElementById("previous_week_button").addEventListener("click", function () {
 
-    currentlyVisibleWeekIndex--; //decrement currentlyVisibleWeekIndex
-    if (currentlyVisibleWeekIndex === 0) {
+    currentlyActiveWeekIndex--; //decrement currentlyActiveWeekIndex
+    if (currentlyActiveWeekIndex === 0) {
         document.getElementById("previous_week_button").disabled = true;  //If user is viewing the current week, disable Previous week button.
     }
     snackbar.style.visibility = "hidden";
 
-    for (var i=0; i<currentlyVisibleWeekDates.length; i++) {
-        //subtract 7 days from each element of the currentlyVisibleWeekDates[] array
-        currentlyVisibleWeekDates[i] = moment(currentlyVisibleWeekDates[i], "dddd, MMMM D, YYYY").add(-7, 'days').format("dddd, MMMM D, YYYY");
+    for (var i=0; i<currentlyActiveWeekDates.length; i++) {
+        //subtract 7 days from each element of the currentlyActiveWeekDates[] array
+        currentlyActiveWeekDates[i] = moment(currentlyActiveWeekDates[i], "dddd, MMMM D, YYYY").add(-7, 'days').format("dddd, MMMM D, YYYY");
 
         initialize2dArrays(); //clear 2d arrays before populating them with elements from the new week
         var nodesToRemove = document.querySelectorAll(".added_task_div"); //find all addedTaskDiv elements and save them in nodesToRemove[] array
@@ -357,7 +389,7 @@ document.getElementById("previous_week_button").addEventListener("click", functi
     }
 
     readUserData();  //read user data for new week
-    setDaysOfWeek(currentlyVisibleWeekDates);
+    setDaysOfWeek(currentlyActiveWeekDates);
     resetDomElements();
     hideOrShowDayDivs();
 });
@@ -365,14 +397,14 @@ document.getElementById("previous_week_button").addEventListener("click", functi
 //handles the user pressing the "Next week" button
 document.getElementById("next_week_button").addEventListener("click", function () {
 
-    currentlyVisibleWeekIndex++; //increment currentlyVisibleWeekIndex
+    currentlyActiveWeekIndex++; //increment currentlyActiveWeekIndex
     document.getElementById("previous_week_button").disabled = false;
 
     snackbar.style.visibility = "hidden";
 
-    for (var i=0; i<currentlyVisibleWeekDates.length; i++) {
-        //add 7 days to each element of the currentlyVisibleWeekDates[] array
-        currentlyVisibleWeekDates[i] = moment(currentlyVisibleWeekDates[i], "dddd, MMMM D, YYYY").add(7, 'days').format("dddd, MMMM D, YYYY");
+    for (var i=0; i<currentlyActiveWeekDates.length; i++) {
+        //add 7 days to each element of the currentlyActiveWeekDates[] array
+        currentlyActiveWeekDates[i] = moment(currentlyActiveWeekDates[i], "dddd, MMMM D, YYYY").add(7, 'days').format("dddd, MMMM D, YYYY");
 
         initialize2dArrays(); //clear 2d arrays before populating them with elements from the new week
         var nodesToRemove = document.querySelectorAll(".added_task_div"); //find all addedTaskDiv elements and save them in nodesToRemove[] array
@@ -382,7 +414,7 @@ document.getElementById("next_week_button").addEventListener("click", function (
 
     }
     readUserData();  //read user data for new week
-    setDaysOfWeek(currentlyVisibleWeekDates);
+    setDaysOfWeek(currentlyActiveWeekDates);
     resetDomElements();
     hideOrShowDayDivs();
 });
@@ -401,17 +433,17 @@ document.getElementById("next_week_button").addEventListener("click", function (
 
 
 //edit existing task in database
-function editUserData(taskClass, taskText, dayIndex, taskIndex) {
+function editUserData(taskClassIndex, taskText, dayIndex, taskIndex) {
 
     dayTaskJsonArray[dayIndex][taskIndex] = {
-        taskClass: taskClass,
+        taskClassIndex: taskClassIndex,
         taskText: taskText
     };
 
     var userId = firebase.auth().currentUser.uid;
 
     //write edited task data
-    firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex] + "/" + taskIndex).set(dayTaskJsonArray[dayIndex][taskIndex]);
+    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex] + "/" + taskIndex).set(dayTaskJsonArray[dayIndex][taskIndex]);
 
 }
 
@@ -424,7 +456,7 @@ function removeUserData(dayIndex, taskIndex) {
     var userId = firebase.auth().currentUser.uid;
 
     //saves a given day's tasks with the completed task removed
-    firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);
+    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);
 
 }
 
@@ -437,22 +469,22 @@ function undoRemoveUserData(completedTaskJson, taskIndex, dayIndex) {
     var userId = firebase.auth().currentUser.uid;
 
     //write new task data
-    firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);
+    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);
 }
 
 
 //write new task to database
-function writeUserData(taskClass, taskText, dayIndex) {
+function writeUserData(taskClassIndex, taskText, dayIndex) {
 
     dayTaskJsonArray[dayIndex].push({
-        taskClass: taskClass,
+        taskClassIndex: taskClassIndex,
         taskText: taskText
     });
 
     var userId = firebase.auth().currentUser.uid;
 
     //write new task data
-    firebase.database().ref('users/' + userId + "/" + currentlyVisibleWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);
+    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);
 }
 
 
@@ -460,23 +492,47 @@ function writeUserData(taskClass, taskText, dayIndex) {
 function readUserData() {
 
     var userId = firebase.auth().currentUser.uid;
-    for (var i=0; i<currentlyVisibleWeekDates.length; i++) {
+    for (var i=0; i<dayDivArray.length; i++) {
 
         (function(i) {
-            firebase.database().ref('/users/' + userId + "/" + currentlyVisibleWeekDates[i]).once('value', (function(snapshot) {
+
+            if (!bInitialReadComplete) {  //The boolean bInitialReadComplete prevents us from reading the class data multiple times, and hence from creating duplicate classDivs when token refreshes occur.
+
+                //Fetch class data
+                firebase.database().ref('/users/' + userId + "/classes").once('value', (function (snapshot) {
+                        if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
+
+                            classJsonArray = snapshot.val(); //Store entire "classes" JSON object from Firebase as classJsonArray.
+                            for (var j = 0; j < classJsonArray.length; j++) {
+                                var classDiv = createClassDiv(classJsonArray[j].classColor, classJsonArray[j].classTime, classJsonArray[j].classLocation, classJsonArray[j].className, classJsonArray[j].classTime, i);
+                                dayDivArray[i].insertBefore(classDiv, dayDivArray[i].childNodes[1]);
+                            }
+                            bInitialReadComplete = true; //Set boolean bInitialReadComplete to "true", indicating that the class data has been read and won't be read again.
+                        }
+                    }
+                ));
+
+            }
+
+
+            //Fetch task data
+            firebase.database().ref('/users/' + userId + "/" + currentlyActiveWeekDates[i]).once('value', (function(snapshot) {
                     if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
 
                         dayTaskJsonArray[i] = snapshot.val();
+
                         for (var j=0; j<dayTaskJsonArray[i].length; j++) {
                             var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayDivArray[i].lastElementChild); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
-                            dayDivArray[i].insertBefore(addedTaskDiv, dayDivArray[i].childNodes[dayDivArray[i].childElementCount-1]); //Inserts addedTaskDiv <div> element before the newTaskDiv <div> element (which is the last child element in dayDivArray[i] ). This ensures tasks are added to the page in the order the user enters them.
+
+                            classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].append(addedTaskDiv);
                         }
                     }
                 }
             ));
 
         }(i));
-    }
+    }  //end FOR loop
+
 }
 
 

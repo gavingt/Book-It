@@ -162,8 +162,13 @@ html, body *{
     width: 70%;
 }
 
+.day_div_header {
+    background-color: beige;
+    border-bottom: solid;
+    padding: 1px 4px 1px 4px;
+}
 
-.day_div_class {
+.class_div {
     border-top-width: thin;
     border-top: solid;
 

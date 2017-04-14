@@ -1,6 +1,5 @@
 
 //TODO: progress spinner for fetching data?
-//TODO: separate sections in each dayDiv for different classes
 //TODO: When I make Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyActiveWeekDates[1], "dddd, MMMM D, YYYY"));
 //TODO: Look into local storage
 //TODO: hide all content until data is read from Firebase. Also hide if user not signed in or user signed up but hasn't completed initial setup wizard.
@@ -539,6 +538,39 @@ function readUserData() {
     }  //end FOR loop
 
 }
+
+//Write class data from initial setup wizard
+document.getElementById("wizard_submit_button").addEventListener("click", function() {
+
+    var classJsonObject = [
+        {
+            classColor: "lightblue",
+            classDays: "M W F",
+            classLocation: "Wexler Hall A119",
+            className: document.getElementById("wizard_class_1_input").value,
+            classTime: "6:00pm-7:15pm"
+        },
+        {
+            classColor: "#ffa197",
+            classDays: "Tu Th",
+            classLocation: "Physical Science Bldg. 112",
+            className: document.getElementById("wizard_class_2_input").value,
+            classTime: "5:00pm-7:00pm"
+        },
+        {
+            classColor: "palegreen",
+            classDays: "M W F",
+            classLocation: "Goldwater 334",
+            className: document.getElementById("wizard_class_3_input").value,
+            classTime: "7:45pm-8:30pm"
+        }
+    ];
+
+    var userId = firebase.auth().currentUser.uid;
+
+    //write class data to Firebase
+    firebase.database().ref('users/' + userId + "/classes").set(classJsonObject);
+});
 
 
 document.getElementById("sign_in_google_button").addEventListener("click", function() {

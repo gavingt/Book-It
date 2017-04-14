@@ -40,7 +40,7 @@ firebase.initializeApp(config);
 var image = new Image();
 image.src = "img/checkbox.png";
 
-initialize2dArrays(); //calls initialize2dArrays() function when user first loads page
+initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
 createDayDivs();  //creates a dayDiv for each day when user first loads page
 initializeDates(); //gets the dates for the current week when user first loads page
 hideOrShowDayDivs();
@@ -293,11 +293,13 @@ function hideOrShowDayDivs () {
 
 
 //Turns taskDivArray, dayTaskJsonArray, and classDivArray into 2D arrays (each of their elements stores its own array)
-function initialize2dArrays() {
+function initialize2dArrays(bIncludeClassDivArray) {
     for (var i = 0; i < 7; i++) {
         addedTaskDivArray[i] = [];
         dayTaskJsonArray[i] = [];
-        classDivArray[i] = [];
+        if (bIncludeClassDivArray) {
+            classDivArray[i] = [];
+        }
     }
 }
 
@@ -387,14 +389,12 @@ document.getElementById("previous_week_button").addEventListener("click", functi
         //subtract 7 days from each element of the currentlyActiveWeekDates[] array
         currentlyActiveWeekDates[i] = moment(currentlyActiveWeekDates[i], "dddd, MMMM D, YYYY").add(-7, 'days').format("dddd, MMMM D, YYYY");
 
-        initialize2dArrays(); //clear 2d arrays before populating them with elements from the new week
+        initialize2dArrays(false); //clear 2d arrays before populating them with elements from the new week
         var nodesToRemove = document.querySelectorAll(".added_task_div"); //find all addedTaskDiv elements and save them in nodesToRemove[] array
         for (var j=0; j<nodesToRemove.length; j++) {   //iterate through nodesToRemove[] array and remove each element
             nodesToRemove[j].parentNode.removeChild(nodesToRemove[j]);
         }
     }
-
-    //TODO: something wrong with readUserData() call here
 
     readUserData();  //read user data for new week
     setDaysOfWeek(currentlyActiveWeekDates);
@@ -414,7 +414,7 @@ document.getElementById("next_week_button").addEventListener("click", function (
         //add 7 days to each element of the currentlyActiveWeekDates[] array
         currentlyActiveWeekDates[i] = moment(currentlyActiveWeekDates[i], "dddd, MMMM D, YYYY").add(7, 'days').format("dddd, MMMM D, YYYY");
 
-        initialize2dArrays(); //clear 2d arrays before populating them with elements from the new week
+        initialize2dArrays(false); //clear 2d arrays before populating them with elements from the new week
         var nodesToRemove = document.querySelectorAll(".added_task_div"); //find all addedTaskDiv elements and save them in nodesToRemove[] array
         for (var j=0; j<nodesToRemove.length; j++) {    //iterate through nodesToRemove[] array and remove each element
             nodesToRemove[j].parentNode.removeChild(nodesToRemove[j]);
@@ -527,9 +527,7 @@ function readUserData() {
                     if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
 
                         dayTaskJsonArray[i] = snapshot.val();
-
                         for (var j=0; j<dayTaskJsonArray[i].length; j++) {
-
                             var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayTaskJsonArray[i][j].taskClassIndex); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
                             classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].insertBefore(addedTaskDiv, classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].lastChild);  //Inserts addedTaskDiv before the last child element of the classDivArray.
                         }

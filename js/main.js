@@ -8,7 +8,6 @@
 //TODO: create a temporary section at top of page for entering class info and writing it
 //TODO: Remove all addedTaskDivs before calling readUserData(). Then we can use .on instead of .once and token refreshes won't cause duplicate entries. Also, remove bbInitialReadComplete variable.
 
-//TODO: when I click an addedTaskSpan to edit it, the last classDiv in a day disappears. (last classDiv is being saved as addTaskButton?).
 
 
 
@@ -137,8 +136,8 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
         newTaskDiv.appendChild(newTaskSaveButton);
         newTaskSaveButton.addEventListener("click", function () {
             if (newTaskInput.value !== "") {  //don't save task if text field is left blank
-                var addedTaskDiv = createAddedTaskDiv(newTaskInput.value, dayIndex, addTaskButton, classDivIndex); //call function createAddedTaskDiv and pass in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
-                classDiv.insertBefore(addedTaskDiv, newTaskDiv);  //Inserts addedTask <p> element before the newTaskDiv <div> element. This ensures tasks are added to the page in the order the user enters them.
+                var addedTaskDiv = createAddedTaskDiv(newTaskInput.value, dayIndex, classDivIndex); //call function createAddedTaskDiv and pass in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
+                classDiv.insertBefore(addedTaskDiv, newTaskDiv);  //Inserts addedTaskDiv before the newTaskDiv. This ensures tasks are added to the page in the order the user enters them.
 
                 writeUserData(classDivIndex, newTaskInput.value, dayIndex);
 
@@ -169,7 +168,7 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
 //Creates addedTaskDiv elements. This function gets called in two places:
                                                          // 1) in createDayDivs(), to generate an addedTaskDiv when the user adds a new task
                                                          // 2) in readUserData(), to generate addedTaskDivs from existing tasks stored in Firebase
-function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton, classDivIndex) {
+function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
 
     var addedTaskDiv = document.createElement("div"); //creates a <div> element to house a newly added task
     addedTaskDiv.className = "added_task_div";
@@ -224,7 +223,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton, classDivInde
         resetDomElements();
 
         addedTaskDiv.style.display = "none";
-        addTaskButton.style.display = "none";
+        //classDivArray[dayIndex][classDivIndex].lastElementChild.style.display = "none";  //hide addTaskButton
 
         var editTaskDiv = document.createElement("div"); //Creates a div to house the UI for editing a task. This holds a textbox, Save button, and Cancel button.
         editTaskDiv.className = "edit_task_div";  //Gives every editTaskDiv a class name so they can be referenced later in the JavaScript code
@@ -249,7 +248,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton, classDivInde
             addedTaskTextSpan.textContent = editTaskInput.value; //set the addedTaskTextSpan's text equal to the newly edited text value from newTaskInput
             addedTaskDiv.style.display = "block"; //make the addedTaskDiv visible again after we hid it earlier
             editTaskDiv.parentNode.removeChild(editTaskDiv); //Removes editTaskDiv from the DOM
-            addTaskButton.style.display = "block";
+            //classDivArray[dayIndex][classDivIndex].lastElementChild.style.display = "block";  //show addTaskButton
 
             editUserData(classDivIndex, addedTaskTextSpan.textContent, dayIndex, addedTaskDivIndex);
 
@@ -259,8 +258,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, addTaskButton, classDivInde
         editTaskCancelButton.textContent = "Cancel";
         editTaskDiv.appendChild(editTaskCancelButton);
         editTaskCancelButton.addEventListener("click", function () {
-            //dayDivArray[dayIndex].appendChild(addTaskButton);      //Moves addTaskButton back to the bottom of dayDiv
-            addTaskButton.style.display = "block";  //Makes addTaskButton reappear
+            //classDivArray[dayIndex][classDivIndex].lastElementChild.style.display = "block";  //Makes addTaskButton reappear
             addedTaskDiv.style.display = "block";
             editTaskDiv.parentNode.removeChild(editTaskDiv);  //Removes editTaskDiv from the DOM
         });
@@ -310,7 +308,8 @@ function resetDomElements() {
 
     var addedTaskDivsToShow = document.getElementsByClassName("added_task_div");
     for (var i = 0; i < addedTaskDivsToShow.length; i++) {
-        addedTaskDivsToShow[i].parentNode.appendChild(addedTaskDivsToShow[i]);
+
+        //addedTaskDivsToShow[i].parentNode.appendChild(addedTaskDivsToShow[i]);
         addedTaskDivsToShow[i].style.display = "block";
     }
 
@@ -394,6 +393,8 @@ document.getElementById("previous_week_button").addEventListener("click", functi
             nodesToRemove[j].parentNode.removeChild(nodesToRemove[j]);
         }
     }
+
+    //TODO: something wrong with readUserData() call here
 
     readUserData();  //read user data for new week
     setDaysOfWeek(currentlyActiveWeekDates);
@@ -529,9 +530,7 @@ function readUserData() {
 
                         for (var j=0; j<dayTaskJsonArray[i].length; j++) {
 
-                            //TODO: problem with editing is below: addTaskButton is being assigned as lastElementChild of dayDiv but it no longer is. Actually addTaskButton isn't even created yet at this point.
-                            console.log(dayDivArray[i]);
-                            var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayDivArray[i].lastElementChild, dayTaskJsonArray[i][j].taskClassIndex); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
+                            var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayTaskJsonArray[i][j].taskClassIndex); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
                             classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].insertBefore(addedTaskDiv, classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].lastChild);  //Inserts addedTaskDiv before the last child element of the classDivArray.
                         }
                     }

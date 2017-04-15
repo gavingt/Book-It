@@ -574,11 +574,6 @@ document.getElementById("wizard_submit_button").addEventListener("click", functi
 
 
 
-document.getElementById("settings_button").addEventListener("click", function(){
-   alert("setttings button pressed");
-
-});
-
 
 document.getElementById("sign_in_google_button").addEventListener("click", function() {
     firebase.auth().signInWithPopup(googleProvider).then(function(result) {
@@ -626,6 +621,36 @@ document.getElementById("sign_out_button").addEventListener("click", function() 
     });
 });
 
+
+//TODO: create var for dropdown_list so I'm not constantly using getElementById
+
+//When the user clicks on the button, toggle between hiding and showing the dropdown list
+document.getElementById("dropdown_button").addEventListener("click", function() {
+    document.getElementById("dropdown_list").classList.toggle("show");
+});
+
+document.getElementById("dropdown_button").addEventListener("mouseover", function() {
+    document.getElementById("dropdown_button").src = "img/settings_black.png";
+});
+
+document.getElementById("dropdown_button").addEventListener("mouseout", function() {
+    if (!document.getElementById("dropdown_list").classList.contains('show')) {
+        document.getElementById("dropdown_button").src = "img/settings_gray.png";
+    }
+});
+
+
+// Close the dropdown menu if the user clicks outside of it
+window.onclick = function(event) {
+    if (!event.target.matches('.dropbtn')) {
+        document.getElementById("dropdown_list").classList.remove('show');
+        document.getElementById("dropdown_button").src = "img/settings_gray.png";
+    }
+};
+
+document.getElementById("dropdown_item_initial_setup_wizard").addEventListener("click", function() {
+    alert("initial setup wizard");
+});
 
 
 /******************************************************/

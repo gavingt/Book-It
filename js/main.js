@@ -613,7 +613,7 @@ document.getElementById("sign_in_facebook_button").addEventListener("click", fun
 });
 
 
-document.getElementById("sign_out_button").addEventListener("click", function() {
+document.getElementById("settings_item_sign_out").addEventListener("click", function() {
     firebase.auth().signOut().then(function() {
     }).catch(function(error) {
         // An error happened.
@@ -622,34 +622,38 @@ document.getElementById("sign_out_button").addEventListener("click", function() 
 });
 
 
-//TODO: create var for dropdown_list so I'm not constantly using getElementById
+//TODO: create var for settings_list so I'm not constantly using getElementById
 
 //When the user clicks on the button, toggle between hiding and showing the dropdown list
-document.getElementById("dropdown_button").addEventListener("click", function() {
-    document.getElementById("dropdown_list").classList.toggle("show");
+document.getElementById("settings_button").addEventListener("click", function() {
+    document.getElementById("settings_list").classList.toggle('show');
 });
 
-document.getElementById("dropdown_button").addEventListener("mouseover", function() {
-    document.getElementById("dropdown_button").src = "img/settings_black.png";
+document.getElementById("settings_button").addEventListener("mouseover", function() {
+    document.getElementById("settings_button").src = "img/settings_black.png";
 });
 
-document.getElementById("dropdown_button").addEventListener("mouseout", function() {
-    if (!document.getElementById("dropdown_list").classList.contains('show')) {
-        document.getElementById("dropdown_button").src = "img/settings_gray.png";
+document.getElementById("settings_button").addEventListener("mouseout", function() {
+    if (!document.getElementById("settings_list").classList.contains('show')) {
+        document.getElementById("settings_button").src = "img/settings_gray.png";
     }
 });
 
 
 // Close the dropdown menu if the user clicks outside of it
 window.onclick = function(event) {
-    if (!event.target.matches('.dropbtn')) {
-        document.getElementById("dropdown_list").classList.remove('show');
-        document.getElementById("dropdown_button").src = "img/settings_gray.png";
+    if (!event.target.matches('.dropdownButton')) {
+        document.getElementById("settings_list").classList.remove('show');
+        document.getElementById("settings_button").src = "img/settings_gray.png";
     }
 };
 
-document.getElementById("dropdown_item_initial_setup_wizard").addEventListener("click", function() {
+document.getElementById("settings_item_initial_setup_wizard").addEventListener("click", function() {
     alert("initial setup wizard");
+});
+
+document.getElementById("settings_item_about_this_app").addEventListener("click", function() {
+    alert("Created by Gavin and Adam Wright, 2017");
 });
 
 

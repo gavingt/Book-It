@@ -154,6 +154,10 @@ html, body *{
 
 }
 
+#settings_button {
+    float: right;
+}
+
 .day_div {
     background-color: #EEEEEE;
     border: solid;

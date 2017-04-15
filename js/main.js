@@ -573,6 +573,13 @@ document.getElementById("wizard_submit_button").addEventListener("click", functi
 });
 
 
+
+document.getElementById("settings_button").addEventListener("click", function(){
+   alert("setttings button pressed");
+
+});
+
+
 document.getElementById("sign_in_google_button").addEventListener("click", function() {
     firebase.auth().signInWithPopup(googleProvider).then(function(result) {
         // This gives you a Google Access Token. You can use it to access the Google API.

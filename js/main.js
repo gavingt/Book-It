@@ -43,6 +43,7 @@ initialize2dArrays(true); //calls initialize2dArrays() function when user first 
 createDayDivs();  //creates a dayDiv for each day when user first loads page
 initializeDates(); //gets the dates for the current week when user first loads page
 hideOrShowDayDivs();
+initializeSettingsButton();
 
 
 firebase.auth().onAuthStateChanged(function(user) {
@@ -54,12 +55,12 @@ firebase.auth().onAuthStateChanged(function(user) {
         }
         document.getElementById("sign_in_google_button").style.display = "none";
         document.getElementById("sign_in_facebook_button").style.display = "none";
-        document.getElementById("sign_out_button").style.display = "inline";
+        document.getElementById("settings_button").style.display = "inline";
     } else {
         // No user is signed in.
         document.getElementById("sign_in_google_button").style.display = "inline";
         document.getElementById("sign_in_facebook_button").style.display = "inline";
-        document.getElementById("sign_out_button").style.display = "none";
+        document.getElementById("settings_button").style.display = "none";
     }
 });
 
@@ -622,40 +623,45 @@ document.getElementById("settings_item_sign_out").addEventListener("click", func
 });
 
 
-//TODO: create var for settings_list so I'm not constantly using getElementById
+
+function initializeSettingsButton() {
+
+    var settingsButton = document.getElementById("settings_button");
+    var settingsList = document.getElementById("settings_list");
 
 //When the user clicks on the button, toggle between hiding and showing the dropdown list
-document.getElementById("settings_button").addEventListener("click", function() {
-    document.getElementById("settings_list").classList.toggle('show');
-});
+    settingsButton.addEventListener("click", function () {
+        settingsList.classList.toggle('show');
+    });
 
-document.getElementById("settings_button").addEventListener("mouseover", function() {
-    document.getElementById("settings_button").src = "img/settings_black.png";
-});
+    settingsButton.addEventListener("mouseover", function () {
+        settingsButton.src = "img/settings_black.png";
+    });
 
-document.getElementById("settings_button").addEventListener("mouseout", function() {
-    if (!document.getElementById("settings_list").classList.contains('show')) {
-        document.getElementById("settings_button").src = "img/settings_gray.png";
-    }
-});
+    settingsButton.addEventListener("mouseout", function () {
+        if (!settingsList.classList.contains('show')) {
+            settingsButton.src = "img/settings_gray.png";
+        }
+    });
 
 
 // Close the dropdown menu if the user clicks outside of it
-window.onclick = function(event) {
-    if (!event.target.matches('.dropdownButton')) {
-        document.getElementById("settings_list").classList.remove('show');
-        document.getElementById("settings_button").src = "img/settings_gray.png";
-    }
-};
+    window.onclick = function (event) {
+        if (!event.target.matches('.dropdownButton')) {
+            settingsList.classList.remove('show');
+            settingsButton.src = "img/settings_gray.png";
+        }
+    };
 
-document.getElementById("settings_item_initial_setup_wizard").addEventListener("click", function() {
-    alert("initial setup wizard");
-});
+    document.getElementById("settings_item_initial_setup_wizard").addEventListener("click", function () {
+        alert("initial setup wizard");
+    });
 
-document.getElementById("settings_item_about_this_app").addEventListener("click", function() {
-    alert("Created by Gavin and Adam Wright, 2017");
-});
+    document.getElementById("settings_item_about_this_app").addEventListener("click", function () {
+        alert("Created by Gavin and Adam Wright, 2017");
+    });
 
+}
 
 /******************************************************/
 /*****************END FIREBASE CODE********************/

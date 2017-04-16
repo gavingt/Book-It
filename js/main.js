@@ -4,9 +4,10 @@
 //TODO: Look into local storage
 //TODO: hide all content until data is read from Firebase. Also hide if user not signed in or user signed up but hasn't completed initial setup wizard.
 //TODO: use <hr> elements between tasks?
-//TODO: create a temporary section at top of page for entering class info and writing it
-//TODO: Remove all addedTaskDivs before calling readUserData(). Then we can use .on instead of .once and token refreshes won't cause duplicate entries. Also, remove bbInitialReadComplete variable.
+//TODO: Remove all addedTaskDivs before calling readTaskData(). Then we can use .on instead of .once and token refreshes won't cause duplicate entries. Also, remove bbInitialReadComplete variable.
+//TODO: add shadows to each dayDiv
 
+//TODO: change Google button to remove + signs
 
 
 
@@ -49,8 +50,9 @@ initializeSettingsButton();
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
         // User is signed in
-        if (bInitialReadComplete === false) {  //Doing this check ensures that Firebase's hourly token refreshes don't cause re-reading of data (and thus duplicate tasks, since readUserData() generates addedTaskDiv elements).
-            readUserData(); //as soon as user is signed in, read existing data from Firebase and populate addedTaskDivs with tasks
+        if (bInitialReadComplete === false) {  //Doing this check ensures that Firebase's hourly token refreshes don't cause re-reading of data (and thus duplicate tasks, since readTaskData() generates addedTaskDiv elements).
+            readClassData(); //Reads class data if it exists for current user. If it doesn't, opens initial setup wizard.
+            readTaskData(); //as soon as user is signed in, read existing data from Firebase and populate addedTaskDivs with tasks
             bInitialReadComplete = true;
         }
         document.getElementById("sign_in_google_button").style.display = "none";
@@ -93,7 +95,7 @@ function createDayDivs () {
 
 
 
-//Creates classDiv elements. This function gets called in readUserData(), to generate classDivs based on the classes the user added in the initial setup wizard.
+//Creates classDiv elements. This function gets called in readTaskData(), to generate classDivs based on the classes the user added in the initial setup wizard.
 function createClassDiv(classColor, classDays, classLocation, className, classTime, dayIndex, classDivIndex) {
     var classDiv = document.createElement("div");
     classDiv.className = "class_div";
@@ -167,7 +169,7 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
 
 //Creates addedTaskDiv elements. This function gets called in two places:
                                                          // 1) in createDayDivs(), to generate an addedTaskDiv when the user adds a new task
-                                                         // 2) in readUserData(), to generate addedTaskDivs from existing tasks stored in Firebase
+                                                         // 2) in readTaskData(), to generate addedTaskDivs from existing tasks stored in Firebase
 function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
 
     var addedTaskDiv = document.createElement("div"); //creates a <div> element to house a newly added task
@@ -182,7 +184,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
         var completedTaskIndex = addedTaskDivArray[dayIndex].indexOf(markTaskFinishedImage.parentNode);
         var completedTaskJson = dayTaskJsonArray[dayIndex][completedTaskIndex];
         addedTaskDivArray[dayIndex].splice(completedTaskIndex, 1);
-        removeUserData(dayIndex, completedTaskIndex);
+        removeTaskData(dayIndex, completedTaskIndex);
 
 
         //We have to clone the snackbar to remove its event listeners so that the UNDO button doesn't undo multiple completed tasks
@@ -197,7 +199,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
         document.getElementById("snackbar_undo_button").addEventListener("click", function() {
 
             snackbar.style.visibility = "hidden";
-            undoRemoveUserData(completedTaskJson, completedTaskIndex, dayIndex);
+            undoRemoveTaskData(completedTaskJson, completedTaskIndex, dayIndex);
             addedTaskDiv.style.display = "block";
             addedTaskDiv.className = "added_task_div";  //We unhide this addedTaskDiv from the resetDomElements() function.
             addedTaskDivArray[dayIndex].splice(completedTaskIndex, 0, addedTaskDiv);
@@ -250,7 +252,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
             editTaskDiv.parentNode.removeChild(editTaskDiv); //Removes editTaskDiv from the DOM
             //classDivArray[dayIndex][classDivIndex].lastElementChild.style.display = "block";  //show addTaskButton
 
-            editUserData(classDivIndex, addedTaskTextSpan.textContent, dayIndex, addedTaskDivIndex);
+            editTaskData(classDivIndex, addedTaskTextSpan.textContent, dayIndex, addedTaskDivIndex);
 
         });
 
@@ -396,7 +398,7 @@ document.getElementById("previous_week_button").addEventListener("click", functi
         }
     }
 
-    readUserData();  //read user data for new week
+    readTaskData();  //read user data for new week
     setDaysOfWeek(currentlyActiveWeekDates);
     resetDomElements();
     hideOrShowDayDivs();
@@ -421,7 +423,7 @@ document.getElementById("next_week_button").addEventListener("click", function (
         }
 
     }
-    readUserData();  //read user data for new week
+    readTaskData();  //read user data for new week
     setDaysOfWeek(currentlyActiveWeekDates);
     resetDomElements();
     hideOrShowDayDivs();
@@ -440,8 +442,11 @@ document.getElementById("next_week_button").addEventListener("click", function (
 /****************************************************/
 
 
+
+
+
 //edit existing task in database
-function editUserData(taskClassIndex, taskText, dayIndex, taskIndex) {
+function editTaskData(taskClassIndex, taskText, dayIndex, taskIndex) {
 
     dayTaskJsonArray[dayIndex][taskIndex] = {
         taskClassIndex: taskClassIndex,
@@ -457,7 +462,7 @@ function editUserData(taskClassIndex, taskText, dayIndex, taskIndex) {
 
 
 //remove existing task in database
-function removeUserData(dayIndex, taskIndex) {
+function removeTaskData(dayIndex, taskIndex) {
 
     dayTaskJsonArray[dayIndex].splice(taskIndex,1);
 
@@ -470,7 +475,7 @@ function removeUserData(dayIndex, taskIndex) {
 
 
 //write a task back into the database if it was marked complete and then the UNDO button in snackbar was pressed
-function undoRemoveUserData(completedTaskJson, taskIndex, dayIndex) {
+function undoRemoveTaskData(completedTaskJson, taskIndex, dayIndex) {
 
     dayTaskJsonArray[dayIndex].splice(taskIndex, 0, completedTaskJson);
 
@@ -496,30 +501,45 @@ function writeUserData(taskClassIndex, taskText, dayIndex) {
 }
 
 
-//Reads data from Firebase. This only gets called at the initial page load or when the user switches between weeks.
-function readUserData() {
+//Reads class data if it exists. If it doesn't, it opens the initial setup wizard.
+function readClassData() {
 
     var userId = firebase.auth().currentUser.uid;
+
+    for (var i = 0; i < dayDivArray.length; i++) {
+
+        (function (i) {
+
+            //Fetch class data
+            firebase.database().ref('/users/' + userId + "/classes").once('value', (function (snapshot) {
+                    if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
+                        classJsonArray = snapshot.val(); //Store entire "classes" JSON object from Firebase as classJsonArray.
+                        for (var j = 0; j < classJsonArray.length; j++) {
+                            var classDiv = createClassDiv(classJsonArray[j].classColor, classJsonArray[j].classTime, classJsonArray[j].classLocation, classJsonArray[j].className, classJsonArray[j].classTime, i, j);
+                            dayDivArray[i].append(classDiv);
+                        }
+                    }
+                    else {
+                        document.getElementById("initial_setup_wizard_div").style.display = "block"; //If no class data is saved, show initial setup wizard
+                    }
+                }
+            ));
+
+        }(i));
+    }  //end FOR loop
+}
+
+
+
+
+//Reads data from Firebase. This only gets called at the initial page load or when the user switches between weeks.
+function readTaskData() {
+
+    var userId = firebase.auth().currentUser.uid;
+
     for (var i=0; i<dayDivArray.length; i++) {
 
         (function(i) {
-
-            if (!bInitialReadComplete) {  //The boolean bInitialReadComplete prevents us from reading the class data multiple times, and hence from creating duplicate classDivs when token refreshes occur.
-
-                //Fetch class data
-                firebase.database().ref('/users/' + userId + "/classes").once('value', (function (snapshot) {
-                        if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
-                            classJsonArray = snapshot.val(); //Store entire "classes" JSON object from Firebase as classJsonArray.
-                            for (var j = 0; j < classJsonArray.length; j++) {
-                                var classDiv = createClassDiv(classJsonArray[j].classColor, classJsonArray[j].classTime, classJsonArray[j].classLocation, classJsonArray[j].className, classJsonArray[j].classTime, i, j);
-                                dayDivArray[i].append(classDiv);
-                            }
-                            bInitialReadComplete = true; //Set boolean bInitialReadComplete to "true", indicating that the class data has been read and won't be read again.
-                        }
-                    }
-                ));
-
-            }
 
 
             //Fetch task data
@@ -539,6 +559,9 @@ function readUserData() {
     }  //end FOR loop
 
 }
+
+
+
 
 //Write class data from initial setup wizard
 document.getElementById("wizard_submit_button").addEventListener("click", function() {

@@ -7,8 +7,10 @@
 //TODO: Remove all addedTaskDivs before calling readTaskData(). Then we can use .on instead of .once and token refreshes won't cause duplicate entries. Also, remove bbInitialReadComplete variable.
 //TODO: add shadows to each dayDiv
 
-//TODO: change Google button to remove + signs
 //TODO: hide all content until data is read from Firebase. Also hide if user not signed in or user signed up but hasn't completed initial setup wizard.
+
+//TODO: when you switch users, old task data isn't wiped.
+//TODO: if no user signed in on page load and then a use signs in, we're trying to assign a style.display to an element that's not yet generated (dayDiv?)
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -44,17 +46,21 @@ var image2 = new Image();
 image2.src = "img/settings_black.png";
 
 
-initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
-createDayDivs();  //creates a dayDiv for each day when user first loads page
-initializeDates(); //gets the dates for the current week when user first loads page
-hideOrShowDayDivs();
-initializeSettingsButton();
+
 
 
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
         // User is signed in
         if (bInitialReadComplete === false) {  //Doing this check ensures that Firebase's hourly token refreshes don't cause re-reading of data (and thus duplicate tasks, since readTaskData() generates addedTaskDiv elements).
+
+            document.getElementById("week_switcher_buttons").style.display = "block";
+            initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
+            createDayDivs();  //creates a dayDiv for each day when user first loads page
+            initializeDates(); //gets the dates for the current week when user first loads page
+            hideOrShowDayDivs(); //Hide dayDivs after pressing week switcher buttons, if needed.
+            initializeSettingsButton();
+
             readClassData(); //Reads class data if it exists for current user. If it doesn't, opens initial setup wizard.
             readTaskData(); //as soon as user is signed in, read existing data from Firebase and populate addedTaskDivs with tasks
             bInitialReadComplete = true;
@@ -283,14 +289,18 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
 //Hides or shows dayDivs based on the week that's visible. If it's the current week, we hide the dayDivs for days that have already passed.
 function hideOrShowDayDivs () {
 
+    for (var i=0; i<dayDivArray.length; i++) {
+        dayDivArray[i].style.display = "block";
+    }
+
     if (currentlyActiveWeekIndex === 0) {
-        for (var i = 0; i < todaysDateIndex; i++) {
-            dayDivArray[i].style.display = "none";
+        for (var j = 0; j<todaysDateIndex; j++) {
+            dayDivArray[j].style.display = "none";
         }
     }
     else {
-        for (var j = 0; j < todaysDateIndex; j++) {
-            dayDivArray[j].style.display = "block";
+        for (var k = 0; k<todaysDateIndex; k++) {
+            dayDivArray[k].style.display = "block";
         }
     }
 }
@@ -609,6 +619,10 @@ document.getElementById("sign_in_google_button").addEventListener("click", funct
         var token = result.credential.accessToken;
         // The signed-in user info.
         var user = result.user;
+
+        hideOrShowDayDivs();
+        document.getElementById("week_switcher_buttons").style.display = "block";
+
     }).catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
@@ -643,6 +657,11 @@ document.getElementById("sign_in_facebook_button").addEventListener("click", fun
 
 document.getElementById("settings_item_sign_out").addEventListener("click", function() {
     firebase.auth().signOut().then(function() {
+        document.getElementById("week_switcher_buttons").style.display = "none";
+        for (var i=0; i<dayDivArray.length; i++) {
+            dayDivArray[i].style.display = "none";
+        }
+
     }).catch(function(error) {
         // An error happened.
         alert("Sign-out error occurred \n" + "Error code: " + errorCode + "\nError message: " + errorMessage);

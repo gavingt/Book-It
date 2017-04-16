@@ -2,13 +2,13 @@
 //TODO: progress spinner for fetching data?
 //TODO: When I make Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyActiveWeekDates[1], "dddd, MMMM D, YYYY"));
 //TODO: Look into local storage
-//TODO: hide all content until data is read from Firebase. Also hide if user not signed in or user signed up but hasn't completed initial setup wizard.
+
 //TODO: use <hr> elements between tasks?
 //TODO: Remove all addedTaskDivs before calling readTaskData(). Then we can use .on instead of .once and token refreshes won't cause duplicate entries. Also, remove bbInitialReadComplete variable.
 //TODO: add shadows to each dayDiv
 
 //TODO: change Google button to remove + signs
-
+//TODO: hide all content until data is read from Firebase. Also hide if user not signed in or user signed up but hasn't completed initial setup wizard.
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -656,12 +656,10 @@ function initializeSettingsButton() {
     var settingsButton = document.getElementById("settings_button");
     var settingsList = document.getElementById("settings_list");
 
-//When the user clicks on the button, toggle between hiding and showing the dropdown list
+    //When the user clicks on the button, toggle between hiding and showing the dropdown list
     settingsButton.addEventListener("click", function () {
         settingsList.classList.toggle('show');
-        if (settingsButton.src === "img/settings_black.png") {
-            settingsButton.src = "img/settings_gray.png";
-        }
+
     });
 
     settingsButton.addEventListener("mouseover", function () {

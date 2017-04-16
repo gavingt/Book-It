@@ -36,9 +36,13 @@ var config = {
 };
 firebase.initializeApp(config);
 
-//The below two lines force checkbox.png to be preloaded so that it doesn't load after the tasks themselves arrive from Firebase
-var image = new Image();
-image.src = "img/checkbox.png";
+//The below lines force these images to be preloaded so that they they're ready when we need to display them.
+var image1 = new Image();
+image1.src = "img/checkbox.png";
+
+var image2 = new Image();
+image2.src = "img/settings_black.png";
+
 
 initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
 createDayDivs();  //creates a dayDiv for each day when user first loads page
@@ -655,6 +659,9 @@ function initializeSettingsButton() {
 //When the user clicks on the button, toggle between hiding and showing the dropdown list
     settingsButton.addEventListener("click", function () {
         settingsList.classList.toggle('show');
+        if (settingsButton.src === "img/settings_black.png") {
+            settingsButton.src = "img/settings_gray.png";
+        }
     });
 
     settingsButton.addEventListener("mouseover", function () {

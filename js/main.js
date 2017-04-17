@@ -9,7 +9,10 @@
 
 //TODO: hide all content until user has completed initial setup wizard.
 
-//TODO: sign in buttons go in main content area, and greeting goes in header
+//TODO: if task text is too long, it should wrap within dayDivs.
+//TODO: when user switches weeks, hide content until it's reloaded.
+
+//TODO: sit at desk
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -44,6 +47,7 @@ image1.src = "img/checkbox.png";
 var image2 = new Image();
 image2.src = "img/settings_black.png";
 
+initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
 
 
 //Perform certain actions based on whether Firebase reports that a user is signed in or not signed in.
@@ -52,22 +56,22 @@ firebase.auth().onAuthStateChanged(function(user) {
         // User is signed in
         if (bInitialReadComplete === false) {  //Doing this check ensures that Firebase's hourly token refreshes don't cause re-reading of data (and thus duplicate tasks, since readTaskData() generates addedTaskDiv elements).
 
-            initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
             createDayDivs();  //creates a dayDiv for each day when user first loads page
             initializeDates(); //gets the dates for the current week when user first loads page
-            initializeSettingsButton();
             readClassData(); //Reads class data if it exists for current user. If it doesn't, opens initial setup wizard.
             readTaskData(); //as soon as user is signed in, read existing data from Firebase and populate addedTaskDivs with tasks
             bInitialReadComplete = true;
+            document.getElementById('sign_in_button_group').style.display = "none";
+
+            initializeSettingsButton(true);
 
         }
-        document.getElementById("sign_in_google_button").style.display = "none";
-        document.getElementById("sign_in_facebook_button").style.display = "none";
-        document.getElementById("settings_button").style.display = "inline";
 
     } else {
         // No user is signed in.
-        document.getElementById("button_group").style.display = "block";
+        document.getElementById("sign_in_button_group").style.display = "inline-block";
+        initializeSettingsButton(false);
+
     }
 });
 
@@ -623,6 +627,7 @@ document.getElementById("sign_in_google_button").addEventListener("click", funct
         // The signed-in user info.
         var user = result.user;
 
+        window.location.reload(); //Reload the page if the user signs in.
 
     }).catch(function(error) {
         // Handle Errors here.
@@ -643,6 +648,9 @@ document.getElementById("sign_in_facebook_button").addEventListener("click", fun
         var token = result.credential.accessToken;
         // The signed-in user info.
         var user = result.user;
+
+        window.location.reload(); //Reload the page if the user signs in.
+
     }).catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
@@ -668,14 +676,24 @@ document.getElementById("settings_item_sign_out").addEventListener("click", func
 
 
 
-function initializeSettingsButton() {
+function initializeSettingsButton(bUserSignedIn) {
 
     var settingsButton = document.getElementById("settings_button");
     var settingsList = document.getElementById("settings_list");
 
     //When the user clicks on the button, toggle between hiding and showing the dropdown list
     settingsButton.addEventListener("click", function () {
-        settingsList.classList.toggle('show');
+        if (bUserSignedIn) {
+            settingsList.classList.toggle('show');
+            document.getElementById('settings_item_initial_setup_wizard').style.display = "block";
+            document.getElementById('settings_item_sign_out').style.display = "block";
+            //TODO: above is not working if you're signed out at page load and then sign in (is initializeSettingsButton not getting called after signing in?)
+        }
+        else {
+            settingsList.classList.toggle('show');
+            document.getElementById('settings_item_initial_setup_wizard').style.display = "none";
+            document.getElementById('settings_item_sign_out').style.display = "none";
+        }
 
     });
 

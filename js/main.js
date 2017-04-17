@@ -7,10 +7,9 @@
 //TODO: Remove all addedTaskDivs before calling readTaskData(). Then we can use .on instead of .once and token refreshes won't cause duplicate entries. Also, remove bbInitialReadComplete variable.
 //TODO: add shadows to each dayDiv
 
-//TODO: hide all content until data is read from Firebase. Also hide if user not signed in or user signed up but hasn't completed initial setup wizard.
+//TODO: hide all content until user has completed initial setup wizard.
 
-//TODO: when you switch users, old task data isn't wiped.
-//TODO: if no user signed in on page load and then a use signs in, we're trying to assign a style.display to an element that's not yet generated (dayDiv?)
+//TODO: sign in buttons go in main content area, and greeting goes in header
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -47,34 +46,31 @@ image2.src = "img/settings_black.png";
 
 
 
-
-
+//Perform certain actions based on whether Firebase reports that a user is signed in or not signed in.
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
         // User is signed in
         if (bInitialReadComplete === false) {  //Doing this check ensures that Firebase's hourly token refreshes don't cause re-reading of data (and thus duplicate tasks, since readTaskData() generates addedTaskDiv elements).
 
-            document.getElementById("week_switcher_buttons").style.display = "block";
             initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
             createDayDivs();  //creates a dayDiv for each day when user first loads page
             initializeDates(); //gets the dates for the current week when user first loads page
-            hideOrShowDayDivs(); //Hide dayDivs after pressing week switcher buttons, if needed.
             initializeSettingsButton();
-
             readClassData(); //Reads class data if it exists for current user. If it doesn't, opens initial setup wizard.
             readTaskData(); //as soon as user is signed in, read existing data from Firebase and populate addedTaskDivs with tasks
             bInitialReadComplete = true;
+
         }
         document.getElementById("sign_in_google_button").style.display = "none";
         document.getElementById("sign_in_facebook_button").style.display = "none";
         document.getElementById("settings_button").style.display = "inline";
+
     } else {
         // No user is signed in.
-        document.getElementById("sign_in_google_button").style.display = "inline";
-        document.getElementById("sign_in_facebook_button").style.display = "inline";
-        document.getElementById("settings_button").style.display = "none";
+        document.getElementById("button_group").style.display = "block";
     }
 });
+
 
 
 /****************************************************/
@@ -90,6 +86,7 @@ function createDayDivs () {
 
             var dayDiv = document.createElement("div");
             dayDiv.className = "day_div"; //Gives every dayDiv a class name so they can be referenced later in the JavaScript code
+            dayDiv.style.display = "none";
 
             var dayDivHeader = document.createElement("div");
             dayDivHeader.className = "day_div_header";
@@ -288,6 +285,8 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
 
 //Hides or shows dayDivs based on the week that's visible. If it's the current week, we hide the dayDivs for days that have already passed.
 function hideOrShowDayDivs () {
+
+    document.getElementById("week_switcher_buttons").style.display = "block";
 
     for (var i=0; i<dayDivArray.length; i++) {
         dayDivArray[i].style.display = "block";
@@ -566,6 +565,10 @@ function readTaskData() {
                             classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].insertBefore(addedTaskDiv, classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].lastChild);  //Inserts addedTaskDiv before the last child element of the classDivArray.
                         }
                     }
+
+                    if (i === dayDivArray.length - 1) {
+                        hideOrShowDayDivs();
+                    }
                 }
             ));
 
@@ -620,8 +623,6 @@ document.getElementById("sign_in_google_button").addEventListener("click", funct
         // The signed-in user info.
         var user = result.user;
 
-        hideOrShowDayDivs();
-        document.getElementById("week_switcher_buttons").style.display = "block";
 
     }).catch(function(error) {
         // Handle Errors here.
@@ -657,10 +658,7 @@ document.getElementById("sign_in_facebook_button").addEventListener("click", fun
 
 document.getElementById("settings_item_sign_out").addEventListener("click", function() {
     firebase.auth().signOut().then(function() {
-        document.getElementById("week_switcher_buttons").style.display = "none";
-        for (var i=0; i<dayDivArray.length; i++) {
-            dayDivArray[i].style.display = "none";
-        }
+        window.location.reload(); //Reload the page if the user signs out. By doing this, we can avoid including a lot of code for resetting the environment for when a different user signs in.
 
     }).catch(function(error) {
         // An error happened.

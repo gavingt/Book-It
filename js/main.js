@@ -65,7 +65,6 @@ firebase.auth().onAuthStateChanged(function(user) {
             readClassData(); //Reads class data if it exists for current user. If it doesn't, opens initial setup wizard.
             readTaskData(); //as soon as user is signed in, read existing data from Firebase and populate addedTaskDivs with tasks
             bInitialReadComplete = true;
-            document.getElementById('sign_in_button_group').style.display = "none";
 
             initializeSettingsButton(true);
 
@@ -73,8 +72,10 @@ firebase.auth().onAuthStateChanged(function(user) {
 
     } else {
         // No user is signed in.
+        document.getElementById('sign_in_button_group_wrapper').style.display = "block";
         document.getElementById("sign_in_button_group").style.display = "inline-block";
         initializeSettingsButton(false);
+
 
     }
 });
@@ -691,7 +692,6 @@ function initializeSettingsButton(bUserSignedIn) {
             settingsList.classList.toggle('show');
             document.getElementById('settings_item_initial_setup_wizard').style.display = "block";
             document.getElementById('settings_item_sign_out').style.display = "block";
-            //TODO: above is not working if you're signed out at page load and then sign in (is initializeSettingsButton not getting called after signing in?)
         }
         else {
             settingsList.classList.toggle('show');
@@ -719,6 +719,15 @@ function initializeSettingsButton(bUserSignedIn) {
             settingsButton.src = "img/settings_gray.png";
         }
     };
+
+    window.onclick = function (event) {
+        if (!event.target.matches('.dropdownButton')) {
+            settingsList.classList.remove('show');
+            settingsButton.src = "img/settings_gray.png";
+        }
+    };
+
+
 
     document.getElementById("settings_item_initial_setup_wizard").addEventListener("click", function () {
         alert("initial setup wizard");

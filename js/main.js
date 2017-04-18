@@ -2,16 +2,11 @@
 //TODO: progress spinner for fetching data?
 //TODO: When I make Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyActiveWeekDates[1], "dddd, MMMM D, YYYY"));
 //TODO: Look into local storage
-
 //TODO: use <hr> elements between tasks?
+//TODO: get rid of extra border between classDivs.
+
 //TODO: Remove all addedTaskDivs before calling readTaskData(). Then we can use .on instead of .once and token refreshes won't cause duplicate entries. Also, remove bbInitialReadComplete variable.
-//TODO: add shadows to each dayDiv
 
-//TODO: hide all content until user has completed initial setup wizard.
-//TODO: if settingsList isn't visible, settingsButton should be gray (trying to fix mobile issue with settings button)
-
-//TODO: if task text is too long, it should wrap within dayDivs.
-//TODO: when user switches weeks, hide content until it's reloaded.
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -68,11 +63,13 @@ firebase.auth().onAuthStateChanged(function(user) {
 
             initializeSettingsButton(true);
 
+            document.getElementById("main_content_wrapper").style.display = "block";
+
         }
 
     } else {
         // No user is signed in.
-        document.getElementById('sign_in_button_group_wrapper').style.display = "block";
+        document.getElementById("sign_in_button_group_wrapper").style.display = "block";
         document.getElementById("sign_in_button_group").style.display = "inline-block";
         initializeSettingsButton(false);
 
@@ -102,7 +99,7 @@ function createDayDivs () {
             dayDiv.appendChild(dayDivHeader);
 
             dayDivArray[i] = dayDiv;  //Sets the dayDiv we just built to be equal to the ith element of the dayDivArray[]
-            document.body.appendChild(dayDivArray[i]);   //Makes the dayDiv appear on the page
+            document.getElementById('main_content_wrapper').appendChild(dayDivArray[i]);   //Makes the dayDiv appear on the page
 
         }(i)); //This is the end of the function that exists solely to solve closure problem. It's also where we pass in the value of i so that it's accessible within the above code.
     } //end of FOR loop
@@ -543,6 +540,7 @@ function readClassData() {
                     }
                     else {
                         document.getElementById("initial_setup_wizard_div").style.display = "block"; //If no class data is saved, show initial setup wizard
+                        document.getElementById("main_content_wrapper").style.display = "none";
                     }
                 }
             ));
@@ -619,7 +617,9 @@ document.getElementById("wizard_submit_button").addEventListener("click", functi
     var userId = firebase.auth().currentUser.uid;
 
     //write class data to Firebase
-    firebase.database().ref('users/' + userId + "/classes").set(classJsonObject);
+    firebase.database().ref('users/' + userId + "/classes").set(classJsonObject).then(function() {
+        window.location.reload(); //Reload the page after user submits class data.
+    });
 });
 
 
@@ -670,6 +670,8 @@ document.getElementById("sign_in_facebook_button").addEventListener("click", fun
 
 
 document.getElementById("settings_item_sign_out").addEventListener("click", function() {
+
+    document.getElementById("main_content_wrapper").style.display = "none";
     firebase.auth().signOut().then(function() {
         window.location.reload(); //Reload the page if the user signs out. By doing this, we can avoid including a lot of code for resetting the environment for when a different user signs in.
 
@@ -711,17 +713,19 @@ function initializeSettingsButton(bUserSignedIn) {
         }
     });
 
+    settingsButton.addEventListener("touchstart", function() {
+        if (settingsList.classList.contains("show")) {
+            settingsButton.src = "img/settings_gray.png";
+        }
+        else {
+            settingsButton.src = "img/settings_black.png";
+        }
+    });
+
 
 // Close the dropdown menu if the user clicks outside of it
     window.onclick = function (event) {
-        if (!event.target.matches('.dropdownButton')) {
-            settingsList.classList.remove('show');
-            settingsButton.src = "img/settings_gray.png";
-        }
-    };
-
-    window.onclick = function (event) {
-        if (!event.target.matches('.dropdownButton')) {
+        if (!event.target.matches('.settings_button')) {
             settingsList.classList.remove('show');
             settingsButton.src = "img/settings_gray.png";
         }
@@ -730,7 +734,7 @@ function initializeSettingsButton(bUserSignedIn) {
 
 
     document.getElementById("settings_item_initial_setup_wizard").addEventListener("click", function () {
-        alert("initial setup wizard");
+        document.getElementById("initial_setup_wizard_div").style.display = "block";
     });
 
     document.getElementById("settings_item_about_this_app").addEventListener("click", function () {

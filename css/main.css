@@ -106,6 +106,10 @@ html {
     overflow-y: scroll; /*This ensures the scrollbar is visible even when it's not needed. This prevents the scrollbar from appearing when you switch weeks and shifting the page layout. */
 }
 
+body {
+    padding: 0 0 30px 0;
+}
+
 
 
 #header {
@@ -139,11 +143,11 @@ html {
     position: absolute;
     display: inline-block;
     right: 15px;
-    bottom: 5px;
+    bottom: 8px;
 }
 
 /* Dropdown button */
-.dropdownButton {
+.settings_button {
     /*padding: 16px;*/
     font-size: 16px;
     cursor: pointer;
@@ -155,7 +159,7 @@ html {
     position: absolute;
     background-color: white;
     min-width: 180px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
     z-index: 1;
     right: 0;
 }
@@ -207,8 +211,14 @@ html {
 
 
 
+#main_content_wrapper {
+    margin-top: 25px;
+    text-align: center;
+}
+
 .week_switcher_buttons {
     cursor:pointer;
+
 }
 
 .week_switcher_buttons:disabled {
@@ -223,22 +233,30 @@ html {
 
 
 .day_div {
+    display: block;
     background-color: #EEEEEE;
     border: solid;
     border-width: 1px;
-    margin: 25px 10px 0px 10px;
-    width: 70%;
+    margin: 25px auto 0 auto;
+    max-width: 90%;
+    width: 900px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    z-index: 1;
+    word-break: break-all;
+    word-wrap: break-word;
 }
 
 .day_div_header {
     background-color: beige;
     border-bottom: solid;
     padding: 1px 4px 1px 4px;
+    text-align: center;
 }
 
 .class_div {
     border-top-width: thin;
     border-top: solid;
+    text-align: left;
 
 }
 
@@ -249,6 +267,7 @@ html {
     display: inline-block;
     background-color: white;
     padding: 1px 4px 1px 4px;
+    margin-bottom: 10px;
 }
 
 

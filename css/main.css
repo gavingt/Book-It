@@ -125,7 +125,7 @@ html {
 
 #greeting {
     font-size: 20px;
-    display: inline;
+    display: none;
     position: absolute;
     bottom: 2px;
     right: 100px;
@@ -183,22 +183,25 @@ html {
 
 
 #sign_in_button_group_wrapper {
-    margin-top: 10%;
+    margin-top: 50%;
     text-align: center;
 }
 
 #sign_in_button_group {
+    max-width: 70%;
 }
 
 #sign_in_facebook_button {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     display:block;
     cursor : pointer;
+    max-width: 100%;
 }
 
 #sign_in_google_button {
     display:block;
     cursor : pointer;
+    max-width: 100%;
 }
 
 

@@ -8,11 +8,10 @@
 //TODO: add shadows to each dayDiv
 
 //TODO: hide all content until user has completed initial setup wizard.
+//TODO: if settingsList isn't visible, settingsButton should be gray (trying to fix mobile issue with settings button)
 
 //TODO: if task text is too long, it should wrap within dayDivs.
 //TODO: when user switches weeks, hide content until it's reloaded.
-
-//TODO: sit at desk
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -48,6 +47,11 @@ var image2 = new Image();
 image2.src = "img/settings_black.png";
 
 initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
+
+//Only show greeting if screen is big enough to accommodate it. We check both width and height because we have to account for both portrait and landscape mode.
+if (screen.width > 750 && screen.height > 750) {
+    document.getElementById('greeting').style.display = "inline";
+}
 
 
 //Perform certain actions based on whether Firebase reports that a user is signed in or not signed in.

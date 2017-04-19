@@ -60,10 +60,9 @@ firebase.auth().onAuthStateChanged(function(user) {
 
             createDayDivs();  //creates a dayDiv for each day when user first loads page
             initializeDates(); //gets the dates for the current week when user first loads page
-            readClassData(); //Reads class data if it exists for current user. If it doesn't, opens initial setup wizard.
-            readTaskData(); //as soon as user is signed in, read existing data from Firebase and populate addedTaskDivs with tasks
-            bInitialReadComplete = true;
+            readClassData(); //Reads class data if it exists for current user, followed by reading task data. If class data doesn't exist, it opens initial setup wizard.
             initializeSettingsButton(true);
+            bInitialReadComplete = true;
         }
 
     } else {
@@ -86,7 +85,6 @@ function createDayDivs () {
     for (var i = 0; i < 7; i++) {
             var dayDiv = document.createElement("div");
             dayDiv.className = "day_div"; //Gives every dayDiv a class name so they can be referenced
-            //dayDiv.style.display = "none";
 
             var dayDivHeader = document.createElement("div");
             dayDivHeader.className = "day_div_header";
@@ -485,28 +483,24 @@ function readClassData() {
 
     var userId = firebase.auth().currentUser.uid;
 
-    for (var i = 0; i < dayDivArray.length; i++) {
-
-        (function (i) {
-
-            //Fetch class data
-            firebase.database().ref('/users/' + userId + "/classes").once('value', (function (snapshot) {
-                    if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
-                        classJsonArray = snapshot.val(); //Store entire "classes" JSON object from Firebase as classJsonArray.
-                        for (var j = 0; j < classJsonArray.length; j++) {
-                            var classDiv = createClassDiv(classJsonArray[j].classColor, classJsonArray[j].classTime, classJsonArray[j].classLocation, classJsonArray[j].className, classJsonArray[j].classTime, i, j);
-                            dayDivArray[i].append(classDiv);
-                        }
-                    }
-                    else {
-                        document.getElementById("initial_setup_wizard_div").style.display = "block"; //If no class data is saved, show initial setup wizard
-                        document.getElementById("main_content_wrapper").style.display = "none";
+    //Fetch class data
+    firebase.database().ref('/users/' + userId + "/classes").once('value', (function (snapshot) {
+            if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
+                classJsonArray = snapshot.val(); //Store entire "classes" JSON object from Firebase as classJsonArray.
+                for (var i = 0; i < dayDivArray.length; i++) {
+                    for (var j = 0; j < classJsonArray.length; j++) {
+                        var classDiv = createClassDiv(classJsonArray[j].classColor, classJsonArray[j].classTime, classJsonArray[j].classLocation, classJsonArray[j].className, classJsonArray[j].classTime, i, j);
+                        dayDivArray[i].append(classDiv);
                     }
                 }
-            ));
-
-        }(i));
-    }  //end FOR loop
+                readTaskData(); //If user has pre-existing class data, execute readTaskData() after reading class data
+            }
+            else {
+                document.getElementById("initial_setup_wizard_div").style.display = "block"; //If no class data is saved, show initial setup wizard
+                document.getElementById("main_content_wrapper").style.display = "none";
+            }
+        }
+    ));
 }
 
 

@@ -56,27 +56,21 @@ firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
         // User is signed in
 
-        //if (bInitialReadComplete === false) {  //Doing this check ensures that Firebase's hourly token refreshes don't cause re-reading of data (and thus duplicate tasks, since readTaskData() generates addedTaskDiv elements).
+        if (bInitialReadComplete === false) {  //Doing this check ensures that Firebase's hourly token refreshes don't cause re-reading of data (and thus duplicate tasks, since readTaskData() generates addedTaskDiv elements).
 
             createDayDivs();  //creates a dayDiv for each day when user first loads page
             initializeDates(); //gets the dates for the current week when user first loads page
             readClassData(); //Reads class data if it exists for current user. If it doesn't, opens initial setup wizard.
             readTaskData(); //as soon as user is signed in, read existing data from Firebase and populate addedTaskDivs with tasks
             bInitialReadComplete = true;
-
             initializeSettingsButton(true);
-
-            document.getElementById("main_content_wrapper").style.display = "block";
-
-        //}
+        }
 
     } else {
         // No user is signed in.
         document.getElementById("sign_in_button_group_wrapper").style.display = "block";
         document.getElementById("sign_in_button_group").style.display = "inline-block";
         initializeSettingsButton(false);
-
-
     }
 });
 
@@ -90,12 +84,9 @@ firebase.auth().onAuthStateChanged(function(user) {
 //creates dayDiv elements and saves them in dayDivArray[]
 function createDayDivs () {
     for (var i = 0; i < 7; i++) {
-        (function (i) {   //Solves closure problem described here: http://stackoverflow.com/questions/13343340/calling-an-asynchronous-function-within-a-for-loop-in-javascript.
-            //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
-
             var dayDiv = document.createElement("div");
-            dayDiv.className = "day_div"; //Gives every dayDiv a class name so they can be referenced later in the JavaScript code
-            dayDiv.style.display = "none";
+            dayDiv.className = "day_div"; //Gives every dayDiv a class name so they can be referenced
+            //dayDiv.style.display = "none";
 
             var dayDivHeader = document.createElement("div");
             dayDivHeader.className = "day_div_header";
@@ -103,9 +94,7 @@ function createDayDivs () {
 
             dayDivArray[i] = dayDiv;  //Sets the dayDiv we just built to be equal to the ith element of the dayDivArray[]
             document.getElementById('main_content_wrapper').appendChild(dayDivArray[i]);   //Makes the dayDiv appear on the page
-
-        }(i)); //This is the end of the function that exists solely to solve closure problem. It's also where we pass in the value of i so that it's accessible within the above code.
-    } //end of FOR loop
+    }
 }
 
 
@@ -156,9 +145,7 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
             if (newTaskInput.value !== "") {  //don't save task if text field is left blank
                 var addedTaskDiv = createAddedTaskDiv(newTaskInput.value, dayIndex, classDivIndex); //call function createAddedTaskDiv and pass in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
                 classDiv.insertBefore(addedTaskDiv, newTaskDiv);  //Inserts addedTaskDiv before the newTaskDiv. This ensures tasks are added to the page in the order the user enters them.
-
                 writeUserData(classDivIndex, newTaskInput.value, dayIndex);
-
                 newTaskInput.value = "";  //Removes existing text from newTaskInput textbox
             }
         });
@@ -170,10 +157,8 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
             classDiv.appendChild(addTaskButton);      //Moves addTaskButton back to the bottom of dayDiv
             addTaskButton.style.display = "block";  //Makes addTaskButton reappear
             newTaskDiv.parentNode.removeChild(newTaskDiv); //Removes newTaskDiv from the DOM
-
         });
     });
-
 
     classDivArray[dayIndex].push(classDiv);
     return classDiv;
@@ -191,16 +176,14 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
     var addedTaskDiv = document.createElement("div"); //creates a <div> element to house a newly added task
     addedTaskDiv.className = "added_task_div";
 
-    var markTaskFinishedImage = document.createElement("img");
+    var markTaskFinishedImage = document.createElement("img"); //creates the checkbox image for an addedTaskDiv
     markTaskFinishedImage.src = "img/checkbox.png";
     markTaskFinishedImage.addEventListener("click", function() {
 
-        var completedTaskIndex = addedTaskDivArray[dayIndex].indexOf(markTaskFinishedImage.parentNode);
+        var completedTaskIndex = addedTaskDivArray[dayIndex].indexOf(markTaskFinishedImage.parentNode);  //finds the index of the task the user wishes to mark as completed
         var completedTaskJson = dayTaskJsonArray[dayIndex][completedTaskIndex];
 
-        console.log(classDivArray[dayIndex][0]);
-        console.log("completedTaskIndexBeforeUndo: " + completedTaskIndex);
-        removeTaskData(dayIndex, completedTaskIndex);
+        removeTaskData(dayIndex, completedTaskIndex); //removes the selected task from Firebase
 
         //We have to clone the snackbar to remove its event listeners so that the UNDO button doesn't undo multiple completed tasks
         var newSnackbar = snackbar.cloneNode(true);
@@ -208,7 +191,6 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
         snackbar = newSnackbar;
         snackbar.style.visibility = "visible";
         clearTimeout(snackbarTimeoutId);
-
         snackbarTimeoutId = setTimeout(function(){ snackbar.style.visibility = "hidden"; }, 10000); //hides snackbar after waiting 500 ms for fadeout animation to run
 
         document.getElementById("snackbar_undo_button").addEventListener("click", function() {
@@ -228,9 +210,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
     addedTaskTextSpan.textContent = addedTaskText; //Sets the textContent of the newly added task to be equal to what the user typed into the textbox
     addedTaskTextSpan.style.padding = "5px 10px 5px 10px";
     addedTaskDiv.appendChild(addedTaskTextSpan);
-
     var addedTaskDivIndex = addedTaskDivArray[dayIndex].push(addedTaskDiv) - 1; //push returns new length of the array, so we subtract 1 to get the index of the new addedTaskDiv
-
 
 
     //task editing is handled in the eventListener below
@@ -261,7 +241,6 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
             addedTaskTextSpan.textContent = editTaskInput.value; //set the addedTaskTextSpan's text equal to the newly edited text value from newTaskInput
             addedTaskDiv.style.display = "block"; //make the addedTaskDiv visible again after we hid it earlier
             editTaskDiv.parentNode.removeChild(editTaskDiv); //Removes editTaskDiv from the DOM
-            //classDivArray[dayIndex][classDivIndex].lastElementChild.style.display = "block";  //show addTaskButton
 
             editTaskData(classDivIndex, addedTaskTextSpan.textContent, dayIndex, addedTaskDivIndex);
 
@@ -277,7 +256,6 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
 
         classDivArray[dayIndex][classDivIndex].insertBefore(editTaskDiv, addedTaskDiv);
         editTaskInput.focus();
-
     });
 
     return addedTaskDiv;
@@ -288,11 +266,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
 //Hides or shows dayDivs based on the week that's visible. If it's the current week, we hide the dayDivs for days that have already passed.
 function hideOrShowDayDivs () {
 
-    document.getElementById("week_switcher_buttons").style.display = "block";
-
-    for (var i=0; i<dayDivArray.length; i++) {
-        dayDivArray[i].style.display = "block";
-    }
+    document.getElementById('main_content_wrapper').style.display = "block";
 
     if (currentlyActiveWeekIndex === 0) {
         for (var j = 0; j<todaysDateIndex; j++) {
@@ -308,27 +282,11 @@ function hideOrShowDayDivs () {
 
 
 
-
-//Turns taskDivArray, dayTaskJsonArray, and classDivArray into 2D arrays (each of their elements stores its own array)
-function initialize2dArrays(bIncludeClassDivArray) {
-    for (var i = 0; i < 7; i++) {
-        addedTaskDivArray[i] = [];
-        dayTaskJsonArray[i] = [];
-        if (bIncludeClassDivArray) {
-            classDivArray[i] = [];
-        }
-    }
-}
-
-
-
 //Resets various DOM elements to their original states.
 function resetDomElements() {
 
     var addedTaskDivsToShow = document.getElementsByClassName("added_task_div");
     for (var i = 0; i < addedTaskDivsToShow.length; i++) {
-
-        //addedTaskDivsToShow[i].parentNode.appendChild(addedTaskDivsToShow[i]);
         addedTaskDivsToShow[i].style.display = "block";
     }
 
@@ -342,7 +300,7 @@ function resetDomElements() {
         editTaskDivsToHide[k].parentNode.removeChild(editTaskDivsToHide[k]);
     }
 
-    var addTaskButtonsToShow = document.getElementsByClassName("add_task_button"); //store all addTaskButton in a local array
+    var addTaskButtonsToShow = document.getElementsByClassName("add_task_button"); //store all addTaskButtons in a local array
     var classDivs = document.getElementsByClassName("class_div"); //store all classDivs in a local array
     for (var m=0; m<classDivs.length; m++) {
         classDivs[m].appendChild(addTaskButtonsToShow[m]);
@@ -476,6 +434,7 @@ function editTaskData(taskClassIndex, taskText, dayIndex, taskIndex) {
 }
 
 
+
 //remove existing task in database
 function removeTaskData(dayIndex, taskIndex) {
 
@@ -487,6 +446,7 @@ function removeTaskData(dayIndex, taskIndex) {
     firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);
 
 }
+
 
 
 //write a task back into the database if it was marked complete and then the UNDO button in snackbar was pressed
@@ -502,6 +462,7 @@ function undoRemoveTaskData(completedTaskJson, taskIndex, dayIndex) {
 }
 
 
+
 //write new task to database
 function writeUserData(taskClassIndex, taskText, dayIndex) {
 
@@ -515,6 +476,8 @@ function writeUserData(taskClassIndex, taskText, dayIndex) {
     //write new task data
     firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);
 }
+
+
 
 
 //Reads class data if it exists. If it doesn't, it opens the initial setup wizard.
@@ -547,6 +510,8 @@ function readClassData() {
 }
 
 
+
+
 //Reads data from Firebase. This only gets called at the initial page load or when the user switches between weeks.
 function readTaskData() {
 
@@ -554,7 +519,8 @@ function readTaskData() {
 
     for (var i = 0; i < dayDivArray.length; i++) {
 
-        (function (i) {
+        (function (i) {   //Solves closure problem described here: http://stackoverflow.com/questions/13343340/calling-an-asynchronous-function-within-a-for-loop-in-javascript.
+                          //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
 
             //Fetch task data
             firebase.database().ref('/users/' + userId + "/" + currentlyActiveWeekDates[i]).on('value', (function (snapshot) {
@@ -584,48 +550,11 @@ function readTaskData() {
                 }
             ));
 
-        }(i));
+        }(i));  //This is the end of the function that exists solely to solve closure problem. It's also where we pass in the value of i so that it's accessible within the above code.
     }  //end FOR loop
 
 }
 
-
-
-
-//Write class data from initial setup wizard
-document.getElementById("wizard_submit_button").addEventListener("click", function() {
-
-    var classJsonObject = [
-        {
-            classColor: "lightblue",
-            classDays: "M W F",
-            classLocation: "Wexler Hall A119",
-            className: document.getElementById("wizard_class_1_input").value,
-            classTime: "6:00pm-7:15pm"
-        },
-        {
-            classColor: "#ffa197",
-            classDays: "Tu Th",
-            classLocation: "Physical Science Bldg. 112",
-            className: document.getElementById("wizard_class_2_input").value,
-            classTime: "5:00pm-7:00pm"
-        },
-        {
-            classColor: "palegreen",
-            classDays: "M W F",
-            classLocation: "Goldwater 334",
-            className: document.getElementById("wizard_class_3_input").value,
-            classTime: "7:45pm-8:30pm"
-        }
-    ];
-
-    var userId = firebase.auth().currentUser.uid;
-
-    //write class data to Firebase
-    firebase.database().ref('users/' + userId + "/classes").set(classJsonObject).then(function() {
-        window.location.reload(); //Reload the page after user submits class data.
-    });
-});
 
 
 
@@ -689,13 +618,71 @@ document.getElementById("settings_item_sign_out").addEventListener("click", func
 
 
 
-/******************************************************/
-/*****************END FIREBASE CODE********************/
-/******************************************************/
+//Write class data from initial setup wizard
+document.getElementById("wizard_submit_button").addEventListener("click", function() {
+
+    var classJsonObject = [
+        {
+            classColor: "lightblue",
+            classDays: "M W F",
+            classLocation: "Wexler Hall A119",
+            className: document.getElementById("wizard_class_1_input").value,
+            classTime: "6:00pm-7:15pm"
+        },
+        {
+            classColor: "#ffa197",
+            classDays: "Tu Th",
+            classLocation: "Physical Science Bldg. 112",
+            className: document.getElementById("wizard_class_2_input").value,
+            classTime: "5:00pm-7:00pm"
+        },
+        {
+            classColor: "palegreen",
+            classDays: "M W F",
+            classLocation: "Goldwater 334",
+            className: document.getElementById("wizard_class_3_input").value,
+            classTime: "7:45pm-8:30pm"
+        }
+    ];
+
+    var userId = firebase.auth().currentUser.uid;
+
+    //write class data to Firebase
+    firebase.database().ref('users/' + userId + "/classes").set(classJsonObject).then(function() {
+        window.location.reload(); //Reload the page after user submits class data.
+    });
+});
 
 
 
 
+/************************************************************/
+/**********************END FIREBASE CODE*********************/
+/************************************************************/
+
+
+
+
+
+/************************************************************/
+/******************START UTILITY FUNCTIONS*******************/
+/************************************************************/
+
+
+
+//Turns taskDivArray, dayTaskJsonArray, and classDivArray into 2D arrays (each of their elements stores its own array)
+function initialize2dArrays(bIncludeClassDivArray) {
+    for (var i = 0; i < 7; i++) {
+        addedTaskDivArray[i] = [];
+        dayTaskJsonArray[i] = [];
+        if (bIncludeClassDivArray) {
+            classDivArray[i] = [];
+        }
+    }
+}
+
+
+//Adds various eventListeners to make the Settings button work.
 function initializeSettingsButton(bUserSignedIn) {
 
     var settingsButton = document.getElementById("settings_button");
@@ -736,7 +723,7 @@ function initializeSettingsButton(bUserSignedIn) {
     });
 
 
-// Close the dropdown menu if the user clicks outside of it
+    // Close the dropdown menu if the user clicks outside of it
     window.onclick = function (event) {
         if (!event.target.matches('.settings_button')) {
             settingsList.classList.remove('show');
@@ -755,3 +742,8 @@ function initializeSettingsButton(bUserSignedIn) {
     });
 
 }
+
+
+/************************************************************/
+/*******************END UTILITY FUNCTIONS********************/
+/************************************************************/

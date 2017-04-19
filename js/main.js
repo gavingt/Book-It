@@ -7,7 +7,7 @@
 //TODO: get rid of extra border between classDivs.
 //TODO: in Settings dropdown, include user portrait and email (or name?)
 
-//TODO: What do I do about a user changing classes? Should I also change that from .once to .on?
+//TODO: move Add task and Cancel buttons below input box, make input box take up entire div width
 
 
 
@@ -134,7 +134,7 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
         resetDomElements();
         addTaskButton.style.display = "none";  //Makes addTaskButton that was clicked disappear.
         var newTaskDiv = document.createElement("div"); //Creates a div to house the UI for adding a new task. This holds a textbox, Submit button, and Cancel button.
-        newTaskDiv.className = "new_task_div";  //Gives every newTaskDiv a class name so they can be referenced later in the JavaScript code
+        newTaskDiv.className = "new_task_div";  //Gives every newTaskDiv a class name so they can be referenced later.
         classDiv.appendChild(newTaskDiv);
 
         var newTaskInput = document.createElement("input");
@@ -184,7 +184,7 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
 
 
 //Creates addedTaskDiv elements. This function gets called in two places:
-                                                         // 1) in createDayDivs(), to generate an addedTaskDiv when the user adds a new task
+                                                         // 1) in createClassDiv(), to generate an addedTaskDiv when the user adds a new task
                                                          // 2) in readTaskData(), to generate addedTaskDivs from existing tasks stored in Firebase
 function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
 
@@ -194,14 +194,13 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
     var markTaskFinishedImage = document.createElement("img");
     markTaskFinishedImage.src = "img/checkbox.png";
     markTaskFinishedImage.addEventListener("click", function() {
-        addedTaskDiv.style.display = "none";
-        addedTaskDiv.className = ""; //We hide this particular addedTaskDiv from the resetDomElements() function by removing its className, since otherwise it could get brought back if user clicks addTaskButton within 10 seconds
 
         var completedTaskIndex = addedTaskDivArray[dayIndex].indexOf(markTaskFinishedImage.parentNode);
         var completedTaskJson = dayTaskJsonArray[dayIndex][completedTaskIndex];
-        addedTaskDivArray[dayIndex].splice(completedTaskIndex, 1);
-        removeTaskData(dayIndex, completedTaskIndex);
 
+        console.log(classDivArray[dayIndex][0]);
+        console.log("completedTaskIndexBeforeUndo: " + completedTaskIndex);
+        removeTaskData(dayIndex, completedTaskIndex);
 
         //We have to clone the snackbar to remove its event listeners so that the UNDO button doesn't undo multiple completed tasks
         var newSnackbar = snackbar.cloneNode(true);
@@ -216,9 +215,6 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
 
             snackbar.style.visibility = "hidden";
             undoRemoveTaskData(completedTaskJson, completedTaskIndex, dayIndex);
-            addedTaskDiv.style.display = "block";
-            addedTaskDiv.className = "added_task_div";  //We unhide this addedTaskDiv from the resetDomElements() function.
-            addedTaskDivArray[dayIndex].splice(completedTaskIndex, 0, addedTaskDiv);
         });
 
         document.getElementById("snackbar_hide_button").addEventListener("click", function() {
@@ -235,14 +231,13 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
 
     var addedTaskDivIndex = addedTaskDivArray[dayIndex].push(addedTaskDiv) - 1; //push returns new length of the array, so we subtract 1 to get the index of the new addedTaskDiv
 
+
+
     //task editing is handled in the eventListener below
     addedTaskTextSpan.addEventListener("click", function() {
 
         resetDomElements();
-
         addedTaskDiv.style.display = "none";
-        //classDivArray[dayIndex][classDivIndex].lastElementChild.style.display = "none";  //hide addTaskButton
-
         var editTaskDiv = document.createElement("div"); //Creates a div to house the UI for editing a task. This holds a textbox, Save button, and Cancel button.
         editTaskDiv.className = "edit_task_div";  //Gives every editTaskDiv a class name so they can be referenced later in the JavaScript code
 
@@ -276,12 +271,10 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
         editTaskCancelButton.textContent = "Cancel";
         editTaskDiv.appendChild(editTaskCancelButton);
         editTaskCancelButton.addEventListener("click", function () {
-            //classDivArray[dayIndex][classDivIndex].lastElementChild.style.display = "block";  //Makes addTaskButton reappear
             addedTaskDiv.style.display = "block";
             editTaskDiv.parentNode.removeChild(editTaskDiv);  //Removes editTaskDiv from the DOM
         });
 
-        //dayDivArray[dayIndex].insertBefore(editTaskDiv, addedTaskDiv);
         classDivArray[dayIndex][classDivIndex].insertBefore(editTaskDiv, addedTaskDiv);
         editTaskInput.focus();
 
@@ -498,6 +491,7 @@ function removeTaskData(dayIndex, taskIndex) {
 
 //write a task back into the database if it was marked complete and then the UNDO button in snackbar was pressed
 function undoRemoveTaskData(completedTaskJson, taskIndex, dayIndex) {
+
 
     dayTaskJsonArray[dayIndex].splice(taskIndex, 0, completedTaskJson);
 

@@ -2,10 +2,12 @@
 //TODO: progress spinner for fetching data?
 //TODO: When I make Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyActiveWeekDates[1], "dddd, MMMM D, YYYY"));
 //TODO: Look into local storage
-//TODO: use <hr> elements between tasks?
+//TODO: use <hr> elements between tasks (must have this since tasks can be multiple lines)
+//TODO: if you edit a task and the task is really long, there should be a larger editTask input box.
 //TODO: get rid of extra border between classDivs.
+//TODO: in Settings dropdown, include user portrait and email (or name?)
 
-//TODO: Remove all addedTaskDivs before calling readTaskData(). Then we can use .on instead of .once and token refreshes won't cause duplicate entries. Also, remove bbInitialReadComplete variable.
+//TODO: What do I do about a user changing classes? Should I also change that from .once to .on?
 
 
 
@@ -53,7 +55,8 @@ if (screen.width > 750 && screen.height > 750) {
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
         // User is signed in
-        if (bInitialReadComplete === false) {  //Doing this check ensures that Firebase's hourly token refreshes don't cause re-reading of data (and thus duplicate tasks, since readTaskData() generates addedTaskDiv elements).
+
+        //if (bInitialReadComplete === false) {  //Doing this check ensures that Firebase's hourly token refreshes don't cause re-reading of data (and thus duplicate tasks, since readTaskData() generates addedTaskDiv elements).
 
             createDayDivs();  //creates a dayDiv for each day when user first loads page
             initializeDates(); //gets the dates for the current week when user first loads page
@@ -65,7 +68,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 
             document.getElementById("main_content_wrapper").style.display = "block";
 
-        }
+        //}
 
     } else {
         // No user is signed in.
@@ -550,24 +553,32 @@ function readClassData() {
 }
 
 
-
-
 //Reads data from Firebase. This only gets called at the initial page load or when the user switches between weeks.
 function readTaskData() {
 
     var userId = firebase.auth().currentUser.uid;
 
-    for (var i=0; i<dayDivArray.length; i++) {
+    for (var i = 0; i < dayDivArray.length; i++) {
 
-        (function(i) {
-
+        (function (i) {
 
             //Fetch task data
-            firebase.database().ref('/users/' + userId + "/" + currentlyActiveWeekDates[i]).once('value', (function(snapshot) {
+            firebase.database().ref('/users/' + userId + "/" + currentlyActiveWeekDates[i]).on('value', (function (snapshot) {
+
+                    //remove existing tasks before we read task data
+                    var addedTaskDivsToRemoveArray = dayDivArray[i].getElementsByClassName("added_task_div");
+                    var count = addedTaskDivsToRemoveArray.length;
+                    for (var k = 0; k < count; k++) {
+                        addedTaskDivArray[i].splice(0, 1);
+                        addedTaskDivsToRemoveArray[0].parentNode.removeChild(addedTaskDivsToRemoveArray[0]);
+                    }
+
+
+                    //read task data
                     if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
 
                         dayTaskJsonArray[i] = snapshot.val();
-                        for (var j=0; j<dayTaskJsonArray[i].length; j++) {
+                        for (var j = 0; j < dayTaskJsonArray[i].length; j++) {
                             var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayTaskJsonArray[i][j].taskClassIndex); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
                             classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].insertBefore(addedTaskDiv, classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].lastChild);  //Inserts addedTaskDiv before the last child element of the classDivArray.
                         }
@@ -683,6 +694,14 @@ document.getElementById("settings_item_sign_out").addEventListener("click", func
 
 
 
+
+/******************************************************/
+/*****************END FIREBASE CODE********************/
+/******************************************************/
+
+
+
+
 function initializeSettingsButton(bUserSignedIn) {
 
     var settingsButton = document.getElementById("settings_button");
@@ -742,7 +761,3 @@ function initializeSettingsButton(bUserSignedIn) {
     });
 
 }
-
-/******************************************************/
-/*****************END FIREBASE CODE********************/
-/******************************************************/

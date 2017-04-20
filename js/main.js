@@ -3,10 +3,9 @@
 //TODO: When I make Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyActiveWeekDates[1], "dddd, MMMM D, YYYY"));
 //TODO: Look into local storage
 //TODO: use <hr> elements between tasks (must have this since tasks can be multiple lines)
-//TODO: if you edit a task and the task is really long, there should be a larger editTask input box.
 //TODO: get rid of extra border between classDivs.
-//TODO: in Settings dropdown, include user portrait and email (or name?)
 
+//TODO: in Settings dropdown, include user portrait and email (or name?)
 //TODO: move Add task and Cancel buttons below input box, make input box take up entire div width
 
 
@@ -37,11 +36,21 @@ var config = {
 firebase.initializeApp(config);
 
 //The below lines force these images to be preloaded so that they they're ready when we need to display them.
+
 var image1 = new Image();
-image1.src = "img/checkbox.png";
+image1.src = "img/checkbox_gray.png";
 
 var image2 = new Image();
-image2.src = "img/settings_black.png";
+image2.src = "img/checkbox_black.png";
+
+var image3 = new Image();
+image3.src = "img/add_task_button_gray.png";
+
+var image4 = new Image();
+image4.src = "img/add_task_button_black.png";
+
+var image5 = new Image();
+image5.src = "img/settings_black.png";
 
 initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
 
@@ -113,6 +122,7 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
     var addTaskButton = document.createElement("button");
     addTaskButton.className = "add_task_button"; //Gives every addTaskButton a class name so they can be referenced later in the JavaScript code
     addTaskButton.style.display = "block";
+    addTaskButton.className = "add_task_button";
     addTaskButton.textContent = "Add task";
     classDiv.appendChild(addTaskButton);
 
@@ -127,6 +137,7 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
         var newTaskInput = document.createElement("input");
         newTaskInput.type = "text";
         newTaskInput.placeholder = "task";
+        newTaskInput.className = "new_task_input";
         newTaskInput.addEventListener("keyup", function (event) {  //this eventListener simulates pressing the newTaskSaveButton after you type into newTaskInput and press Enter.
             event.preventDefault();
             if (event.keyCode === 13) {
@@ -135,10 +146,13 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
         });
         newTaskDiv.appendChild(newTaskInput);
         newTaskInput.focus();
+        
+        var newTaskButtonContainerDiv = document.createElement('div');
+
 
         var newTaskSaveButton = document.createElement("button");
         newTaskSaveButton.textContent = "Add task";
-        newTaskDiv.appendChild(newTaskSaveButton);
+        newTaskButtonContainerDiv.appendChild(newTaskSaveButton);
         newTaskSaveButton.addEventListener("click", function () {
             if (newTaskInput.value !== "") {  //don't save task if text field is left blank
                 var addedTaskDiv = createAddedTaskDiv(newTaskInput.value, dayIndex, classDivIndex); //call function createAddedTaskDiv and pass in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
@@ -150,12 +164,13 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
 
         var newTaskCancelButton = document.createElement("button");
         newTaskCancelButton.textContent = "Cancel";
-        newTaskDiv.appendChild(newTaskCancelButton);
+        newTaskButtonContainerDiv.appendChild(newTaskCancelButton);
         newTaskCancelButton.addEventListener("click", function () {
             classDiv.appendChild(addTaskButton);      //Moves addTaskButton back to the bottom of dayDiv
             addTaskButton.style.display = "block";  //Makes addTaskButton reappear
             newTaskDiv.parentNode.removeChild(newTaskDiv); //Removes newTaskDiv from the DOM
         });
+        newTaskDiv.appendChild(newTaskButtonContainerDiv);
     });
 
     classDivArray[dayIndex].push(classDiv);
@@ -175,7 +190,9 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
     addedTaskDiv.className = "added_task_div";
 
     var markTaskFinishedImage = document.createElement("img"); //creates the checkbox image for an addedTaskDiv
-    markTaskFinishedImage.src = "img/checkbox.png";
+    markTaskFinishedImage.src = "img/checkbox_gray.png";
+    markTaskFinishedImage.className = "mark_task_finished_image";
+    markTaskFinishedImage.style.cursor = "pointer";
     markTaskFinishedImage.addEventListener("click", function() {
 
         var completedTaskIndex = addedTaskDivArray[dayIndex].indexOf(markTaskFinishedImage.parentNode);  //finds the index of the task the user wishes to mark as completed
@@ -202,11 +219,18 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
         });
 
     });
+    markTaskFinishedImage.addEventListener("mouseover", function () {
+        markTaskFinishedImage.src = "img/checkbox_black.png";
+    });
+    markTaskFinishedImage.addEventListener("mouseout", function() {
+        markTaskFinishedImage.src = "img/checkbox_gray.png";
+    });
+
     addedTaskDiv.appendChild(markTaskFinishedImage);
 
     var addedTaskTextSpan = document.createElement("span");
     addedTaskTextSpan.textContent = addedTaskText; //Sets the textContent of the newly added task to be equal to what the user typed into the textbox
-    addedTaskTextSpan.style.padding = "5px 10px 5px 10px";
+    addedTaskTextSpan.className = "added_task_text_span";
     addedTaskDiv.appendChild(addedTaskTextSpan);
     var addedTaskDivIndex = addedTaskDivArray[dayIndex].push(addedTaskDiv) - 1; //push returns new length of the array, so we subtract 1 to get the index of the new addedTaskDiv
 

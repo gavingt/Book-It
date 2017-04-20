@@ -256,7 +256,7 @@ body {
     border-top-width: thin;
     border-top: solid;
     text-align: left;
-
+    padding-bottom: 5px;
 }
 
 .class_name_div {
@@ -270,6 +270,27 @@ body {
 }
 
 
+.add_task_button {
+    margin-left: 5px;
+    margin-top: 10px;
+}
+
+.new_task_input {
+    width: 100%;
+}
+
+
+.added_task_div {
+    padding: 5px 0 5px 0;
+}
+
+.mark_task_finished_image {
+    padding: 0 5px 0 5px;
+}
+
+.edit_task_div {
+    padding: 5px 0 5px 5px;
+}
 
 
 

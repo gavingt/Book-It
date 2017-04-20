@@ -119,11 +119,12 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
     classDiv.appendChild(classNameDiv);
 
 
-    var addTaskButton = document.createElement("button");
-    addTaskButton.className = "add_task_button"; //Gives every addTaskButton a class name so they can be referenced later in the JavaScript code
-    addTaskButton.style.display = "block";
-    addTaskButton.className = "add_task_button";
-    addTaskButton.textContent = "Add task";
+    var addTaskButton = document.createElement("i");
+    addTaskButton.className = "add_task_button fa fa-plus"; //Gives each addTaskButton a class name and also assigns a Font Awesome icon to it.
+    addTaskButton.style.display = "table"; //"table" ensures element goes on a new line but is only as big as its contents (block takes up whole line, whereas inline-block fits to content but doesn't occupy its own line).
+    addTaskButton.style.cursor = "pointer";
+    addTaskButton.style.color = "#808080";
+    addTaskButton.textContent = " Add task";
     classDiv.appendChild(addTaskButton);
 
     addTaskButton.addEventListener("click", function () {
@@ -146,7 +147,7 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
         });
         newTaskDiv.appendChild(newTaskInput);
         newTaskInput.focus();
-        
+
         var newTaskButtonContainerDiv = document.createElement('div');
 
 
@@ -171,6 +172,12 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
             newTaskDiv.parentNode.removeChild(newTaskDiv); //Removes newTaskDiv from the DOM
         });
         newTaskDiv.appendChild(newTaskButtonContainerDiv);
+    });
+    addTaskButton.addEventListener("mouseover", function() {
+        addTaskButton.style.color = "black";
+    });
+    addTaskButton.addEventListener("mouseout", function() {
+        addTaskButton.style.color = "#808080";
     });
 
     classDivArray[dayIndex].push(classDiv);

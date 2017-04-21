@@ -22,6 +22,8 @@ var bInitialReadComplete = false; //boolean value that stores whether or not we'
 var name, email, photoUrl;
 var spinner = document.getElementById("spinner"); //progress spinner
 
+var dayDivWrapperClone;
+
 
 // Initialize Firebase. This code should stay at the top of main.js
 var config = {
@@ -99,8 +101,15 @@ function createDayDivs () {
             dayDiv.appendChild(dayDivHeader);
 
             dayDivArray[i] = dayDiv;  //Sets the dayDiv we just built to be equal to the ith element of the dayDivArray[]
-            document.getElementById('main_content_wrapper').appendChild(dayDivArray[i]);   //Makes the dayDiv appear on the page
+            document.getElementById('day_div_wrapper').appendChild(dayDivArray[i]);   //Makes the dayDiv appear on the page
+
     }
+
+    //dayDivWrapperClone = document.getElementById("day_div_wrapper").cloneNode(true);
+/*    dayDivWrapperClone = document.createElement("button");
+    dayDivWrapperClone.textContent = "hello";
+    dayDivWrapperClone.className = "box";
+    document.getElementById("main_content_wrapper").appendChild(dayDivWrapperClone);*/
 }
 
 
@@ -392,7 +401,7 @@ function setDaysOfWeek() {
 document.getElementById("previous_week_button").addEventListener("click", function () {
 
     //spinner.style.display = "block";
-    //document.getElementById("main_content_wrapper").style.display = "none";
+    document.getElementById("main_content_wrapper").style.display = "none";
     currentlyActiveWeekIndex--; //decrement currentlyActiveWeekIndex
     if (currentlyActiveWeekIndex === 0) {
         document.getElementById("previous_week_button").disabled = true;  //If user is viewing the current week, disable Previous week button.
@@ -419,7 +428,7 @@ document.getElementById("previous_week_button").addEventListener("click", functi
 document.getElementById("next_week_button").addEventListener("click", function () {
 
     //spinner.style.display = "block";
-    //document.getElementById("main_content_wrapper").style.display = "none";
+    document.getElementById("main_content_wrapper").style.display = "none";
     currentlyActiveWeekIndex++; //increment currentlyActiveWeekIndex
     document.getElementById("previous_week_button").disabled = false;
 
@@ -781,6 +790,23 @@ function initializeSettingsButton(bUserSignedIn) {
     });
 
 }
+
+var wrapper = $('#day_div_wrapper');
+
+    $('.box').click(function() {
+
+        $(this).animate({
+            left: '-50%'
+        }, 500, function() {
+            $(this).css('left', '150%');
+            $(this).appendTo('#main_content_wrapper');
+        });
+
+        $(this).next().animate({
+            left: '50%'
+        }, 500);
+    });
+
 
 
 /************************************************************/

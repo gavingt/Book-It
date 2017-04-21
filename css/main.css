@@ -150,8 +150,8 @@ body {
     border-top: 10px solid #4CDD00;
     width: 40px;
     height: 40px;
-    -webkit-animation: spin 1.25s linear infinite;
-    animation: spin 1.25s linear infinite;
+    -webkit-animation: spin 0.75s linear infinite;
+    animation: spin 0.75s linear infinite;
 }
 
 @keyframes spin {

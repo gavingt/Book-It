@@ -1,5 +1,5 @@
 
-//TODO: progress spinner for fetching data?
+//TODO: progress spinner for fetching data
 //TODO: When I make Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyActiveWeekDates[1], "dddd, MMMM D, YYYY"));
 //TODO: get rid of extra border above/below classDivs.
 
@@ -20,6 +20,7 @@ var todaysDateIndex; //Stores a number from 0-6, corresponding to the 7 days Sun
 var currentlyActiveWeekIndex = 0; //this tracks which week is currently being viewed. It starts at 0 and increments if user hits Next week button, and decrements when user hits Previous week button
 var bInitialReadComplete = false; //boolean value that stores whether or not we've done the initial reading of data at page load (or at login, if not logged in already at page load)
 var name, email, photoUrl;
+var spinner = document.getElementById("spinner"); //progress spinner
 
 
 // Initialize Firebase. This code should stay at the top of main.js
@@ -54,10 +55,11 @@ if (screen.width > 750 && screen.height > 750) {
 //Perform certain actions based on whether Firebase reports that a user is signed in or not signed in.
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
-        // User is signed in
 
+        // User is signed in
         if (bInitialReadComplete === false) {  //Doing this check ensures that Firebase's hourly token refreshes don't cause re-reading of data (and thus duplicate tasks, since readTaskData() generates addedTaskDiv elements).
 
+            spinner.style.display = "block";
             createDayDivs();  //creates a dayDiv for each day when user first loads page
             initializeDates(); //gets the dates for the current week when user first loads page
             readClassData(); //Reads class data if it exists for current user, followed by reading task data. If class data doesn't exist, it opens initial setup wizard.
@@ -68,10 +70,10 @@ firebase.auth().onAuthStateChanged(function(user) {
                 document.getElementById("profile_picture").src = user.photoURL;
                 document.getElementById("email_address").textContent = user.email;
             }
-
         }
 
     } else {
+
         // No user is signed in.
         document.getElementById("sign_in_button_group_wrapper").style.display = "block";
         document.getElementById("sign_in_button_group").style.display = "inline-block";
@@ -389,6 +391,8 @@ function setDaysOfWeek() {
 //handles the user pressing the "Previous week" button
 document.getElementById("previous_week_button").addEventListener("click", function () {
 
+    spinner.style.display = "block";
+    document.getElementById("main_content_wrapper").style.display = "none";
     currentlyActiveWeekIndex--; //decrement currentlyActiveWeekIndex
     if (currentlyActiveWeekIndex === 0) {
         document.getElementById("previous_week_button").disabled = true;  //If user is viewing the current week, disable Previous week button.
@@ -415,6 +419,8 @@ document.getElementById("previous_week_button").addEventListener("click", functi
 //handles the user pressing the "Next week" button
 document.getElementById("next_week_button").addEventListener("click", function () {
 
+    spinner.style.display = "block";
+    document.getElementById("main_content_wrapper").style.display = "none";
     currentlyActiveWeekIndex++; //increment currentlyActiveWeekIndex
     document.getElementById("previous_week_button").disabled = false;
 
@@ -535,6 +541,7 @@ function readClassData() {
             else {
                 document.getElementById("initial_setup_wizard_div").style.display = "block"; //If no class data is saved, show initial setup wizard
                 document.getElementById("main_content_wrapper").style.display = "none";
+                spinner.style.display = "none";
             }
         }
     ));
@@ -577,6 +584,7 @@ function readTaskData() {
 
                     if (i === dayDivArray.length - 1) {
                         hideOrShowDayDivs();
+                        spinner.style.display = "none";
                     }
                 }
             ));

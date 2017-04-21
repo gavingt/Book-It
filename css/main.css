@@ -164,12 +164,32 @@ body {
     right: 0;
 }
 
-/* List items inside the dropdown */
+/* <div> list item inside the settings dropdown */
+#settings_list div {
+    color: black;
+    padding: 12px 16px 0 16px;
+    text-decoration: none;
+    cursor: default;
+    display: block;
+}
+
+#profile_picture {
+    width: 50px;
+    float: right;
+    margin-bottom: 10px;
+    display: inline;
+}
+
+#email_address {
+    display: inline;
+}
+
+/* <span> list items inside the settings dropdown */
 #settings_list span {
     color: black;
     padding: 12px 16px;
     text-decoration: none;
-    cursor: default;
+    cursor: pointer;
     display: block;
 }
 
@@ -275,8 +295,21 @@ body {
     margin-top: 10px;
 }
 
+.new_task_div {
+    margin: 0 5px 0 5px;
+}
+
 .new_task_input {
     width: 100%;
+    box-sizing: border-box; /* These border-box values force the input to behave like a block element. Left and right margin must be set in new_task_div, which is the parent node of new_task_input. */
+    margin-bottom: 1px;
+    margin-top: 5px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+.new_task_save_button {
+    margin-right: 1px;
 }
 
 
@@ -288,9 +321,6 @@ body {
     padding: 0 5px 0 5px;
 }
 
-.edit_task_div {
-    padding: 5px 0 5px 5px;
-}
 
 
 

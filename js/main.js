@@ -1,12 +1,8 @@
 
 //TODO: progress spinner for fetching data?
 //TODO: When I make Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyActiveWeekDates[1], "dddd, MMMM D, YYYY"));
-//TODO: Look into local storage
-//TODO: use <hr> elements between tasks (must have this since tasks can be multiple lines)
-//TODO: get rid of extra border between classDivs.
+//TODO: get rid of extra border above/below classDivs.
 
-//TODO: in Settings dropdown, include user portrait and email (or name?)
-//TODO: move Add task and Cancel buttons below input box, make input box take up entire div width
 
 
 
@@ -23,6 +19,7 @@ var snackbar = document.getElementById("snackbar"); //gets a reference to the sn
 var todaysDateIndex; //Stores a number from 0-6, corresponding to the 7 days Sunday through Saturday, indicating which day of the week is today. For instance, if today is Sunday it equals 0, and if it's Tuesday it equals 2.
 var currentlyActiveWeekIndex = 0; //this tracks which week is currently being viewed. It starts at 0 and increments if user hits Next week button, and decrements when user hits Previous week button
 var bInitialReadComplete = false; //boolean value that stores whether or not we've done the initial reading of data at page load (or at login, if not logged in already at page load)
+var name, email, photoUrl;
 
 
 // Initialize Firebase. This code should stay at the top of main.js
@@ -42,12 +39,6 @@ image1.src = "img/checkbox_gray.png";
 
 var image2 = new Image();
 image2.src = "img/checkbox_black.png";
-
-var image3 = new Image();
-image3.src = "img/add_task_button_gray.png";
-
-var image4 = new Image();
-image4.src = "img/add_task_button_black.png";
 
 var image5 = new Image();
 image5.src = "img/settings_black.png";
@@ -72,6 +63,12 @@ firebase.auth().onAuthStateChanged(function(user) {
             readClassData(); //Reads class data if it exists for current user, followed by reading task data. If class data doesn't exist, it opens initial setup wizard.
             initializeSettingsButton(true);
             bInitialReadComplete = true;
+
+            if (user !== null) {
+                document.getElementById("profile_picture").src = user.photoURL;
+                document.getElementById("email_address").textContent = user.email;
+            }
+
         }
 
     } else {
@@ -123,14 +120,15 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
     addTaskButton.className = "add_task_button fa fa-plus"; //Gives each addTaskButton a class name and also assigns a Font Awesome icon to it.
     addTaskButton.style.display = "table"; //"table" ensures element goes on a new line but is only as big as its contents (block takes up whole line, whereas inline-block fits to content but doesn't occupy its own line).
     addTaskButton.style.cursor = "pointer";
-    addTaskButton.style.color = "#808080";
-    addTaskButton.textContent = " Add task";
+    addTaskButton.style.color = "#595959";
+    addTaskButton.textContent = "\xa0 Add task";
+    addTaskButton.style.fontSize = "19px";
     classDiv.appendChild(addTaskButton);
 
     addTaskButton.addEventListener("click", function () {
-
         resetDomElements();
         addTaskButton.style.display = "none";  //Makes addTaskButton that was clicked disappear.
+
         var newTaskDiv = document.createElement("div"); //Creates a div to house the UI for adding a new task. This holds a textbox, Submit button, and Cancel button.
         newTaskDiv.className = "new_task_div";  //Gives every newTaskDiv a class name so they can be referenced later.
         classDiv.appendChild(newTaskDiv);
@@ -150,9 +148,9 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
 
         var newTaskButtonContainerDiv = document.createElement('div');
 
-
         var newTaskSaveButton = document.createElement("button");
         newTaskSaveButton.textContent = "Add task";
+        newTaskSaveButton.className = "new_task_save_button";
         newTaskButtonContainerDiv.appendChild(newTaskSaveButton);
         newTaskSaveButton.addEventListener("click", function () {
             if (newTaskInput.value !== "") {  //don't save task if text field is left blank
@@ -168,16 +166,17 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
         newTaskButtonContainerDiv.appendChild(newTaskCancelButton);
         newTaskCancelButton.addEventListener("click", function () {
             classDiv.appendChild(addTaskButton);      //Moves addTaskButton back to the bottom of dayDiv
-            addTaskButton.style.display = "block";  //Makes addTaskButton reappear
+            addTaskButton.style.display = "table";  //Makes addTaskButton reappear
             newTaskDiv.parentNode.removeChild(newTaskDiv); //Removes newTaskDiv from the DOM
         });
         newTaskDiv.appendChild(newTaskButtonContainerDiv);
     });
+
     addTaskButton.addEventListener("mouseover", function() {
         addTaskButton.style.color = "black";
     });
     addTaskButton.addEventListener("mouseout", function() {
-        addTaskButton.style.color = "#808080";
+        addTaskButton.style.color = "#595959";
     });
 
     classDivArray[dayIndex].push(classDiv);
@@ -247,12 +246,14 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
 
         resetDomElements();
         addedTaskDiv.style.display = "none";
+
         var editTaskDiv = document.createElement("div"); //Creates a div to house the UI for editing a task. This holds a textbox, Save button, and Cancel button.
-        editTaskDiv.className = "edit_task_div";  //Gives every editTaskDiv a class name so they can be referenced later in the JavaScript code
+        editTaskDiv.className = "new_task_div";  //Gives every editTaskDiv a class name so they can be referenced later in the JavaScript code
 
         var editTaskInput = document.createElement("input");
         editTaskInput.type = "text";
         editTaskInput.placeholder = "task";
+        editTaskInput.className = "new_task_input";
         editTaskInput.value = addedTaskTextSpan.textContent; //sets text of the editTaskInput to be equal to the added text of the addedTaskTextSpan that was clicked on
         editTaskInput.addEventListener("keyup", function (event) {  //this eventListener simulates pressing the editTaskSaveButton after you type into editTaskInput and press Enter.
             event.preventDefault();
@@ -262,26 +263,30 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
         });
         editTaskDiv.appendChild(editTaskInput);
 
+        var editTaskButtonContainerDiv = document.createElement('div');
+
         var editTaskSaveButton = document.createElement("button");
         editTaskSaveButton.textContent = "Save";
-        editTaskDiv.appendChild(editTaskSaveButton);
+        editTaskSaveButton.className = "new_task_save_button";
+        editTaskButtonContainerDiv.appendChild(editTaskSaveButton);
         editTaskSaveButton.addEventListener("click", function () {
+            if (editTaskInput.value !== "") {
+                addedTaskTextSpan.textContent = editTaskInput.value; //set the addedTaskTextSpan's text equal to the newly edited text value from newTaskInput
+                addedTaskDiv.style.display = "block"; //make the addedTaskDiv visible again after we hid it earlier
+                editTaskDiv.parentNode.removeChild(editTaskDiv); //Removes editTaskDiv from the DOM
 
-            addedTaskTextSpan.textContent = editTaskInput.value; //set the addedTaskTextSpan's text equal to the newly edited text value from newTaskInput
-            addedTaskDiv.style.display = "block"; //make the addedTaskDiv visible again after we hid it earlier
-            editTaskDiv.parentNode.removeChild(editTaskDiv); //Removes editTaskDiv from the DOM
-
-            editTaskData(classDivIndex, addedTaskTextSpan.textContent, dayIndex, addedTaskDivIndex);
-
+                editTaskData(classDivIndex, addedTaskTextSpan.textContent, dayIndex, addedTaskDivIndex);
+            }
         });
 
         var editTaskCancelButton = document.createElement("button");
         editTaskCancelButton.textContent = "Cancel";
-        editTaskDiv.appendChild(editTaskCancelButton);
+        editTaskButtonContainerDiv.appendChild(editTaskCancelButton);
         editTaskCancelButton.addEventListener("click", function () {
             addedTaskDiv.style.display = "block";
             editTaskDiv.parentNode.removeChild(editTaskDiv);  //Removes editTaskDiv from the DOM
         });
+        editTaskDiv.appendChild(editTaskButtonContainerDiv);
 
         classDivArray[dayIndex][classDivIndex].insertBefore(editTaskDiv, addedTaskDiv);
         editTaskInput.focus();
@@ -289,6 +294,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
 
     return addedTaskDiv;
 }
+
 
 
 
@@ -333,7 +339,7 @@ function resetDomElements() {
     var classDivs = document.getElementsByClassName("class_div"); //store all classDivs in a local array
     for (var m=0; m<classDivs.length; m++) {
         classDivs[m].appendChild(addTaskButtonsToShow[m]);
-        addTaskButtonsToShow[m].style.display = "block";
+        addTaskButtonsToShow[m].style.display = "table";
     }
 
 }
@@ -717,11 +723,13 @@ function initializeSettingsButton(bUserSignedIn) {
     settingsButton.addEventListener("click", function () {
         if (bUserSignedIn) {
             settingsList.classList.toggle('show');
+            document.getElementById('settings_item_profile_info').style.display = "block";
             document.getElementById('settings_item_initial_setup_wizard').style.display = "block";
             document.getElementById('settings_item_sign_out').style.display = "block";
         }
         else {
             settingsList.classList.toggle('show');
+            document.getElementById('settings_item_profile_info').style.display = "none";
             document.getElementById('settings_item_initial_setup_wizard').style.display = "none";
             document.getElementById('settings_item_sign_out').style.display = "none";
         }

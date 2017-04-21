@@ -391,8 +391,8 @@ function setDaysOfWeek() {
 //handles the user pressing the "Previous week" button
 document.getElementById("previous_week_button").addEventListener("click", function () {
 
-    spinner.style.display = "block";
-    document.getElementById("main_content_wrapper").style.display = "none";
+    //spinner.style.display = "block";
+    //document.getElementById("main_content_wrapper").style.display = "none";
     currentlyActiveWeekIndex--; //decrement currentlyActiveWeekIndex
     if (currentlyActiveWeekIndex === 0) {
         document.getElementById("previous_week_button").disabled = true;  //If user is viewing the current week, disable Previous week button.
@@ -413,14 +413,13 @@ document.getElementById("previous_week_button").addEventListener("click", functi
     readTaskData();  //read user data for new week
     setDaysOfWeek(currentlyActiveWeekDates);
     resetDomElements();
-    hideOrShowDayDivs();
 });
 
 //handles the user pressing the "Next week" button
 document.getElementById("next_week_button").addEventListener("click", function () {
 
-    spinner.style.display = "block";
-    document.getElementById("main_content_wrapper").style.display = "none";
+    //spinner.style.display = "block";
+    //document.getElementById("main_content_wrapper").style.display = "none";
     currentlyActiveWeekIndex++; //increment currentlyActiveWeekIndex
     document.getElementById("previous_week_button").disabled = false;
 
@@ -440,7 +439,6 @@ document.getElementById("next_week_button").addEventListener("click", function (
     readTaskData();  //read user data for new week
     setDaysOfWeek(currentlyActiveWeekDates);
     resetDomElements();
-    hideOrShowDayDivs();
 });
 
 

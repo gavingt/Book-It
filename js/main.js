@@ -791,18 +791,17 @@ function initializeSettingsButton(bUserSignedIn) {
 
 }
 
-var wrapper = $('#day_div_wrapper');
 
-    $('.box').click(function() {
+    $('#test').click(function() {
 
-        $(this).animate({
+        $('#main_content_wrapper div:first').animate({
             left: '-50%'
         }, 500, function() {
             $(this).css('left', '150%');
             $(this).appendTo('#main_content_wrapper');
         });
 
-        $(this).next().animate({
+        $('#main_content_wrapper div:first').next().animate({
             left: '50%'
         }, 500);
     });

@@ -1,8 +1,9 @@
-
-//TODO: When I make Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyActiveWeekDates[1], "dddd, MMMM D, YYYY"));
+//TODO: style the Previous week/Next week bar
 //TODO: get rid of extra border above/below classDivs.
+//TODO: use other properties from initial setup wizard
+//TODO: GPS functionality
 
-
+//TODO: For Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyActiveWeekDates[1], "dddd, MMMM D, YYYY"));
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -18,7 +19,7 @@ var snackbar = document.getElementById("snackbar"); //gets a reference to the sn
 var todaysDateIndex; //Stores a number from 0-6, corresponding to the 7 days Sunday through Saturday, indicating which day of the week is today. For instance, if today is Sunday it equals 0, and if it's Tuesday it equals 2.
 var currentlyActiveWeekIndex = 0; //this tracks which week is currently being viewed. It starts at 0 and increments if user hits Next week button, and decrements when user hits Previous week button
 var bInitialReadComplete = false; //boolean value that stores whether or not we've done the initial reading of data at page load (or at login, if not logged in already at page load)
-var name, email, photoUrl;
+var name, email, photoUrl; // these will hold the name, email, and PhotoUrl provided by Google or Facebook after a user logs in
 var spinner = document.getElementById("spinner"); //progress spinner
 
 
@@ -392,15 +393,16 @@ document.getElementById("previous_week_button").addEventListener("click", functi
 
     var dayDivWrapper = $('#day_div_wrapper');
 
-    dayDivWrapper.animate({
+    dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
         left: '150%'
-    }, 300, function() {
+    }, 300, function() {  //Do this callback function after the above animation is finished. Instantly move element to specified position, and then animate it back to its starting position of left:0.
         $(this).css('left', '-150%');
+        dayDivWrapper.animate({
+            left: '0'
+        }, 300);
     });
 
-    dayDivWrapper.animate({
-        left: '0'
-    }, 300);
+
 
     currentlyActiveWeekIndex--; //decrement currentlyActiveWeekIndex
     if (currentlyActiveWeekIndex === 0) {
@@ -427,15 +429,16 @@ document.getElementById("next_week_button").addEventListener("click", function (
 
     var dayDivWrapper = $('#day_div_wrapper');
 
-    dayDivWrapper.animate({
-        left: '-150%'   //Do this first. Animate element from its starting position to this newly specified position.
-    }, 300, function() {
-        $(this).css('left', '150%');   //Do this callback function after the above animation is finished. Instantly move element to specified position.
+    dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
+        left: '-150%'
+    }, 300, function() {   //Do this callback function after the above animation is finished. Instantly move element to specified position, and then animate it back to its starting position of left:0.
+        $(this).css('left', '150%');
+        dayDivWrapper.animate({
+            left: '0'
+        }, 300);
     });
 
-    dayDivWrapper.animate({
-        left: '0'
-    }, 300);
+
 
     currentlyActiveWeekIndex++; //increment currentlyActiveWeekIndex
     document.getElementById("previous_week_button").disabled = false;
@@ -483,8 +486,7 @@ function editTaskData(taskClassIndex, taskText, dayIndex, taskIndex) {
 
     var userId = firebase.auth().currentUser.uid;
 
-    //write edited task data
-    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex] + "/" + taskIndex).set(dayTaskJsonArray[dayIndex][taskIndex]);
+    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex] + "/" + taskIndex).set(dayTaskJsonArray[dayIndex][taskIndex]); //write edited task data
 
 }
 
@@ -497,8 +499,7 @@ function removeTaskData(dayIndex, taskIndex) {
 
     var userId = firebase.auth().currentUser.uid;
 
-    //saves a given day's tasks with the completed task removed
-    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);
+    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]); //saves a given day's tasks with the completed task removed
 
 }
 
@@ -512,8 +513,7 @@ function undoRemoveTaskData(completedTaskJson, taskIndex, dayIndex) {
 
     var userId = firebase.auth().currentUser.uid;
 
-    //write new task data
-    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);
+    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]); //write deleted task back into Firebase
 }
 
 
@@ -528,8 +528,7 @@ function writeUserData(taskClassIndex, taskText, dayIndex) {
 
     var userId = firebase.auth().currentUser.uid;
 
-    //write new task data
-    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);
+    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);  //write new task data
 }
 
 

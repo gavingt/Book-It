@@ -2,6 +2,14 @@
 //TODO: progress spinner for fetching data
 //TODO: When I make Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyActiveWeekDates[1], "dddd, MMMM D, YYYY"));
 //TODO: get rid of extra border above/below classDivs.
+//TODO: if current week is less than 7 days and you press Next week and then Previous week buttons, the page will have extra space at the bottom.
+
+//TODO: 1) change date functions to find 3 weeks of dates at once, 2) inside createDayDivs, clone day_div_wrapper, 3) every step of the way, do things 3 times
+
+//TODO: what if I just used a single day_div_wrapper that slides off screen and then teleports to the other side, so it looks like it's a new div sliding in? TRY THIS FIRST!!!!!!
+//TODO: remove JQuery from animations
+
+
 
 
 
@@ -21,8 +29,6 @@ var currentlyActiveWeekIndex = 0; //this tracks which week is currently being vi
 var bInitialReadComplete = false; //boolean value that stores whether or not we've done the initial reading of data at page load (or at login, if not logged in already at page load)
 var name, email, photoUrl;
 var spinner = document.getElementById("spinner"); //progress spinner
-
-var dayDivWrapperClone;
 
 
 // Initialize Firebase. This code should stay at the top of main.js
@@ -104,12 +110,6 @@ function createDayDivs () {
             document.getElementById('day_div_wrapper').appendChild(dayDivArray[i]);   //Makes the dayDiv appear on the page
 
     }
-
-    //dayDivWrapperClone = document.getElementById("day_div_wrapper").cloneNode(true);
-/*    dayDivWrapperClone = document.createElement("button");
-    dayDivWrapperClone.textContent = "hello";
-    dayDivWrapperClone.className = "box";
-    document.getElementById("main_content_wrapper").appendChild(dayDivWrapperClone);*/
 }
 
 
@@ -400,6 +400,17 @@ function setDaysOfWeek() {
 //handles the user pressing the "Previous week" button
 document.getElementById("previous_week_button").addEventListener("click", function () {
 
+    $("#main_content_wrapper").animate({
+        left: '150%'
+    }, 250, function() {
+        $(this).css('left', '-150%');
+    });
+
+    $('#main_content_wrapper').animate({
+        left: '0'
+    }, 250);
+
+
     //spinner.style.display = "block";
     document.getElementById("main_content_wrapper").style.display = "none";
     currentlyActiveWeekIndex--; //decrement currentlyActiveWeekIndex
@@ -413,10 +424,6 @@ document.getElementById("previous_week_button").addEventListener("click", functi
         currentlyActiveWeekDates[i] = moment(currentlyActiveWeekDates[i], "dddd, MMMM D, YYYY").add(-7, 'days').format("dddd, MMMM D, YYYY");
 
         initialize2dArrays(false); //clear 2d arrays before populating them with elements from the new week
-        var nodesToRemove = document.querySelectorAll(".added_task_div"); //find all addedTaskDiv elements and save them in nodesToRemove[] array
-        for (var j=0; j<nodesToRemove.length; j++) {   //iterate through nodesToRemove[] array and remove each element
-            nodesToRemove[j].parentNode.removeChild(nodesToRemove[j]);
-        }
     }
 
     readTaskData();  //read user data for new week
@@ -427,8 +434,18 @@ document.getElementById("previous_week_button").addEventListener("click", functi
 //handles the user pressing the "Next week" button
 document.getElementById("next_week_button").addEventListener("click", function () {
 
+        $("#day_div_wrapper").animate({
+            left: '-150%'
+        }, 300, function() {
+            $(this).css('left', '150%');
+        });
+
+        $('#day_div_wrapper').animate({
+            left: '0'
+        }, 300);
+
     //spinner.style.display = "block";
-    document.getElementById("main_content_wrapper").style.display = "none";
+    //document.getElementById("main_content_wrapper").style.display = "none";
     currentlyActiveWeekIndex++; //increment currentlyActiveWeekIndex
     document.getElementById("previous_week_button").disabled = false;
 
@@ -439,11 +456,6 @@ document.getElementById("next_week_button").addEventListener("click", function (
         currentlyActiveWeekDates[i] = moment(currentlyActiveWeekDates[i], "dddd, MMMM D, YYYY").add(7, 'days').format("dddd, MMMM D, YYYY");
 
         initialize2dArrays(false); //clear 2d arrays before populating them with elements from the new week
-        var nodesToRemove = document.querySelectorAll(".added_task_div"); //find all addedTaskDiv elements and save them in nodesToRemove[] array
-        for (var j=0; j<nodesToRemove.length; j++) {    //iterate through nodesToRemove[] array and remove each element
-            nodesToRemove[j].parentNode.removeChild(nodesToRemove[j]);
-        }
-
     }
     readTaskData();  //read user data for new week
     setDaysOfWeek(currentlyActiveWeekDates);
@@ -795,14 +807,14 @@ function initializeSettingsButton(bUserSignedIn) {
     $('#test').click(function() {
 
         $('#main_content_wrapper div:first').animate({
-            left: '-50%'
+            left: '-150%'
         }, 500, function() {
             $(this).css('left', '150%');
             $(this).appendTo('#main_content_wrapper');
         });
 
         $('#main_content_wrapper div:first').next().animate({
-            left: '50%'
+            left: '0%'
         }, 500);
     });
 

@@ -263,28 +263,28 @@ body {
 
 #main_content_wrapper {
     position: absolute;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
     width: 100%;
-    height: 100%;
-
+/*    height: 100%;*/
+    /*overflow: hidden;*/
 }
 
 .box {
     position: absolute;
-    width: 50%;
-    height: 300px;
+    width: 100%;
     text-align: center;
-    left: 150%;
-    top: 100px;
-    margin-left: -25%;
+
+
 }
 
 #day_div_wrapper {
-    left: 50%;
+    left: 0%;
+    margin-bottom: 50px;
 }
 
 #day_div_wrapper_clone {
+    left: 150%;
 }
 
 

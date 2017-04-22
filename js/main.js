@@ -402,17 +402,14 @@ document.getElementById("previous_week_button").addEventListener("click", functi
 
     $("#main_content_wrapper").animate({
         left: '150%'
-    }, 250, function() {
+    }, 300, function() {
         $(this).css('left', '-150%');
     });
 
     $('#main_content_wrapper').animate({
         left: '0'
-    }, 250);
+    }, 300);
 
-
-    //spinner.style.display = "block";
-    document.getElementById("main_content_wrapper").style.display = "none";
     currentlyActiveWeekIndex--; //decrement currentlyActiveWeekIndex
     if (currentlyActiveWeekIndex === 0) {
         document.getElementById("previous_week_button").disabled = true;  //If user is viewing the current week, disable Previous week button.
@@ -426,26 +423,26 @@ document.getElementById("previous_week_button").addEventListener("click", functi
         initialize2dArrays(false); //clear 2d arrays before populating them with elements from the new week
     }
 
-    readTaskData();  //read user data for new week
-    setDaysOfWeek(currentlyActiveWeekDates);
-    resetDomElements();
+    setTimeout(function(){
+        readTaskData();  //read user data for new week
+        setDaysOfWeek(currentlyActiveWeekDates);
+        resetDomElements();
+    }, 50); //hides snackbar after waiting 500 ms for fadeout animation to run
 });
 
 //handles the user pressing the "Next week" button
 document.getElementById("next_week_button").addEventListener("click", function () {
 
         $("#day_div_wrapper").animate({
-            left: '-150%'
+            left: '-150%'   //Do this first. Animate element from its starting position to this newly specified position.
         }, 300, function() {
-            $(this).css('left', '150%');
+            $(this).css('left', '150%');   //Do this callback function after the above animation is finished. Instantly move element to specified position.
         });
 
         $('#day_div_wrapper').animate({
             left: '0'
         }, 300);
 
-    //spinner.style.display = "block";
-    //document.getElementById("main_content_wrapper").style.display = "none";
     currentlyActiveWeekIndex++; //increment currentlyActiveWeekIndex
     document.getElementById("previous_week_button").disabled = false;
 
@@ -457,9 +454,13 @@ document.getElementById("next_week_button").addEventListener("click", function (
 
         initialize2dArrays(false); //clear 2d arrays before populating them with elements from the new week
     }
-    readTaskData();  //read user data for new week
-    setDaysOfWeek(currentlyActiveWeekDates);
-    resetDomElements();
+
+    setTimeout(function(){
+        readTaskData();  //read user data for new week
+        setDaysOfWeek(currentlyActiveWeekDates);
+        resetDomElements();
+    }, 50); //hides snackbar after waiting 500 ms for fadeout animation to run
+
 });
 
 

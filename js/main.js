@@ -1,15 +1,6 @@
 
-//TODO: progress spinner for fetching data
 //TODO: When I make Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyActiveWeekDates[1], "dddd, MMMM D, YYYY"));
 //TODO: get rid of extra border above/below classDivs.
-//TODO: if current week is less than 7 days and you press Next week and then Previous week buttons, the page will have extra space at the bottom.
-
-//TODO: 1) change date functions to find 3 weeks of dates at once, 2) inside createDayDivs, clone day_div_wrapper, 3) every step of the way, do things 3 times
-
-//TODO: what if I just used a single day_div_wrapper that slides off screen and then teleports to the other side, so it looks like it's a new div sliding in? TRY THIS FIRST!!!!!!
-//TODO: remove JQuery from animations
-
-
 
 
 

@@ -262,15 +262,14 @@ body {
 
 
 #main_content_wrapper {
-
     margin-top: 25px;
     text-align: center;
-    width: 100%
+    width: 100%;
+    overflow: hidden;
 }
 
 #day_div_wrapper {
-    position: absolute;
-
+    position: relative;
     width: 100%;
 }
 

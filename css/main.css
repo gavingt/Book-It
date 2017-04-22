@@ -262,32 +262,17 @@ body {
 
 
 #main_content_wrapper {
-    position: absolute;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-}
 
-.box {
-    position: absolute;
-    width: 100%;
+    margin-top: 25px;
     text-align: center;
-
-
+    width: 100%
 }
 
 #day_div_wrapper {
-    left: 0%;
-    margin-bottom: 50px;
+    position: absolute;
+
+    width: 100%;
 }
-
-#day_div_wrapper_clone {
-    left: 150%;
-}
-
-
-
-
 
 
 .week_switcher_buttons {

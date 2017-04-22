@@ -108,7 +108,6 @@ function createDayDivs () {
 
             dayDivArray[i] = dayDiv;  //Sets the dayDiv we just built to be equal to the ith element of the dayDivArray[]
             document.getElementById('day_div_wrapper').appendChild(dayDivArray[i]);   //Makes the dayDiv appear on the page
-
     }
 }
 
@@ -400,13 +399,15 @@ function setDaysOfWeek() {
 //handles the user pressing the "Previous week" button
 document.getElementById("previous_week_button").addEventListener("click", function () {
 
-    $("#main_content_wrapper").animate({
+    var dayDivWrapper = $('#day_div_wrapper');
+
+    dayDivWrapper.animate({
         left: '150%'
     }, 300, function() {
         $(this).css('left', '-150%');
     });
 
-    $('#main_content_wrapper').animate({
+    dayDivWrapper.animate({
         left: '0'
     }, 300);
 
@@ -433,15 +434,17 @@ document.getElementById("previous_week_button").addEventListener("click", functi
 //handles the user pressing the "Next week" button
 document.getElementById("next_week_button").addEventListener("click", function () {
 
-        $("#day_div_wrapper").animate({
-            left: '-150%'   //Do this first. Animate element from its starting position to this newly specified position.
-        }, 300, function() {
-            $(this).css('left', '150%');   //Do this callback function after the above animation is finished. Instantly move element to specified position.
-        });
+    var dayDivWrapper = $('#day_div_wrapper');
 
-        $('#day_div_wrapper').animate({
-            left: '0'
-        }, 300);
+    dayDivWrapper.animate({
+        left: '-150%'   //Do this first. Animate element from its starting position to this newly specified position.
+    }, 300, function() {
+        $(this).css('left', '150%');   //Do this callback function after the above animation is finished. Instantly move element to specified position.
+    });
+
+    dayDivWrapper.animate({
+        left: '0'
+    }, 300);
 
     currentlyActiveWeekIndex++; //increment currentlyActiveWeekIndex
     document.getElementById("previous_week_button").disabled = false;
@@ -803,22 +806,6 @@ function initializeSettingsButton(bUserSignedIn) {
     });
 
 }
-
-
-    $('#test').click(function() {
-
-        $('#main_content_wrapper div:first').animate({
-            left: '-150%'
-        }, 500, function() {
-            $(this).css('left', '150%');
-            $(this).appendTo('#main_content_wrapper');
-        });
-
-        $('#main_content_wrapper div:first').next().animate({
-            left: '0%'
-        }, 500);
-    });
-
 
 
 /************************************************************/

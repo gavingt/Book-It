@@ -5,6 +5,11 @@
 
 //TODO: For Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyActiveWeekDates[1], "dddd, MMMM D, YYYY"));
 
+//TODO: to make Past due work: 1) When user first completes initial setup wizard, save the current date as var lastCheckedForPastDueItemsDate,
+                            // 2) On subsequent page loads, check all dates between lastCheckedForPastDueItemsDate and the last Sunday that passed (wrap in IF statement to see if lastCheckedForPastDueItemsDate is older than last Sunday)
+                            // 3) Move any past due items to their own JSON object in Firebase called pastDueItems, preserving their structure (or simply add the date of the past due item to a list that can be read from, updated, and deleted from)
+                            // 4) overwrite lastCheckedForPastDueItemsDate with current date
+
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
 var googleProvider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization
@@ -52,11 +57,10 @@ if (screen.width > 750 && screen.height > 750) {
 }
 
 
-//Perform certain actions based on whether Firebase reports that a user is signed in or not signed in.
+//Callback function that indicates whether a user is signed in or not.
 firebase.auth().onAuthStateChanged(function(user) {
-    if (user) {
+    if (user) {  // User is signed in
 
-        // User is signed in
         if (bInitialReadComplete === false) {  //Doing this check ensures that Firebase's hourly token refreshes don't cause re-reading of data (and thus duplicate tasks, since readTaskData() generates addedTaskDiv elements).
 
             spinner.style.display = "block";
@@ -71,10 +75,8 @@ firebase.auth().onAuthStateChanged(function(user) {
                 document.getElementById("email_address").textContent = user.email;
             }
         }
+    } else {  // No user is signed in.
 
-    } else {
-
-        // No user is signed in.
         document.getElementById("sign_in_button_group_wrapper").style.display = "block";
         document.getElementById("sign_in_button_group").style.display = "inline-block";
         initializeSettingsButton(false);
@@ -92,7 +94,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 function createDayDivs () {
     for (var i = 0; i < 7; i++) {
             var dayDiv = document.createElement("div");
-            dayDiv.className = "day_div"; //Gives every dayDiv a class name so they can be referenced
+            dayDiv.className = "day_div"; //Gives every dayDiv a class name so it can be referenced
 
             var dayDivHeader = document.createElement("div");
             dayDivHeader.className = "day_div_header";
@@ -100,6 +102,8 @@ function createDayDivs () {
 
             dayDivArray[i] = dayDiv;  //Sets the dayDiv we just built to be equal to the ith element of the dayDivArray[]
             document.getElementById('day_div_wrapper').appendChild(dayDivArray[i]);   //Makes the dayDiv appear on the page
+
+            //TODO: change loop to iterate 8 times, so that dayDivArray[7] will be Past Due section
     }
 }
 
@@ -376,6 +380,8 @@ function initializeDates() {
 function setDaysOfWeek() {
     for (var i=0; i<dayDivArray.length; i++) {
 
+        //TODO: change above dayDivArray.length to 7
+
         if (currentlyActiveWeekDates[i] === moment().format("dddd, MMMM D, YYYY")) {
             dayDivArray[i].firstChild.textContent = currentlyActiveWeekDates[i] + " (Today)";  //if currentlyActiveWeekDates[i] is storing today's date, append " (Today)" at the end.
         }
@@ -394,12 +400,12 @@ document.getElementById("previous_week_button").addEventListener("click", functi
     var dayDivWrapper = $('#day_div_wrapper');
 
     dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
-        left: '150%'
-    }, 300, function() {  //Do this callback function after the above animation is finished. Instantly move element to specified position, and then animate it back to its starting position of left:0.
-        $(this).css('left', '-150%');
+        left: '110%'
+    }, 400, function() {  //Do this callback function after the above animation is finished. Instantly move element to specified position, and then animate it back to its starting position of left:0.
+        $(this).css('left', '-110%');
         dayDivWrapper.animate({
             left: '0'
-        }, 300);
+        }, 400);
     });
 
 
@@ -421,7 +427,7 @@ document.getElementById("previous_week_button").addEventListener("click", functi
         readTaskData();  //read user data for new week
         setDaysOfWeek(currentlyActiveWeekDates);
         resetDomElements();
-    }, 50); //hides snackbar after waiting 500 ms for fadeout animation to run
+    }, 300); //hides snackbar after waiting 500 ms for fadeout animation to run
 });
 
 //handles the user pressing the "Next week" button
@@ -430,12 +436,12 @@ document.getElementById("next_week_button").addEventListener("click", function (
     var dayDivWrapper = $('#day_div_wrapper');
 
     dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
-        left: '-150%'
-    }, 300, function() {   //Do this callback function after the above animation is finished. Instantly move element to specified position, and then animate it back to its starting position of left:0.
-        $(this).css('left', '150%');
+        left: '-110%'
+    }, 400, function() {   //Do this callback function after the above animation is finished. Instantly move element to specified position, and then animate it back to its starting position of left:0.
+        $(this).css('left', '110%');
         dayDivWrapper.animate({
             left: '0'
-        }, 300);
+        }, 400);
     });
 
 
@@ -456,7 +462,7 @@ document.getElementById("next_week_button").addEventListener("click", function (
         readTaskData();  //read user data for new week
         setDaysOfWeek(currentlyActiveWeekDates);
         resetDomElements();
-    }, 50); //hides snackbar after waiting 500 ms for fadeout animation to run
+    }, 300); //hides snackbar after waiting 500 ms for fadeout animation to run
 
 });
 
@@ -544,6 +550,9 @@ function readClassData() {
             if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
                 classJsonArray = snapshot.val(); //Store entire "classes" JSON object from Firebase as classJsonArray.
                 for (var i = 0; i < dayDivArray.length; i++) {
+
+                    //TODO: how do I change this function to accommodate Past Due section?
+
                     for (var j = 0; j < classJsonArray.length; j++) {
                         var classDiv = createClassDiv(classJsonArray[j].classColor, classJsonArray[j].classTime, classJsonArray[j].classLocation, classJsonArray[j].className, classJsonArray[j].classTime, i, j);
                         dayDivArray[i].append(classDiv);

@@ -6,9 +6,12 @@
 //TODO: For Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyActiveWeekDates[1], "dddd, MMMM D, YYYY"));
 
 //TODO: to make Past due work: 1) When user first completes initial setup wizard, save the current date as var lastCheckedForPastDueItemsDate,
-                            // 2) On subsequent page loads, check all dates between lastCheckedForPastDueItemsDate and the last Sunday that passed (wrap in IF statement to see if lastCheckedForPastDueItemsDate is older than last Sunday)
-                            // 3) Move any past due items to their own JSON object in Firebase called pastDueItems, preserving their structure (or simply add the date of the past due item to a list that can be read from, updated, and deleted from)
+                            // 2) On subsequent page loads, check all dates between lastCheckedForPastDueItemsDate and yesterday (first check whether lastCheckedForPastDueItemsDate is older than yesterday or just that it doesn't equal yesterday or today).
+                            // 3) Add the date of each past due item to a list that can be read from, updated, and deleted from
                             // 4) overwrite lastCheckedForPastDueItemsDate with current date
+
+//TODO: remove Add task buttons from Past due dayDiv
+//TODO: do I need to change other arrays such as dayTaskJsonArray to accommodate Past due section?
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -92,19 +95,21 @@ firebase.auth().onAuthStateChanged(function(user) {
 
 //creates dayDiv elements and saves them in dayDivArray[]
 function createDayDivs () {
-    for (var i = 0; i < 7; i++) {
+    for (var i = 0; i < 8; i++) {
             var dayDiv = document.createElement("div");
             dayDiv.className = "day_div"; //Gives every dayDiv a class name so it can be referenced
 
             var dayDivHeader = document.createElement("div");
             dayDivHeader.className = "day_div_header";
+            dayDivHeader.appendChild(document.createElement('span'));
             dayDiv.appendChild(dayDivHeader);
 
             dayDivArray[i] = dayDiv;  //Sets the dayDiv we just built to be equal to the ith element of the dayDivArray[]
             document.getElementById('day_div_wrapper').appendChild(dayDivArray[i]);   //Makes the dayDiv appear on the page
-
-            //TODO: change loop to iterate 8 times, so that dayDivArray[7] will be Past Due section
     }
+
+    dayDivArray[0].firstChild.firstChild.textContent = "Overdue";
+    dayDivArray[0].firstChild.firstChild.style.color = "red";
 }
 
 
@@ -310,12 +315,14 @@ function hideOrShowDayDivs () {
     document.getElementById('main_content_wrapper').style.display = "block";
 
     if (currentlyActiveWeekIndex === 0) {
-        for (var j = 0; j<todaysDateIndex; j++) {
+        dayDivArray[0].style.display = "block";
+        for (var j = 1; j <todaysDateIndex + 1; j++) {
             dayDivArray[j].style.display = "none";
         }
     }
     else {
-        for (var k = 0; k<todaysDateIndex; k++) {
+        dayDivArray[0].style.display = "none";
+        for (var k = 1; k < 8; k++) {
             dayDivArray[k].style.display = "block";
         }
     }
@@ -378,18 +385,16 @@ function initializeDates() {
 
 //sets the dates to the dateLabel elements in each dayDivArray[] element
 function setDaysOfWeek() {
-    for (var i=0; i<dayDivArray.length; i++) {
-
-        //TODO: change above dayDivArray.length to 7
+    for (var i=1; i<8; i++) {
 
         if (currentlyActiveWeekDates[i] === moment().format("dddd, MMMM D, YYYY")) {
-            dayDivArray[i].firstChild.textContent = currentlyActiveWeekDates[i] + " (Today)";  //if currentlyActiveWeekDates[i] is storing today's date, append " (Today)" at the end.
+            dayDivArray[i].firstChild.firstChild.textContent = currentlyActiveWeekDates[i-1] + " (Today)";  //if currentlyActiveWeekDates[i] is storing today's date, append " (Today)" at the end.
         }
         else if (currentlyActiveWeekDates[i] === moment().add(1, 'days').format("dddd, MMMM D, YYYY")) {
-            dayDivArray[i].firstChild.textContent = currentlyActiveWeekDates[i] + " (Tomorrow)";  //if currentlyActiveWeekDates[i] is storing tomorrow's date, append " (Tomorrow)" at the end.
+            dayDivArray[i].firstChild.firstChild.textContent = currentlyActiveWeekDates[i-1] + " (Tomorrow)";  //if currentlyActiveWeekDates[i] is storing tomorrow's date, append " (Tomorrow)" at the end.
         }
         else {
-            dayDivArray[i].firstChild.textContent = currentlyActiveWeekDates[i]; //Get firstChild of each dayDivArray, which is the dateLabel element. Then we set its textContent equal to the corresponding entry in the currentlyActiveWeekDates[] array.
+            dayDivArray[i].firstChild.firstChild.textContent = currentlyActiveWeekDates[i-1]; //Get firstChild of each dayDivArray, which is the dateLabel element. Then we set its textContent equal to the corresponding entry in the currentlyActiveWeekDates[] array.
         }
     }
 }
@@ -492,7 +497,7 @@ function editTaskData(taskClassIndex, taskText, dayIndex, taskIndex) {
 
     var userId = firebase.auth().currentUser.uid;
 
-    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex] + "/" + taskIndex).set(dayTaskJsonArray[dayIndex][taskIndex]); //write edited task data
+    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex-1] + "/" + taskIndex).set(dayTaskJsonArray[dayIndex][taskIndex]); //write edited task data
 
 }
 
@@ -505,7 +510,7 @@ function removeTaskData(dayIndex, taskIndex) {
 
     var userId = firebase.auth().currentUser.uid;
 
-    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]); //saves a given day's tasks with the completed task removed
+    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex-1]).set(dayTaskJsonArray[dayIndex]); //saves a given day's tasks with the completed task removed
 
 }
 
@@ -519,7 +524,7 @@ function undoRemoveTaskData(completedTaskJson, taskIndex, dayIndex) {
 
     var userId = firebase.auth().currentUser.uid;
 
-    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]); //write deleted task back into Firebase
+    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex-1]).set(dayTaskJsonArray[dayIndex]); //write deleted task back into Firebase
 }
 
 
@@ -534,7 +539,7 @@ function writeUserData(taskClassIndex, taskText, dayIndex) {
 
     var userId = firebase.auth().currentUser.uid;
 
-    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);  //write new task data
+    firebase.database().ref('users/' + userId + "/" + currentlyActiveWeekDates[dayIndex-1]).set(dayTaskJsonArray[dayIndex]);  //write new task data
 }
 
 
@@ -549,9 +554,7 @@ function readClassData() {
     firebase.database().ref('/users/' + userId + "/classes").once('value', (function (snapshot) {
             if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
                 classJsonArray = snapshot.val(); //Store entire "classes" JSON object from Firebase as classJsonArray.
-                for (var i = 0; i < dayDivArray.length; i++) {
-
-                    //TODO: how do I change this function to accommodate Past Due section?
+                for (var i = 0; i < 8; i++) {
 
                     for (var j = 0; j < classJsonArray.length; j++) {
                         var classDiv = createClassDiv(classJsonArray[j].classColor, classJsonArray[j].classTime, classJsonArray[j].classLocation, classJsonArray[j].className, classJsonArray[j].classTime, i, j);
@@ -577,13 +580,13 @@ function readTaskData() {
 
     var userId = firebase.auth().currentUser.uid;
 
-    for (var i = 0; i < dayDivArray.length; i++) {
+    for (var i = 1; i < 8; i++) {
 
         (function (i) {   //Solves closure problem described here: http://stackoverflow.com/questions/13343340/calling-an-asynchronous-function-within-a-for-loop-in-javascript.
                           //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
 
             //Fetch task data
-            firebase.database().ref('/users/' + userId + "/" + currentlyActiveWeekDates[i]).on('value', (function (snapshot) {
+            firebase.database().ref('/users/' + userId + "/" + currentlyActiveWeekDates[i-1]).on('value', (function (snapshot) {
 
                     //remove existing tasks before we read task data
                     var addedTaskDivsToRemoveArray = dayDivArray[i].getElementsByClassName("added_task_div");
@@ -604,7 +607,7 @@ function readTaskData() {
                         }
                     }
 
-                    if (i === dayDivArray.length - 1) {
+                    if (i === 7) {
                         hideOrShowDayDivs();
                         spinner.style.display = "none";
                     }
@@ -706,7 +709,14 @@ document.getElementById("wizard_submit_button").addEventListener("click", functi
         }
     ];
 
+
+
     var userId = firebase.auth().currentUser.uid;
+
+    var lastCheckedForPastDueItemsDateJson = {lastCheckedForPastDueItemsDate: moment().format("dddd, MMMM D, YYYY")};
+
+    //write current date to Firebase and save it as lastCheckedForPastDueItemsDate
+    firebase.database().ref('users/' + userId).set({lastCheckedForPastDueItemsDate: moment().format("dddd, MMMM D, YYYY")}) ;
 
     //write class data to Firebase
     firebase.database().ref('users/' + userId + "/classes").set(classJsonObject).then(function() {
@@ -733,7 +743,8 @@ document.getElementById("wizard_submit_button").addEventListener("click", functi
 
 //Turns taskDivArray, dayTaskJsonArray, and classDivArray into 2D arrays (each of their elements stores its own array)
 function initialize2dArrays(bIncludeClassDivArray) {
-    for (var i = 0; i < 7; i++) {
+    for (var i = 0; i < 8; i++) {
+
         addedTaskDivArray[i] = [];
         dayTaskJsonArray[i] = [];
         if (bIncludeClassDivArray) {

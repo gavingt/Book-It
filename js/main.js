@@ -5,13 +5,18 @@
 
 //TODO: For Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyActiveWeekDates[1], "dddd, MMMM D, YYYY"));
 
-//TODO: to make Past due work: 1) When user first completes initial setup wizard, save the current date as var lastCheckedForPastDueItemsDate,
+//TODO: to make Past due work: 1) When user first completes initial setup wizard, save the current date as var lastCheckedForPastDueItemsDate (DONE)
                             // 2) On subsequent page loads, check all dates between lastCheckedForPastDueItemsDate and yesterday (first check whether lastCheckedForPastDueItemsDate is older than yesterday or just that it doesn't equal yesterday or today).
                             // 3) Add the date of each past due item to a list that can be read from, updated, and deleted from
                             // 4) overwrite lastCheckedForPastDueItemsDate with current date
 
 //TODO: remove Add task buttons from Past due dayDiv
 //TODO: do I need to change other arrays such as dayTaskJsonArray to accommodate Past due section?
+
+//TODO: Change slide animation so that new dayDivs don't slide in until the week's tasks are ready
+
+//TODO: save tasks by their Unix time stamps as opposed to the date string. This will make it possible to filter results from Firebase
+//TODO: save all tasks in a "/tasks" directory on the same level as the existing "/classes" directory, so that we can filter everything in "/tasks" and "/classes" won't be included in the filtering.
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -573,47 +578,74 @@ function readClassData() {
 }
 
 
-
-
 //Reads data from Firebase. This only gets called at the initial page load or when the user switches between weeks.
 function readTaskData() {
 
     var userId = firebase.auth().currentUser.uid;
 
-    for (var i = 1; i < 8; i++) {
+    for (var i = 0; i < 8; i++) {
 
         (function (i) {   //Solves closure problem described here: http://stackoverflow.com/questions/13343340/calling-an-asynchronous-function-within-a-for-loop-in-javascript.
-                          //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
-
-            //Fetch task data
-            firebase.database().ref('/users/' + userId + "/" + currentlyActiveWeekDates[i-1]).on('value', (function (snapshot) {
-
-                    //remove existing tasks before we read task data
-                    var addedTaskDivsToRemoveArray = dayDivArray[i].getElementsByClassName("added_task_div");
-                    var count = addedTaskDivsToRemoveArray.length;
-                    for (var k = 0; k < count; k++) {
-                        addedTaskDivArray[i].splice(0, 1);
-                        addedTaskDivsToRemoveArray[0].parentNode.removeChild(addedTaskDivsToRemoveArray[0]);
-                    }
+            //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
 
 
-                    //read task data
-                    if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
+            //remove existing tasks before we read task data
+            var addedTaskDivsToRemoveArray = dayDivArray[i].getElementsByClassName("added_task_div");
+            var count = addedTaskDivsToRemoveArray.length;
+            for (var k = 0; k < count; k++) {
+                addedTaskDivArray[i].splice(0, 1);
+                addedTaskDivsToRemoveArray[0].parentNode.removeChild(addedTaskDivsToRemoveArray[0]);
+            }
 
-                        dayTaskJsonArray[i] = snapshot.val();
-                        for (var j = 0; j < dayTaskJsonArray[i].length; j++) {
-                            var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayTaskJsonArray[i][j].taskClassIndex); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
-                            classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].insertBefore(addedTaskDiv, classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].lastChild);  //Inserts addedTaskDiv before the last child element of the classDivArray.
+            // Fetch task data for Overdue section
+            if (i === 0) {
+                if (currentlyActiveWeekIndex === 0) {
+                    //TODO: Past due stuff goes here. Don't forget to update lastCheckedForPastDueItemsDate as well.
+
+                    //TODO: to make Past due work: 1) When user first completes initial setup wizard, save the current date as var lastCheckedForPastDueItemsDate (DONE)
+                    // 2) On subsequent page loads, check all dates between lastCheckedForPastDueItemsDate and yesterday (first check whether lastCheckedForPastDueItemsDate is older than yesterday or just that it doesn't equal yesterday or today).
+                    // 3) Add the date of each past due item to a list that can be read from, updated, and deleted from
+                    // 4) overwrite lastCheckedForPastDueItemsDate with current date
+
+                    //TODO: new strategy: get rid of lastCheckedForPastDueItemsDate and just use Firebase
+
+                        firebase.database().ref('/users/' + userId).orderByKey().on('value', (function (snapshot) {
+                            console.log(snapshot.val());
                         }
-                    }
+                        ));
 
-                    if (i === 7) {
-                        hideOrShowDayDivs();
-                        spinner.style.display = "none";
-                    }
+
+                    firebase.database().ref('/users/' + userId + "/" + currentlyActiveWeekDates[i - 1]).on('value', (function (snapshot) {
+
+                        }
+                    ));
+
                 }
-            ));
+            }
+            else { // Fetch task data for currently active week
+                firebase.database().ref('/users/' + userId + "/" + currentlyActiveWeekDates[i - 1]).on('value', (function (snapshot) {
 
+
+
+
+                        //read task data
+                        if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
+
+                            dayTaskJsonArray[i] = snapshot.val();
+                            for (var j = 0; j < dayTaskJsonArray[i].length; j++) {
+                                var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayTaskJsonArray[i][j].taskClassIndex); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
+                                classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].insertBefore(addedTaskDiv, classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].lastChild);  //Inserts addedTaskDiv before the last child element of the classDivArray.
+                            }
+                        }
+
+                        if (i === 7) {
+                            hideOrShowDayDivs();
+                            spinner.style.display = "none";
+                        }
+
+                    }
+                ));
+            }
         }(i));  //This is the end of the function that exists solely to solve closure problem. It's also where we pass in the value of i so that it's accessible within the above code.
     }  //end FOR loop
 
@@ -712,8 +744,6 @@ document.getElementById("wizard_submit_button").addEventListener("click", functi
 
 
     var userId = firebase.auth().currentUser.uid;
-
-    var lastCheckedForPastDueItemsDateJson = {lastCheckedForPastDueItemsDate: moment().format("dddd, MMMM D, YYYY")};
 
     //write current date to Firebase and save it as lastCheckedForPastDueItemsDate
     firebase.database().ref('users/' + userId).set({lastCheckedForPastDueItemsDate: moment().format("dddd, MMMM D, YYYY")}) ;

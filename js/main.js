@@ -3,20 +3,9 @@
 //TODO: use other properties from initial setup wizard
 //TODO: GPS functionality
 
-//TODO: For Past due section, I have to parse the dates as they're stored back into moment() objects. Do this using: console.log(moment(currentlyActiveWeekDates[1], "dddd, MMMM D, YYYY"));
-
-//TODO: to make Past due work: 1) When user first completes initial setup wizard, save the current date as var lastCheckedForPastDueItemsDate (DONE)
-                            // 2) On subsequent page loads, check all dates between lastCheckedForPastDueItemsDate and yesterday (first check whether lastCheckedForPastDueItemsDate is older than yesterday or just that it doesn't equal yesterday or today).
-                            // 3) Add the date of each past due item to a list that can be read from, updated, and deleted from
-                            // 4) overwrite lastCheckedForPastDueItemsDate with current date
-
 //TODO: remove Add task buttons from Past due dayDiv
-//TODO: do I need to change other arrays such as dayTaskJsonArray to accommodate Past due section?
 
 //TODO: Change slide animation so that new dayDivs don't slide in until the week's tasks are ready
-
-//TODO: save tasks by their Unix time stamps as opposed to the date string. This will make it possible to filter results from Firebase
-//TODO: save all tasks in a "/tasks" directory on the same level as the existing "/classes" directory, so that we can filter everything in "/tasks" and "/classes" won't be included in the filtering.
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -428,7 +417,7 @@ document.getElementById("previous_week_button").addEventListener("click", functi
 
     for (var i=0; i<currentlyActiveWeekDates.length; i++) {
         //subtract 7 days from each element of the currentlyActiveWeekDates[] array
-        currentlyActiveWeekDates[i] = moment(currentlyActiveWeekDates[i], "dddd, MMMM D, YYYY").add(-7, 'days').format("dddd, MMMM D, YYYY");
+        currentlyActiveWeekDates[i] = currentlyActiveWeekDates[i].add(-7, 'days');
 
         initialize2dArrays(false); //clear 2d arrays before populating them with elements from the new week
     }
@@ -465,7 +454,7 @@ document.getElementById("next_week_button").addEventListener("click", function (
 
     for (var i=0; i<currentlyActiveWeekDates.length; i++) {
         //add 7 days to each element of the currentlyActiveWeekDates[] array
-        currentlyActiveWeekDates[i] = moment(currentlyActiveWeekDates[i], "dddd, MMMM D, YYYY").add(7, 'days').format("dddd, MMMM D, YYYY");
+        currentlyActiveWeekDates[i] = currentlyActiveWeekDates[i].add(7, 'days');
 
         initialize2dArrays(false); //clear 2d arrays before populating them with elements from the new week
     }
@@ -601,7 +590,6 @@ function readTaskData() {
                                 //remove existing tasks before we read task data
                                 var addedTaskDivsToRemoveArray = dayDivArray[i].getElementsByClassName("added_task_div");
                                 var count = addedTaskDivsToRemoveArray.length;
-                                console.log(count);
                                 for (var k = 0; k < count; k++) {
                                     addedTaskDivArray[i].splice(0, 1);
                                     addedTaskDivsToRemoveArray[0].parentNode.removeChild(addedTaskDivsToRemoveArray[0]);
@@ -632,7 +620,6 @@ function readTaskData() {
                         //remove existing tasks before we read task data
                         var addedTaskDivsToRemoveArray = dayDivArray[i].getElementsByClassName("added_task_div");
                         var count = addedTaskDivsToRemoveArray.length;
-                        console.log(count);
                         for (var k = 0; k < count; k++) {
                             addedTaskDivArray[i].splice(0, 1);
                             addedTaskDivsToRemoveArray[0].parentNode.removeChild(addedTaskDivsToRemoveArray[0]);
@@ -643,7 +630,6 @@ function readTaskData() {
 
                             dayTaskJsonArray[i] = snapshot.val();
                             for (var j = 0; j < dayTaskJsonArray[i].length; j++) {
-                                console.log("read");
                                 var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayTaskJsonArray[i][j].taskClassIndex); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
                                 classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].insertBefore(addedTaskDiv, classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].lastChild);  //Inserts addedTaskDiv before the last child element of the classDivArray.
                             }

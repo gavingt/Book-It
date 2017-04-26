@@ -591,27 +591,22 @@ function readTaskData() {
             //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
 
 
-            //remove existing tasks before we read task data
-            var addedTaskDivsToRemoveArray = dayDivArray[i].getElementsByClassName("added_task_div");
-            var count = addedTaskDivsToRemoveArray.length;
-            for (var k = 0; k < count; k++) {
-                addedTaskDivArray[i].splice(0, 1);
-                addedTaskDivsToRemoveArray[0].parentNode.removeChild(addedTaskDivsToRemoveArray[0]);
-            }
-
             // Fetch task data for Overdue section
             if (i === 0) {
                 if (currentlyActiveWeekIndex === 0) {
-                    //TODO: Past due stuff goes here. Don't forget to update lastCheckedForPastDueItemsDate as well.
-
-                    //TODO: to make Past due work: 1) When user first completes initial setup wizard, save the current date as var lastCheckedForPastDueItemsDate (DONE)
-                    // 2) On subsequent page loads, check all dates between lastCheckedForPastDueItemsDate and yesterday (first check whether lastCheckedForPastDueItemsDate is older than yesterday or just that it doesn't equal yesterday or today).
-                    // 3) Add the date of each past due item to a list that can be read from, updated, and deleted from
-                    // 4) overwrite lastCheckedForPastDueItemsDate with current date
-
-                    //TODO: new strategy: get rid of lastCheckedForPastDueItemsDate and just use Firebase
 
                         firebase.database().ref('/users/' + userId + "/tasks/").endAt(moment().add(-1, 'days').startOf('day').format('x')).orderByKey().on('value', (function (snapshot) {
+
+
+                                //remove existing tasks before we read task data
+                                var addedTaskDivsToRemoveArray = dayDivArray[i].getElementsByClassName("added_task_div");
+                                var count = addedTaskDivsToRemoveArray.length;
+                                console.log(count);
+                                for (var k = 0; k < count; k++) {
+                                    addedTaskDivArray[i].splice(0, 1);
+                                    addedTaskDivsToRemoveArray[0].parentNode.removeChild(addedTaskDivsToRemoveArray[0]);
+                                }
+
                                 if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
 
                                     $.each(snapshot.val(), function(index, value) {
@@ -619,7 +614,7 @@ function readTaskData() {
                                             dayTaskJsonArray[i].push(value[k]);
                                         }
                                     });
-                                    
+
 
                                     for (var j = 0; j < dayTaskJsonArray[i].length; j++) {
                                         var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayTaskJsonArray[i][j].taskClassIndex); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
@@ -628,21 +623,27 @@ function readTaskData() {
                                 }
                             }
                         ));
-
-
                 }
             }
             // Fetch task data for currently active week
             else {
                 firebase.database().ref('/users/' + userId + "/tasks/" + currentlyActiveWeekDates[i - 1]).on('value', (function (snapshot) {
 
+                        //remove existing tasks before we read task data
+                        var addedTaskDivsToRemoveArray = dayDivArray[i].getElementsByClassName("added_task_div");
+                        var count = addedTaskDivsToRemoveArray.length;
+                        console.log(count);
+                        for (var k = 0; k < count; k++) {
+                            addedTaskDivArray[i].splice(0, 1);
+                            addedTaskDivsToRemoveArray[0].parentNode.removeChild(addedTaskDivsToRemoveArray[0]);
+                        }
+
                         //read task data
                         if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
 
-                            console.log(snapshot.val());
                             dayTaskJsonArray[i] = snapshot.val();
                             for (var j = 0; j < dayTaskJsonArray[i].length; j++) {
-
+                                console.log("read");
                                 var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayTaskJsonArray[i][j].taskClassIndex); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
                                 classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].insertBefore(addedTaskDiv, classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].lastChild);  //Inserts addedTaskDiv before the last child element of the classDivArray.
                             }

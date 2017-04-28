@@ -324,11 +324,11 @@ function hideOrShowDayDivs () {
         }
     }
 
-    for (var m=0; m<classDivArray[0].length; m++) {
+/*    for (var m=0; m<classDivArray[0].length; m++) {
          if (classDivArray[0][m].getElementsByClassName('added_task_div').length === 0) {  //if classDiv in Overdue section contains zero addedTaskDivs, hide that classDiv
              classDivArray[0][m].style.display = "none";
          }
-    }
+    }*/
 }
 
 
@@ -592,90 +592,69 @@ function readTaskData() {
             //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
 
 
-            // Fetch task data for Overdue section
-            if (i === 0) {
-                if (currentlyActiveWeekIndex === 0) {
-
-                        firebase.database().ref('/users/' + userId + "/tasks/").startAt('1000000000001').endAt(moment().add(-1, 'days').startOf('day').format('x')).orderByKey().once('value', (function (snapshot) {
-
-/*                                //remove existing tasks before we read task data
-                                var addedTaskDivsToRemoveArray = dayDivArray[i].getElementsByClassName("added_task_div");
-                                var count = addedTaskDivsToRemoveArray.length;
-                                for (var k = 0; k < count; k++) {
-                                    addedTaskDivArray[i].splice(0, 1);
-                                    addedTaskDivsToRemoveArray[0].parentNode.removeChild(addedTaskDivsToRemoveArray[0]);
-                                }*/
-
-                                if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
-
-
-                                    var writeObject = {};
-
-                                    $.each(snapshot.val(), function(index, value) {
-                                        for (var k=0; k < value.length; k++) {
-                                            dayTaskJsonArray[0].push(value[k]);
-                                            //var newPostKey = firebase.database().ref().child('users/' + userId + "/tasks/1000000000000").push().key;
-                                            writeObject[k] = value[k];
-                                        }
-                                    });
-
-                                    //TODO: problem now is that array indices will clash between existing tasks in 1000000000000 and new ones being added. (try using push keys?)
-
-                                    console.log(dayTaskJsonArray[0]);
-
-
-                                    firebase.database().ref('users/' + userId + "/tasks/1000000000000").update(writeObject);  //write new task data
-
-                                    var updates = {}; //initialize object to store paths of tasks to be deleted
-
-                                    for (var m=0; m < Object.keys(snapshot.val()).length; m++) {
-                                        updates['/users/' + userId + '/tasks/' + Object.keys(snapshot.val())[m]] = null;
-                                    }
-
-                                    firebase.database().ref().update(updates);
-
-
-/*                                    for (var j = 0; j < dayTaskJsonArray[i].length; j++) {
-                                        var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayTaskJsonArray[i][j].taskClassIndex); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
-                                        classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].appendChild(addedTaskDiv);
-                                    }*/
-                                }
-                            }
-                        ));
-                }
-            }
             // Fetch task data for currently active week
-/*            else {*/
-                firebase.database().ref('/users/' + userId + "/tasks/" + currentlyActiveWeekDates[i]).on('value', (function (snapshot) {
+            firebase.database().ref('/users/' + userId + "/tasks/" + currentlyActiveWeekDates[i]).on('value', (function (snapshot) {
 
-                        //remove existing tasks before we read task data
-                        var addedTaskDivsToRemoveArray = dayDivArray[i].getElementsByClassName("added_task_div");
-                        var count = addedTaskDivsToRemoveArray.length;
-                        for (var k = 0; k < count; k++) {
-                            addedTaskDivArray[i].splice(0, 1);
-                            addedTaskDivsToRemoveArray[0].parentNode.removeChild(addedTaskDivsToRemoveArray[0]);
-                        }
+                    //remove existing tasks before we read task data
+                    var addedTaskDivsToRemoveArray = dayDivArray[i].getElementsByClassName("added_task_div");
+                    var count = addedTaskDivsToRemoveArray.length;
+                    for (var k = 0; k < count; k++) {
+                        addedTaskDivArray[i].splice(0, 1);
+                        addedTaskDivsToRemoveArray[0].parentNode.removeChild(addedTaskDivsToRemoveArray[0]);
+                    }
 
-                        //read task data
-                        if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
+                    //read task data
+                    if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
 
-                            dayTaskJsonArray[i] = snapshot.val();
+                        dayTaskJsonArray[i] = snapshot.val();
 
 
-                            for (var j = 0; j < dayTaskJsonArray[i].length; j++) {
-                                var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayTaskJsonArray[i][j].taskClassIndex); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
-                                classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].insertBefore(addedTaskDiv, classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].lastChild);  //Inserts addedTaskDiv before the last child element of the classDivArray.
-                            }
-                        }
-
-                        if (i === 7) {
-                            hideOrShowDayDivs();
-                            spinner.style.display = "none";
+                        for (var j = 0; j < dayTaskJsonArray[i].length; j++) {
+                            var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayTaskJsonArray[i][j].taskClassIndex); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
+                            classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].insertBefore(addedTaskDiv, classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].lastChild);  //Inserts addedTaskDiv before the last child element of the classDivArray.
                         }
 
                     }
-                ));
-/*            }*/
+
+
+                    // Fetch task data for Overdue section
+                    if (i === 0 && currentlyActiveWeekIndex === 0) {
+
+                            firebase.database().ref('/users/' + userId + "/tasks/").startAt('1000000000001').endAt(moment().add(-1, 'days').startOf('day').format('x')).orderByKey().once('value', (function (snapshot) {
+
+
+                                    if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
+
+                                        console.log(snapshot.val());
+
+                                        $.each(snapshot.val(), function (index, value) {
+                                            for (var k = 0; k < value.length; k++) {
+                                                dayTaskJsonArray[0].push(value[k]);
+                                            }
+                                        });
+
+                                        firebase.database().ref('users/' + userId + "/tasks/1000000000000").set(dayTaskJsonArray[0]);  //write new task data
+
+                                        var updates = {}; //initialize object to store paths of tasks to be deleted
+
+                                        for (var m = 0; m < Object.keys(snapshot.val()).length; m++) {
+                                            updates['/users/' + userId + '/tasks/' + Object.keys(snapshot.val())[m]] = null;
+                                        }
+
+                                        firebase.database().ref().update(updates);
+                                    }
+                                }
+                            ));
+                    }
+
+
+                    if (i === 7) {
+                        hideOrShowDayDivs();
+                        spinner.style.display = "none";
+                    }
+
+                }
+            ));
         }(i));  //This is the end of the function that exists solely to solve closure problem. It's also where we pass in the value of i so that it's accessible within the above code.
     }  //end FOR loop
 

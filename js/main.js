@@ -328,9 +328,20 @@ function hideOrShowDayDivs () {
 
 
 function hideOrShowOverdueClassDivs () {
+    var emptyClassDivsCount = 0;
     for (var m=0; m<classDivArray[0].length; m++) {
         if (classDivArray[0][m].getElementsByClassName('added_task_div').length === 0) {  //if classDiv in Overdue section contains zero addedTaskDivs, hide that classDiv
             classDivArray[0][m].style.display = "none";
+            emptyClassDivsCount++;
+        }
+        else {
+            classDivArray[0][m].style.display = "block";
+        }
+        if (emptyClassDivsCount === classDivArray[0].length) {
+            dayDivArray[0].style.display = "none";
+        }
+        else {
+            dayDivArray[0].style.display = "block";
         }
     }
 }
@@ -525,6 +536,8 @@ function removeTaskData(dayIndex, taskIndex) {
 
     firebase.database().ref('users/' + userId + "/tasks/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]); //saves a given day's tasks with the completed task removed
 
+    hideOrShowOverdueClassDivs();
+
 }
 
 
@@ -538,6 +551,8 @@ function undoRemoveTaskData(completedTaskJson, taskIndex, dayIndex) {
     var userId = firebase.auth().currentUser.uid;
 
     firebase.database().ref('users/' + userId + "/tasks/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]); //write deleted task back into Firebase
+
+    hideOrShowOverdueClassDivs();
 }
 
 
@@ -658,7 +673,7 @@ function readTaskData() {
                                 }
                             ));
                     }
-                    
+
                     if (i === 7 && currentlyActiveWeekIndex !== 0) {
                         hideOrShowDayDivs();
                     }

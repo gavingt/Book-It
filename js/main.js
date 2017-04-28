@@ -323,13 +323,18 @@ function hideOrShowDayDivs () {
             dayDivArray[k].style.display = "block";
         }
     }
-
-/*    for (var m=0; m<classDivArray[0].length; m++) {
-         if (classDivArray[0][m].getElementsByClassName('added_task_div').length === 0) {  //if classDiv in Overdue section contains zero addedTaskDivs, hide that classDiv
-             classDivArray[0][m].style.display = "none";
-         }
-    }*/
 }
+
+
+
+function hideOrShowOverdueClassDivs () {
+    for (var m=0; m<classDivArray[0].length; m++) {
+        if (classDivArray[0][m].getElementsByClassName('added_task_div').length === 0) {  //if classDiv in Overdue section contains zero addedTaskDivs, hide that classDiv
+            classDivArray[0][m].style.display = "none";
+        }
+    }
+}
+
 
 
 
@@ -623,7 +628,7 @@ function readTaskData() {
                             firebase.database().ref('/users/' + userId + "/tasks/").startAt('1000000000001').endAt(moment().add(-1, 'days').startOf('day').format('x')).orderByKey().once('value', (function (snapshot) {
 
 
-                                    if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
+                                    if (snapshot.val() !== null) {
 
                                         console.log(snapshot.val());
 
@@ -643,14 +648,19 @@ function readTaskData() {
 
                                         firebase.database().ref().update(updates);
                                     }
+                                    else {
+
+                                        hideOrShowDayDivs();
+                                        hideOrShowOverdueClassDivs();
+
+                                        spinner.style.display = "none";
+                                    }
                                 }
                             ));
                     }
-
-
-                    if (i === 7) {
+                    
+                    if (i === 7 && currentlyActiveWeekIndex !== 0) {
                         hideOrShowDayDivs();
-                        spinner.style.display = "none";
                     }
 
                 }

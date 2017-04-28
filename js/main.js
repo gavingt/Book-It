@@ -10,8 +10,8 @@
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
 var googleProvider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization
-var currentlyActiveWeekDates = new Array(7); //stores an array of the dates for the currently visible week
-var dayDivArray = new Array(7); //dayDivArray[] will hold the 7 dayDiv objects. Each dayDiv is a div that houses the tasks for a given weekday. So there are 7 dayDivs corresponding to 7 days of the week.
+var currentlyActiveWeekDates = new Array(8); //stores an array of the dates for the currently visible week
+var dayDivArray = new Array(8); //dayDivArray[] will hold the 7 dayDiv objects. Each dayDiv is a div that houses the tasks for a given weekday. So there are 7 dayDivs corresponding to 7 days of the week.
 var addedTaskDivArray = new Array(8); //This will be an array of arrays that holds the addedTaskDiv objects for each day of the currently visible week
 var dayTaskJsonArray = new Array(8); //This will be an array of arrays that holds the JSON data for the tasks of each day of the currently visible week
 var classDivArray = []; //This will be an array of arrays that stores the classDivs inside each dayDiv.
@@ -377,9 +377,11 @@ function resetDomElements() {
 //When user first loads the page, this sets the currentlyActiveWeekDates[] array to the current week and then sets the dates to the page elements
 function initializeDates() {
 
-    for (var i=0; i<7; i++) {
+    currentlyActiveWeekDates[0] = '1000000000000';
 
-        currentlyActiveWeekDates[i] = moment().startOf('isoWeek').add(i, 'days');
+    for (var i=1; i<8; i++) {
+
+        currentlyActiveWeekDates[i] = moment().startOf('isoWeek').add(i-1, 'days');
     }
 
     todaysDateIndex = moment().isoWeekday() - 1;  //Stores  a number 0-6 indicating the current day of the week from Monday to Sunday. For instance, Monday = 0 and Thursday = 3.
@@ -392,14 +394,14 @@ function initializeDates() {
 function setDaysOfWeek() {
     for (var i=1; i<8; i++) {
 
-        if (currentlyActiveWeekDates[i-1].format("dddd, MMMM D, YYYY") === moment().format("dddd, MMMM D, YYYY")) {
-            dayDivArray[i].firstChild.firstChild.textContent = currentlyActiveWeekDates[i-1].format("dddd, MMMM D, YYYY") + " (Today)";  //if currentlyActiveWeekDates[i] is storing today's date, append " (Today)" at the end.
+        if (currentlyActiveWeekDates[i].format("dddd, MMMM D, YYYY") === moment().format("dddd, MMMM D, YYYY")) {
+            dayDivArray[i].firstChild.firstChild.textContent = currentlyActiveWeekDates[i].format("dddd, MMMM D, YYYY") + " (Today)";  //if currentlyActiveWeekDates[i] is storing today's date, append " (Today)" at the end.
         }
-        else if (currentlyActiveWeekDates[i-1].format("dddd, MMMM D, YYYY") === moment().add(1, 'days').format("dddd, MMMM D, YYYY")) {
-            dayDivArray[i].firstChild.firstChild.textContent = currentlyActiveWeekDates[i-1].format("dddd, MMMM D, YYYY") + " (Tomorrow)";  //if currentlyActiveWeekDates[i] is storing tomorrow's date, append " (Tomorrow)" at the end.
+        else if (currentlyActiveWeekDates[i].format("dddd, MMMM D, YYYY") === moment().add(1, 'days').format("dddd, MMMM D, YYYY")) {
+            dayDivArray[i].firstChild.firstChild.textContent = currentlyActiveWeekDates[i].format("dddd, MMMM D, YYYY") + " (Tomorrow)";  //if currentlyActiveWeekDates[i] is storing tomorrow's date, append " (Tomorrow)" at the end.
         }
         else {
-            dayDivArray[i].firstChild.firstChild.textContent = currentlyActiveWeekDates[i-1].format("dddd, MMMM D, YYYY"); //Get firstChild of each dayDivArray, which is the dateLabel element. Then we set its textContent equal to the corresponding entry in the currentlyActiveWeekDates[] array.
+            dayDivArray[i].firstChild.firstChild.textContent = currentlyActiveWeekDates[i].format("dddd, MMMM D, YYYY"); //Get firstChild of each dayDivArray, which is the dateLabel element. Then we set its textContent equal to the corresponding entry in the currentlyActiveWeekDates[] array.
         }
     }
 }
@@ -425,7 +427,7 @@ document.getElementById("previous_week_button").addEventListener("click", functi
     }
     snackbar.style.visibility = "hidden";
 
-    for (var i=0; i<currentlyActiveWeekDates.length; i++) {
+    for (var i=1; i<currentlyActiveWeekDates.length; i++) {
         //subtract 7 days from each element of the currentlyActiveWeekDates[] array
         currentlyActiveWeekDates[i] = currentlyActiveWeekDates[i].add(-7, 'days');
 
@@ -462,7 +464,7 @@ document.getElementById("next_week_button").addEventListener("click", function (
 
     snackbar.style.visibility = "hidden";
 
-    for (var i=0; i<currentlyActiveWeekDates.length; i++) {
+    for (var i=1; i<currentlyActiveWeekDates.length; i++) {
         //add 7 days to each element of the currentlyActiveWeekDates[] array
         currentlyActiveWeekDates[i] = currentlyActiveWeekDates[i].add(7, 'days');
 
@@ -503,7 +505,7 @@ function editTaskData(taskClassIndex, taskText, dayIndex, taskIndex) {
 
     var userId = firebase.auth().currentUser.uid;
 
-    firebase.database().ref('users/' + userId + "/tasks/" + currentlyActiveWeekDates[dayIndex-1] + "/" + taskIndex).set(dayTaskJsonArray[dayIndex][taskIndex]); //write edited task data
+    firebase.database().ref('users/' + userId + "/tasks/" + currentlyActiveWeekDates[dayIndex] + "/" + taskIndex).set(dayTaskJsonArray[dayIndex][taskIndex]); //write edited task data
 
 }
 
@@ -516,7 +518,7 @@ function removeTaskData(dayIndex, taskIndex) {
 
     var userId = firebase.auth().currentUser.uid;
 
-    firebase.database().ref('users/' + userId + "/tasks/" + currentlyActiveWeekDates[dayIndex-1]).set(dayTaskJsonArray[dayIndex]); //saves a given day's tasks with the completed task removed
+    firebase.database().ref('users/' + userId + "/tasks/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]); //saves a given day's tasks with the completed task removed
 
 }
 
@@ -530,7 +532,7 @@ function undoRemoveTaskData(completedTaskJson, taskIndex, dayIndex) {
 
     var userId = firebase.auth().currentUser.uid;
 
-    firebase.database().ref('users/' + userId + "/tasks/" + currentlyActiveWeekDates[dayIndex-1]).set(dayTaskJsonArray[dayIndex]); //write deleted task back into Firebase
+    firebase.database().ref('users/' + userId + "/tasks/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]); //write deleted task back into Firebase
 }
 
 
@@ -545,7 +547,7 @@ function writeUserData(taskClassIndex, taskText, dayIndex) {
 
     var userId = firebase.auth().currentUser.uid;
 
-    firebase.database().ref('users/' + userId + "/tasks/" + currentlyActiveWeekDates[dayIndex-1]).set(dayTaskJsonArray[dayIndex]);  //write new task data
+    firebase.database().ref('users/' + userId + "/tasks/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);  //write new task data
 }
 
 
@@ -606,33 +608,20 @@ function readTaskData() {
 
                                 if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
 
-                                    //TODO: strategy:
-
-                                    //1) create an initialSetupDate in Firebase when user first completes initial setup wizard (DONE)
-                                    //2) read all dates between initialSetupDate and yesterday by requesting each date individually (not using orderByKey()), and move all returned tasks to 1000000000000
-                                    //3) read tasks from 1000000000000 to populate Overdue section
-
-
-
-                                    //TODO: better strategy:
-
-                                    //1) use Jquery function below to get all the tasks in a single array, then add all those tasks to day 1000000000000 (DONE)
-                                    //2) delete all the tasks from their original locations by using Object.keys to reference the days (DONE)
-                                    //3) read tasks from 1000000000000 to populate Overdue section
 
                                     var writeObject = {};
 
                                     $.each(snapshot.val(), function(index, value) {
                                         for (var k=0; k < value.length; k++) {
-                                            //dayTaskJsonArray[0].push(value[k]);
-                                            var newPostKey = firebase.database().ref().child('users/' + userId + "/tasks/1000000000000").push().key;
-                                            writeObject[newPostKey] = value[k];
+                                            dayTaskJsonArray[0].push(value[k]);
+                                            //var newPostKey = firebase.database().ref().child('users/' + userId + "/tasks/1000000000000").push().key;
+                                            writeObject[k] = value[k];
                                         }
                                     });
 
-                                    //TODO: problem now is that array indices will clash between existing tasks in 1000000000000 new ones being added. (try using push keys?)
+                                    //TODO: problem now is that array indices will clash between existing tasks in 1000000000000 and new ones being added. (try using push keys?)
 
-                                    console.log(writeObject);
+                                    console.log(dayTaskJsonArray[0]);
 
 
                                     firebase.database().ref('users/' + userId + "/tasks/1000000000000").update(writeObject);  //write new task data
@@ -656,8 +645,8 @@ function readTaskData() {
                 }
             }
             // Fetch task data for currently active week
-            else {
-                firebase.database().ref('/users/' + userId + "/tasks/" + currentlyActiveWeekDates[i - 1]).on('value', (function (snapshot) {
+/*            else {*/
+                firebase.database().ref('/users/' + userId + "/tasks/" + currentlyActiveWeekDates[i]).on('value', (function (snapshot) {
 
                         //remove existing tasks before we read task data
                         var addedTaskDivsToRemoveArray = dayDivArray[i].getElementsByClassName("added_task_div");
@@ -671,6 +660,8 @@ function readTaskData() {
                         if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
 
                             dayTaskJsonArray[i] = snapshot.val();
+
+
                             for (var j = 0; j < dayTaskJsonArray[i].length; j++) {
                                 var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayTaskJsonArray[i][j].taskClassIndex); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
                                 classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].insertBefore(addedTaskDiv, classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].lastChild);  //Inserts addedTaskDiv before the last child element of the classDivArray.
@@ -684,7 +675,7 @@ function readTaskData() {
 
                     }
                 ));
-            }
+/*            }*/
         }(i));  //This is the end of the function that exists solely to solve closure problem. It's also where we pass in the value of i so that it's accessible within the above code.
     }  //end FOR loop
 

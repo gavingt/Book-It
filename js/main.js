@@ -1,11 +1,11 @@
 //TODO: style the Previous week/Next week bar
-//TODO: get rid of extra border above/below classDivs.
+//TODO: get rid of extra border above/below classDivs
 //TODO: use other properties from initial setup wizard
 //TODO: GPS functionality
 
 //TODO: Change slide animation so that new dayDivs don't slide in until the week's tasks are ready
 
-//TODO: Overdue tasks can't be completed. This is probably because we're no longer referencing the day of the task. Try saving the days as a list so they can be completed.
+//TODO: get rid of initialSetupDate and replace it with lastCheckedForOverdueTasksDate. Make lastCheckedForOverdueTasksDate functional so that Firebase has to do less work.
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -326,7 +326,7 @@ function hideOrShowDayDivs () {
 }
 
 
-
+//Hides or shows classDivs within Overdue section. If all classDivs are hidden, it hides the entire Overdue section so that the header is also hidden.
 function hideOrShowOverdueClassDivs () {
     var emptyClassDivsCount = 0;
     for (var m=0; m<classDivArray[0].length; m++) {
@@ -628,7 +628,6 @@ function readTaskData() {
 
                         dayTaskJsonArray[i] = snapshot.val();
 
-
                         for (var j = 0; j < dayTaskJsonArray[i].length; j++) {
                             var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayTaskJsonArray[i][j].taskClassIndex); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
                             classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].insertBefore(addedTaskDiv, classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].lastChild);  //Inserts addedTaskDiv before the last child element of the classDivArray.
@@ -637,37 +636,32 @@ function readTaskData() {
                     }
 
 
-                    // Fetch task data for Overdue section
+                    // Find any newly overdue tasks and put them in one place (the day with Unix timestamp 1000000000000)
                     if (i === 0 && currentlyActiveWeekIndex === 0) {
 
                             firebase.database().ref('/users/' + userId + "/tasks/").startAt('1000000000001').endAt(moment().add(-1, 'days').startOf('day').format('x')).orderByKey().once('value', (function (snapshot) {
 
-
                                     if (snapshot.val() !== null) {
 
-                                        console.log(snapshot.val());
-
-                                        $.each(snapshot.val(), function (index, value) {
+                                        $.each(snapshot.val(), function (index, value) {  //since snapshot.val() returns an object in this case, I need to turn it into an array instead
                                             for (var k = 0; k < value.length; k++) {
                                                 dayTaskJsonArray[0].push(value[k]);
                                             }
                                         });
 
-                                        firebase.database().ref('users/' + userId + "/tasks/1000000000000").set(dayTaskJsonArray[0]);  //write new task data
+                                        firebase.database().ref('users/' + userId + "/tasks/1000000000000").set(dayTaskJsonArray[0]);  //write overdue tasks to 1000000000000
 
                                         var updates = {}; //initialize object to store paths of tasks to be deleted
 
                                         for (var m = 0; m < Object.keys(snapshot.val()).length; m++) {
-                                            updates['/users/' + userId + '/tasks/' + Object.keys(snapshot.val())[m]] = null;
+                                            updates['/users/' + userId + '/tasks/' + Object.keys(snapshot.val())[m]] = null; //store null as the value for each key in updates object
                                         }
 
-                                        firebase.database().ref().update(updates);
+                                        firebase.database().ref().update(updates); //batch update all overdue task directories with null
                                     }
                                     else {
-
                                         hideOrShowDayDivs();
                                         hideOrShowOverdueClassDivs();
-
                                         spinner.style.display = "none";
                                     }
                                 }

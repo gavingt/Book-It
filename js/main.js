@@ -596,13 +596,13 @@ function readTaskData() {
 
                         firebase.database().ref('/users/' + userId + "/tasks/").startAt('1000000000001').endAt(moment().add(-1, 'days').startOf('day').format('x')).orderByKey().once('value', (function (snapshot) {
 
-                                //remove existing tasks before we read task data
+/*                                //remove existing tasks before we read task data
                                 var addedTaskDivsToRemoveArray = dayDivArray[i].getElementsByClassName("added_task_div");
                                 var count = addedTaskDivsToRemoveArray.length;
                                 for (var k = 0; k < count; k++) {
                                     addedTaskDivArray[i].splice(0, 1);
                                     addedTaskDivsToRemoveArray[0].parentNode.removeChild(addedTaskDivsToRemoveArray[0]);
-                                }
+                                }*/
 
                                 if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
 
@@ -617,18 +617,25 @@ function readTaskData() {
                                     //TODO: better strategy:
 
                                     //1) use Jquery function below to get all the tasks in a single array, then add all those tasks to day 1000000000000 (DONE)
-                                    //2) delete all the tasks from their original locations by using Object.keys to reference the days
+                                    //2) delete all the tasks from their original locations by using Object.keys to reference the days (DONE)
                                     //3) read tasks from 1000000000000 to populate Overdue section
 
+                                    var writeObject = {};
 
                                     $.each(snapshot.val(), function(index, value) {
                                         for (var k=0; k < value.length; k++) {
-                                            dayTaskJsonArray[0].push(value[k]);
+                                            //dayTaskJsonArray[0].push(value[k]);
+                                            var newPostKey = firebase.database().ref().child('users/' + userId + "/tasks/1000000000000").push().key;
+                                            writeObject[newPostKey] = value[k];
                                         }
                                     });
 
+                                    //TODO: problem now is that array indices will clash between existing tasks in 1000000000000 new ones being added. (try using push keys?)
 
-                                    firebase.database().ref('users/' + userId + "/tasks/1000000000000").set(dayTaskJsonArray[0]);  //write new task data
+                                    console.log(writeObject);
+
+
+                                    firebase.database().ref('users/' + userId + "/tasks/1000000000000").update(writeObject);  //write new task data
 
                                     var updates = {}; //initialize object to store paths of tasks to be deleted
 
@@ -636,18 +643,13 @@ function readTaskData() {
                                         updates['/users/' + userId + '/tasks/' + Object.keys(snapshot.val())[m]] = null;
                                     }
 
-
-                                    //console.log(updates);
-
                                     firebase.database().ref().update(updates);
 
 
-
-
-                                    for (var j = 0; j < dayTaskJsonArray[i].length; j++) {
+/*                                    for (var j = 0; j < dayTaskJsonArray[i].length; j++) {
                                         var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayTaskJsonArray[i][j].taskClassIndex); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
                                         classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].appendChild(addedTaskDiv);
-                                    }
+                                    }*/
                                 }
                             }
                         ));

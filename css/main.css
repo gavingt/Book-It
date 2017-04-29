@@ -135,6 +135,10 @@ body {
     right: 100px;
 }
 
+#dummy_text {
+    position: absolute;
+    right: 110%;
+}
 
 
 
@@ -305,7 +309,7 @@ body {
 
 .day_div_header {
     background-color: beige;
-    border-bottom: solid;
+    border-bottom: hidden;
     padding: 1px 4px 1px 4px;
     text-align: center;
 }

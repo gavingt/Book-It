@@ -1,11 +1,8 @@
-//TODO: style the Previous week/Next week bar
-//TODO: get rid of extra border above/below classDivs
-//TODO: use other properties from initial setup wizard
 //TODO: GPS functionality
+//TODO: make UI elements bigger on mobile
 
-//TODO: Change slide animation so that new dayDivs don't slide in until the week's tasks are ready
-
-//TODO: get rid of initialSetupDate and replace it with lastCheckedForOverdueTasksDate. Make lastCheckedForOverdueTasksDate functional so that Firebase has to do less work.
+//TODO: style the Previous week/Next week bar
+//TODO: use other properties from initial setup wizard
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -23,6 +20,7 @@ var currentlyActiveWeekIndex = 0; //this tracks which week is currently being vi
 var bInitialReadComplete = false; //boolean value that stores whether or not we've done the initial reading of data at page load (or at login, if not logged in already at page load)
 var name, email, photoUrl; // these will hold the name, email, and PhotoUrl provided by Google or Facebook after a user logs in
 var spinner = document.getElementById("spinner"); //progress spinner
+var lastCheckedForOverdueTasksDate = '1000000000001';
 
 
 // Initialize Firebase. This code should stay at the top of main.js
@@ -45,6 +43,9 @@ image2.src = "img/checkbox_black.png";
 
 var image5 = new Image();
 image5.src = "img/settings_black.png";
+
+document.getElementById('dummy_text').className = "fa fa-plus";
+document.getElementById('dummy_text').style.visibility = "hidden";
 
 initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
 
@@ -578,6 +579,13 @@ function readClassData() {
 
     var userId = firebase.auth().currentUser.uid;
 
+    //Read old value of lastCheckedForOverdueTasksDate
+    firebase.database().ref('/users/' + userId + '/lastCheckedForOverdueTasksDate').once('value', (function (snapshot) {
+            lastCheckedForOverdueTasksDate = snapshot.val();
+        }
+    ));
+
+
     //Fetch class data
     firebase.database().ref('/users/' + userId + "/classes").once('value', (function (snapshot) {
             if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
@@ -611,7 +619,6 @@ function readTaskData() {
         (function (i) {   //Solves closure problem described here: http://stackoverflow.com/questions/13343340/calling-an-asynchronous-function-within-a-for-loop-in-javascript.
             //Wrapping the contents of the FOR loop in this function allows us to get a reference to the current value of i, which we otherwise couldn't do from within the asynchronous addEventListener functions defined below
 
-
             // Fetch task data for currently active week
             firebase.database().ref('/users/' + userId + "/tasks/" + currentlyActiveWeekDates[i]).on('value', (function (snapshot) {
 
@@ -632,14 +639,13 @@ function readTaskData() {
                             var addedTaskDiv = createAddedTaskDiv(dayTaskJsonArray[i][j].taskText, i, dayTaskJsonArray[i][j].taskClassIndex); //Calls function createAddedTaskDiv and passes in the necessary values to create a new addedTaskDiv, then return the new object and save it as a var.
                             classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].insertBefore(addedTaskDiv, classDivArray[i][dayTaskJsonArray[i][j].taskClassIndex].lastChild);  //Inserts addedTaskDiv before the last child element of the classDivArray.
                         }
-
                     }
 
 
                     // Find any newly overdue tasks and put them in one place (the day with Unix timestamp 1000000000000)
                     if (i === 0 && currentlyActiveWeekIndex === 0) {
 
-                            firebase.database().ref('/users/' + userId + "/tasks/").startAt('1000000000001').endAt(moment().add(-1, 'days').startOf('day').format('x')).orderByKey().once('value', (function (snapshot) {
+                            firebase.database().ref('/users/' + userId + "/tasks/").startAt(lastCheckedForOverdueTasksDate).endAt(moment().add(-1, 'days').startOf('day').format('x')).orderByKey().once('value', (function (snapshot) {
 
                                     if (snapshot.val() !== null) {
 
@@ -658,6 +664,9 @@ function readTaskData() {
                                         }
 
                                         firebase.database().ref().update(updates); //batch update all overdue task directories with null
+
+                                        //write current date to Firebase and save it as lastCheckedForOverdueTasksDate
+                                        firebase.database().ref('users/' + userId).update({lastCheckedForOverdueTasksDate: moment().startOf('day').format('x')}) ;
                                     }
                                     else {
                                         hideOrShowDayDivs();
@@ -671,12 +680,10 @@ function readTaskData() {
                     if (i === 7 && currentlyActiveWeekIndex !== 0) {
                         hideOrShowDayDivs();
                     }
-
                 }
             ));
         }(i));  //This is the end of the function that exists solely to solve closure problem. It's also where we pass in the value of i so that it's accessible within the above code.
     }  //end FOR loop
-
 }
 
 
@@ -769,12 +776,10 @@ document.getElementById("wizard_submit_button").addEventListener("click", functi
         }
     ];
 
-
-
     var userId = firebase.auth().currentUser.uid;
 
-    //write current date to Firebase and save it as initialSetupDate
-    firebase.database().ref('users/' + userId).set({initialSetupDate: moment().startOf('day').format('x')}) ;
+    firebase.database().ref('users/' + userId).update({lastCheckedForOverdueTasksDate: moment().startOf('day').format('x')}) ;
+
 
     //write class data to Firebase
     firebase.database().ref('users/' + userId + "/classes").set(classJsonObject).then(function() {
@@ -862,7 +867,6 @@ function initializeSettingsButton(bUserSignedIn) {
             settingsButton.src = "img/settings_gray.png";
         }
     };
-
 
 
     document.getElementById("settings_item_initial_setup_wizard").addEventListener("click", function () {

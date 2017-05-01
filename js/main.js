@@ -3,6 +3,7 @@
 
 //TODO: style the Previous week/Next week bar
 //TODO: use other properties from initial setup wizard
+//TODO: change proportions of everything to look good at 100% zoom
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -20,7 +21,7 @@ var currentlyActiveWeekIndex = 0; //this tracks which week is currently being vi
 var bInitialReadComplete = false; //boolean value that stores whether or not we've done the initial reading of data at page load (or at login, if not logged in already at page load)
 var name, email, photoUrl; // these will hold the name, email, and PhotoUrl provided by Google or Facebook after a user logs in
 var spinner = document.getElementById("spinner"); //progress spinner
-var lastCheckedForOverdueTasksDate = '1000000000001';
+var lastCheckedForOverdueTasksDate = '1000000000001'; //Holds date of the last time we checked for overdue tasks. This gets updated every time the user pulls data from Firebase, so its initial value is basically meaningless.
 
 
 // Initialize Firebase. This code should stay at the top of main.js
@@ -33,19 +34,7 @@ var config = {
 };
 firebase.initializeApp(config);
 
-//The below lines force these images to be preloaded so that they they're ready when we need to display them.
-
-var image1 = new Image();
-image1.src = "img/checkbox_gray.png";
-
-var image2 = new Image();
-image2.src = "img/checkbox_black.png";
-
-var image5 = new Image();
-image5.src = "img/settings_black.png";
-
-document.getElementById('dummy_text').className = "fa fa-plus";
-document.getElementById('dummy_text').style.visibility = "hidden";
+preloadImagesAndText();
 
 initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
 
@@ -814,6 +803,23 @@ function initialize2dArrays(bIncludeClassDivArray) {
             classDivArray[i] = [];
         }
     }
+}
+
+
+function preloadImagesAndText() {
+    //The below lines force these images to be preloaded so that they they're ready when we need to display them.
+    var image1 = new Image();
+    image1.src = "img/checkbox_gray.png";
+
+    var image2 = new Image();
+    image2.src = "img/checkbox_black.png";
+
+    var image5 = new Image();
+    image5.src = "img/settings_black.png";
+
+    //These lines eliminate Flash of Invisible Text (FOIT) as Font Awesome plus sign loads in.
+    document.getElementById('dummy_text').className = "fa fa-plus";
+    document.getElementById('dummy_text').style.visibility = "hidden";
 }
 
 

@@ -41,6 +41,9 @@ initialize2dArrays(true); //calls initialize2dArrays() function when user first 
 //Only show greeting if screen is big enough to accommodate it. We check both width and height because we have to account for both portrait and landscape mode.
 if (screen.width > 750 && screen.height > 750) {
     document.getElementById('greeting').style.display = "inline";
+
+    //TODO: if on mobile, hide current_semester_text and center week_switcher_div
+
 }
 
 

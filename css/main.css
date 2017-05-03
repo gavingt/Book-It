@@ -181,8 +181,6 @@ body {
 
 /* Dropdown button */
 .settings_button {
-    /*padding: 16px;*/
-    font-size: 16px;
     cursor: pointer;
 }
 
@@ -276,9 +274,33 @@ body {
     width: 100%;
 }
 
-#week_switcher_div {
-    padding: 5px;
+
+#week_switcher_wrapper {
+    position: relative;
+    padding: 6px 9px 6px 9px;
     background-color: beige;
+    border: solid;
+    border-width: 1px;
+    margin: 25px auto 0 auto;
+    max-width: 90%;
+    width: 900px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    z-index: 1;
+    overflow: hidden;
+}
+
+#current_semester_text {
+    display: inline;
+    margin: auto;
+    float: left;
+    padding-top: 2px;
+
+}
+
+#week_switcher_div {
+    display: inline;
+    margin: auto;
+    float: right;
 }
 
 .week_switcher_buttons {
@@ -290,7 +312,6 @@ body {
 }
 
 .week_switcher_buttons:disabled {
-
     color:gray;
     cursor:default;
     opacity:0.2;
@@ -302,10 +323,9 @@ body {
 
 .day_div {
     display: block;
-    background-color: #EEEEEE;
     border: solid;
     border-width: 1px;
-    margin: 25px auto 0 auto;
+    margin: 30px auto 0 auto;
     max-width: 90%;
     width: 900px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
@@ -316,7 +336,7 @@ body {
 .day_div_header {
     background-color: beige;
     border-bottom: hidden;
-    padding: 1px 4px 1px 4px;
+    padding: 2px 4px 2px 4px;
     text-align: center;
 }
 
@@ -350,10 +370,11 @@ body {
     display: table;
     cursor: pointer;
     color: #595959;
+    font-size: 19px;
 }
 
 .new_task_div {
-    margin: 0 5px 0 5px;
+    margin: 0 5px 3px 5px;
 }
 
 .new_task_input {

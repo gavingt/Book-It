@@ -373,124 +373,6 @@ function resetDomElements() {
 
 
 
-/****************************************************/
-/**************START DATE HANDLING CODE**************/
-/****************************************************/
-
-
-//When user first loads the page, this sets the currentlyActiveWeekDates[] array to the current week and then sets the dates to the page elements
-function initializeDates() {
-
-    currentlyActiveWeekDates[0] = '1000000000000';
-
-    for (var i=1; i<8; i++) {
-
-        currentlyActiveWeekDates[i] = moment().startOf('isoWeek').add(i-1, 'days');
-    }
-
-    todaysDateIndex = moment().isoWeekday() - 1;  //Stores  a number 0-6 indicating the current day of the week from Monday to Sunday. For instance, Monday = 0 and Thursday = 3.
-
-    setDaysOfWeek(currentlyActiveWeekDates);
-}
-
-
-//sets the dates to the dateLabel elements in each dayDivArray[] element
-function setDaysOfWeek() {
-    for (var i=1; i<8; i++) {
-
-        if (currentlyActiveWeekDates[i].format("dddd, MMMM D, YYYY") === moment().format("dddd, MMMM D, YYYY")) {
-            dayDivArray[i].firstChild.firstChild.textContent = currentlyActiveWeekDates[i].format("dddd, MMMM D, YYYY") + " (Today)";  //if currentlyActiveWeekDates[i] is storing today's date, append " (Today)" at the end.
-        }
-        else if (currentlyActiveWeekDates[i].format("dddd, MMMM D, YYYY") === moment().add(1, 'days').format("dddd, MMMM D, YYYY")) {
-            dayDivArray[i].firstChild.firstChild.textContent = currentlyActiveWeekDates[i].format("dddd, MMMM D, YYYY") + " (Tomorrow)";  //if currentlyActiveWeekDates[i] is storing tomorrow's date, append " (Tomorrow)" at the end.
-        }
-        else {
-            dayDivArray[i].firstChild.firstChild.textContent = currentlyActiveWeekDates[i].format("dddd, MMMM D, YYYY"); //Get firstChild of each dayDivArray, which is the dateLabel element. Then we set its textContent equal to the corresponding entry in the currentlyActiveWeekDates[] array.
-        }
-    }
-}
-
-
-//handles the user pressing the "Previous week" button
-document.getElementById("previous_week_button").addEventListener("click", function () {
-
-    var dayDivWrapper = $('#day_div_wrapper');
-
-    dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
-        left: '110%'
-    }, 400, function() {  //Do this callback function after the above animation is finished. Instantly move element to specified position, and then animate it back to its starting position of left:0.
-        $(this).css('left', '-110%');
-        dayDivWrapper.animate({
-            left: '0'
-        }, 400);
-    });
-
-    snackbar.style.visibility = "hidden";
-    currentlyActiveWeekIndex--; //decrement currentlyActiveWeekIndex
-
-    if (currentlyActiveWeekIndex === 0) {
-        document.getElementById("previous_week_button").disabled = true;  //If user is viewing the current week, disable Previous week button.
-        document.getElementById("previous_week_button").childNodes[0].src = "img/left_arrow.png";
-
-    }
-
-    for (var i=1; i<currentlyActiveWeekDates.length; i++) {
-        //subtract 7 days from each element of the currentlyActiveWeekDates[] array
-        currentlyActiveWeekDates[i] = currentlyActiveWeekDates[i].add(-7, 'days');
-        initialize2dArrays(false); //clear 2d arrays before populating them with elements from the new week
-    }
-
-    setTimeout(function(){
-        readTaskData();  //read user data for new week
-        setDaysOfWeek(currentlyActiveWeekDates);
-        resetDomElements();
-    }, 300); //hides snackbar after waiting 500 ms for fadeout animation to run
-});
-
-
-
-
-
-//handles the user pressing the "Next week" button
-document.getElementById("next_week_button").addEventListener("click", function () {
-
-    var dayDivWrapper = $('#day_div_wrapper');
-
-    dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
-        left: '-110%'
-    }, 400, function() {   //Do this callback function after the above animation is finished. Instantly move element to specified position, and then animate it back to its starting position of left:0.
-        $(this).css('left', '110%');
-        dayDivWrapper.animate({
-            left: '0'
-        }, 400);
-    });
-
-    currentlyActiveWeekIndex++; //increment currentlyActiveWeekIndex
-    document.getElementById("previous_week_button").disabled = false;
-
-    snackbar.style.visibility = "hidden";
-
-    for (var i=1; i<currentlyActiveWeekDates.length; i++) {
-        //add 7 days to each element of the currentlyActiveWeekDates[] array
-        currentlyActiveWeekDates[i] = currentlyActiveWeekDates[i].add(7, 'days');
-        initialize2dArrays(false); //clear 2d arrays before populating them with elements from the new week
-    }
-
-    setTimeout(function(){
-        readTaskData();  //read user data for new week
-        setDaysOfWeek(currentlyActiveWeekDates);
-        resetDomElements();
-    }, 300); //hides snackbar after waiting 500 ms for fadeout animation to run
-
-});
-
-
-/****************************************************/
-/***************END DATE HANDLING CODE***************/
-/****************************************************/
-
-
-
 
 /****************************************************/
 /*****************START FIREBASE CODE ***************/
@@ -777,10 +659,71 @@ document.getElementById("wizard_submit_button").addEventListener("click", functi
 
 
 
-
 /************************************************************/
 /**********************END FIREBASE CODE*********************/
 /************************************************************/
+
+
+
+
+
+
+/****************************************************/
+/**************START DATE HANDLING CODE**************/
+/****************************************************/
+
+
+//When user first loads the page, this sets the currentlyActiveWeekDates[] array to the current week and then sets the dates to the page elements
+function initializeDates() {
+
+    currentlyActiveWeekDates[0] = '1000000000000';
+
+    for (var i=1; i<8; i++) {
+
+        currentlyActiveWeekDates[i] = moment().startOf('isoWeek').add(i-1, 'days');
+    }
+
+    todaysDateIndex = moment().isoWeekday() - 1;  //Stores  a number 0-6 indicating the current day of the week from Monday to Sunday. For instance, Monday = 0 and Thursday = 3.
+
+    setDaysOfWeek(currentlyActiveWeekDates);
+}
+
+
+//sets the dates to the dateLabel elements in each dayDivArray[] element
+function setDaysOfWeek() {
+    for (var i=1; i<8; i++) {
+
+        if (currentlyActiveWeekDates[i].format("dddd, MMMM D, YYYY") === moment().format("dddd, MMMM D, YYYY")) {
+            dayDivArray[i].firstChild.firstChild.textContent = currentlyActiveWeekDates[i].format("dddd, MMMM D, YYYY") + " (Today)";  //if currentlyActiveWeekDates[i] is storing today's date, append " (Today)" at the end.
+        }
+        else if (currentlyActiveWeekDates[i].format("dddd, MMMM D, YYYY") === moment().add(1, 'days').format("dddd, MMMM D, YYYY")) {
+            dayDivArray[i].firstChild.firstChild.textContent = currentlyActiveWeekDates[i].format("dddd, MMMM D, YYYY") + " (Tomorrow)";  //if currentlyActiveWeekDates[i] is storing tomorrow's date, append " (Tomorrow)" at the end.
+        }
+        else {
+            dayDivArray[i].firstChild.firstChild.textContent = currentlyActiveWeekDates[i].format("dddd, MMMM D, YYYY"); //Get firstChild of each dayDivArray, which is the dateLabel element. Then we set its textContent equal to the corresponding entry in the currentlyActiveWeekDates[] array.
+        }
+    }
+
+
+    //Below we set currentWeekText in week switcher div
+    var currentWeekText = document.getElementById("current_week_text");
+
+    if (currentlyActiveWeekDates[1].month() === currentlyActiveWeekDates[7].month()) {  //if the current week is all contained within a single month, we display it like this
+        currentWeekText.textContent = currentlyActiveWeekDates[1].format("MMMM D") + " - " + currentlyActiveWeekDates[7].format("D");
+    }
+    else { //if the current week crosses over months, we display it like this
+        currentWeekText.textContent = currentlyActiveWeekDates[1].format("MMMM D") + " - " + currentlyActiveWeekDates[7].format("MMMM D");
+    }
+
+}
+
+
+
+
+/****************************************************/
+/***************END DATE HANDLING CODE***************/
+/****************************************************/
+
 
 
 
@@ -813,6 +756,12 @@ function preloadImagesAndText() {
 
     var image2 = new Image();
     image2.src = "img/checkbox_black.png";
+
+    var image3 = new Image();
+    image3.src = "img/left_arrow_hover.png";
+
+    var image4 = new Image();
+    image4.src = "img/right_arrow_hover.png";
 
     var image5 = new Image();
     image5.src = "img/settings_black.png";
@@ -892,14 +841,85 @@ function initializeWeekSwitcherButtons() {
     var previousWeekButton = document.getElementById("previous_week_button");
     var nextWeekButton = document.getElementById("next_week_button");
 
+    //Sets up eventListeners the "Previous week" button
+    previousWeekButton.addEventListener("click", function () {
+
+        var dayDivWrapper = $('#day_div_wrapper');
+
+        dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
+            left: '110%'
+        }, 400, function() {  //Do this callback function after the above animation is finished. Instantly move element to specified position, and then animate it back to its starting position of left:0.
+            $(this).css('left', '-110%');
+            dayDivWrapper.animate({
+                left: '0'
+            }, 400);
+        });
+
+        snackbar.style.visibility = "hidden";
+        currentlyActiveWeekIndex--; //decrement currentlyActiveWeekIndex
+
+        if (currentlyActiveWeekIndex === 0) {
+            previousWeekButton.disabled = true;  //If user is viewing the current week, disable Previous week button.
+            previousWeekButton.childNodes[0].src = "img/left_arrow.png";
+
+        }
+
+        for (var i=1; i<currentlyActiveWeekDates.length; i++) {
+            //subtract 7 days from each element of the currentlyActiveWeekDates[] array
+            currentlyActiveWeekDates[i] = currentlyActiveWeekDates[i].add(-7, 'days');
+            initialize2dArrays(false); //clear 2d arrays before populating them with elements from the new week
+        }
+
+        setTimeout(function(){
+            readTaskData();  //read user data for new week
+            setDaysOfWeek(currentlyActiveWeekDates);
+            resetDomElements();
+        }, 300); //hides snackbar after waiting 500 ms for fadeout animation to run
+    });
+
     previousWeekButton.addEventListener("mouseover", function () {
         previousWeekButton.childNodes[0].src = "img/left_arrow_hover.png";
     });
 
     previousWeekButton.addEventListener("mouseout", function () {
-            previousWeekButton.childNodes[0].src = "img/left_arrow.png";
+        previousWeekButton.childNodes[0].src = "img/left_arrow.png";
     });
 
+
+
+
+    //Sets up eventListeners the "Next week" button
+    nextWeekButton.addEventListener("click", function () {
+
+        var dayDivWrapper = $('#day_div_wrapper');
+
+        dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
+            left: '-110%'
+        }, 400, function() {   //Do this callback function after the above animation is finished. Instantly move element to specified position, and then animate it back to its starting position of left:0.
+            $(this).css('left', '110%');
+            dayDivWrapper.animate({
+                left: '0'
+            }, 400);
+        });
+
+        currentlyActiveWeekIndex++; //increment currentlyActiveWeekIndex
+        document.getElementById("previous_week_button").disabled = false;
+
+        snackbar.style.visibility = "hidden";
+
+        for (var i=1; i<currentlyActiveWeekDates.length; i++) {
+            //add 7 days to each element of the currentlyActiveWeekDates[] array
+            currentlyActiveWeekDates[i] = currentlyActiveWeekDates[i].add(7, 'days');
+            initialize2dArrays(false); //clear 2d arrays before populating them with elements from the new week
+        }
+
+        setTimeout(function(){
+            readTaskData();  //read user data for new week
+            setDaysOfWeek(currentlyActiveWeekDates);
+            resetDomElements();
+        }, 300); //hides snackbar after waiting 500 ms for fadeout animation to run
+
+    });
 
     nextWeekButton.addEventListener("mouseover", function () {
         nextWeekButton.childNodes[0].src = "img/right_arrow_hover.png";

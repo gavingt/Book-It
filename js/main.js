@@ -55,6 +55,7 @@ firebase.auth().onAuthStateChanged(function(user) {
             initializeDates(); //gets the dates for the current week when user first loads page
             readClassData(); //Reads class data if it exists for current user, followed by reading task data. If class data doesn't exist, it opens initial setup wizard.
             initializeSettingsButton(true);
+            initializeWeekSwitcherButtons();
             bInitialReadComplete = true;
 
             if (user !== null) {
@@ -110,13 +111,10 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
     classNameDiv.textContent = className;
     classDiv.appendChild(classNameDiv);
 
-        var addTaskButton = document.createElement("i");
-        addTaskButton.className = "add_task_button fa fa-plus"; //Gives each addTaskButton a class name and also assigns a Font Awesome icon to it.
+        var addTaskButton = document.createElement("p");
+        addTaskButton.className = "add_task_button fa-before fa-plus"; //Gives each addTaskButton a class name and also assigns a Font Awesome icon to it.
         addTaskButton.style.display = "table"; //"table" ensures element goes on a new line but is only as big as its contents (block takes up whole line, whereas inline-block fits to content but doesn't occupy its own line).
-        addTaskButton.style.cursor = "pointer";
-        addTaskButton.style.color = "#595959";
         addTaskButton.textContent = "\xa0 Add task";
-        addTaskButton.style.fontSize = "19px";
         classDiv.appendChild(addTaskButton);
 
         addTaskButton.addEventListener("click", function () {
@@ -427,16 +425,18 @@ document.getElementById("previous_week_button").addEventListener("click", functi
         }, 400);
     });
 
+    snackbar.style.visibility = "hidden";
     currentlyActiveWeekIndex--; //decrement currentlyActiveWeekIndex
+
     if (currentlyActiveWeekIndex === 0) {
         document.getElementById("previous_week_button").disabled = true;  //If user is viewing the current week, disable Previous week button.
+        document.getElementById("previous_week_button").childNodes[0].src = "img/left_arrow.png";
+
     }
-    snackbar.style.visibility = "hidden";
 
     for (var i=1; i<currentlyActiveWeekDates.length; i++) {
         //subtract 7 days from each element of the currentlyActiveWeekDates[] array
         currentlyActiveWeekDates[i] = currentlyActiveWeekDates[i].add(-7, 'days');
-
         initialize2dArrays(false); //clear 2d arrays before populating them with elements from the new week
     }
 
@@ -473,7 +473,6 @@ document.getElementById("next_week_button").addEventListener("click", function (
     for (var i=1; i<currentlyActiveWeekDates.length; i++) {
         //add 7 days to each element of the currentlyActiveWeekDates[] array
         currentlyActiveWeekDates[i] = currentlyActiveWeekDates[i].add(7, 'days');
-
         initialize2dArrays(false); //clear 2d arrays before populating them with elements from the new week
     }
 
@@ -806,6 +805,7 @@ function initialize2dArrays(bIncludeClassDivArray) {
 }
 
 
+
 function preloadImagesAndText() {
     //The below lines force these images to be preloaded so that they they're ready when we need to display them.
     var image1 = new Image();
@@ -883,6 +883,31 @@ function initializeSettingsButton(bUserSignedIn) {
         alert("Created by Gavin and Adam Wright, 2017");
     });
 
+}
+
+
+
+function initializeWeekSwitcherButtons() {
+
+    var previousWeekButton = document.getElementById("previous_week_button");
+    var nextWeekButton = document.getElementById("next_week_button");
+
+    previousWeekButton.addEventListener("mouseover", function () {
+        previousWeekButton.childNodes[0].src = "img/left_arrow_hover.png";
+    });
+
+    previousWeekButton.addEventListener("mouseout", function () {
+            previousWeekButton.childNodes[0].src = "img/left_arrow.png";
+    });
+
+
+    nextWeekButton.addEventListener("mouseover", function () {
+        nextWeekButton.childNodes[0].src = "img/right_arrow_hover.png";
+    });
+
+    nextWeekButton.addEventListener("mouseout", function () {
+        nextWeekButton.childNodes[0].src = "img/right_arrow.png";
+    });
 }
 
 

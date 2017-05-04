@@ -294,13 +294,16 @@ body {
     margin: auto;
     float: left;
     padding-top: 2px;
-
 }
 
 #week_switcher_div {
     display: inline;
     margin: auto;
     float: right;
+}
+
+#current_week_text {
+
 }
 
 .week_switcher_buttons {

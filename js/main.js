@@ -1,7 +1,6 @@
 //TODO: GPS functionality
 //TODO: make UI elements bigger on mobile
 
-//TODO: style the Previous week/Next week bar
 //TODO: use other properties from initial setup wizard
 //TODO: change proportions of everything to look good at 100% zoom
 
@@ -43,7 +42,8 @@ if (screen.width > 750 && screen.height > 750) {
     document.getElementById('greeting').style.display = "inline";
 }
 else {
-    document.getElementById("logo").style.width = "16%";
+    document.getElementById("logo").style.width = "18%";
+    document.getElementById("settings_div").style.right = "10px";
     document.getElementById("settings_button").style.width = "80%";
     document.getElementById("main_content_wrapper").style.marginTop = "0px";
     document.getElementById("current_semester_text").style.display = "none";
@@ -848,6 +848,9 @@ function initializeWeekSwitcherButtons() {
 
     var previousWeekButton = document.getElementById("previous_week_button");
     var nextWeekButton = document.getElementById("next_week_button");
+    var previousWeekButtonImage = document.getElementById("previous_week_button_image");
+    var nextWeekButtonImage = document.getElementById("next_week_button_image");
+    var previousWeekButtonTouched, nextWeekButtonTouched = false;
 
     //Sets up eventListeners the "Previous week" button
     previousWeekButton.addEventListener("click", function () {
@@ -885,12 +888,25 @@ function initializeWeekSwitcherButtons() {
         }, 300); //hides snackbar after waiting 500 ms for fadeout animation to run
     });
 
-    previousWeekButton.addEventListener("mouseover", function () {
-        previousWeekButton.childNodes[0].src = "img/left_arrow_hover.png";
+    previousWeekButton.addEventListener("mouseenter", function () {
+        if (!previousWeekButtonTouched) {
+            previousWeekButtonImage.src = "img/left_arrow_hover.png";
+        }
+        previousWeekButtonTouched = false;
     });
 
     previousWeekButton.addEventListener("mouseout", function () {
-        previousWeekButton.childNodes[0].src = "img/left_arrow.png";
+        previousWeekButtonImage.src = "img/left_arrow.png";
+    });
+
+    previousWeekButton.addEventListener("touchstart", function() {
+        previousWeekButtonTouched = true;
+        previousWeekButtonImage.src = "img/left_arrow_hover.png";
+    });
+
+    previousWeekButton.addEventListener("touchend", function() {
+        previousWeekButtonTouched = true;
+        previousWeekButtonImage.src = "img/left_arrow.png";
     });
 
 
@@ -929,12 +945,25 @@ function initializeWeekSwitcherButtons() {
 
     });
 
-    nextWeekButton.addEventListener("mouseover", function () {
-        nextWeekButton.childNodes[0].src = "img/right_arrow_hover.png";
+    nextWeekButton.addEventListener("mouseenter", function () {
+        if (!nextWeekButtonTouched) {
+            nextWeekButtonImage.src = "img/right_arrow_hover.png";
+        }
+        nextWeekButtonTouched = false;
     });
 
     nextWeekButton.addEventListener("mouseout", function () {
-        nextWeekButton.childNodes[0].src = "img/right_arrow.png";
+        nextWeekButtonImage.src = "img/right_arrow.png";
+    });
+
+    nextWeekButton.addEventListener("touchstart", function() {
+        nextWeekButtonTouched = true;
+        nextWeekButtonImage.src = "img/right_arrow_hover.png";
+    });
+
+    nextWeekButton.addEventListener("touchend", function() {
+        nextWeekButtonTouched = true;
+        nextWeekButtonImage.src = "img/right_arrow.png";
     });
 }
 

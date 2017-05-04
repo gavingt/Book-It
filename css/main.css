@@ -131,7 +131,7 @@ body {
     display: none;
     position: absolute;
     bottom: 2px;
-    right: 100px;
+    right: 112px;
 }
 
 #dummy_text {
@@ -175,7 +175,7 @@ body {
 #settings_div {
     position: absolute;
     display: inline-block;
-    right: 15px;
+    right: 17px;
     bottom: 8px;
 }
 
@@ -303,7 +303,7 @@ body {
 }
 
 #current_week_text {
-
+    margin-right: 6px;
 }
 
 .week_switcher_buttons {
@@ -312,6 +312,7 @@ body {
     background-repeat:no-repeat;
     border: none;
     outline:none;
+    margin-left:3px;
 }
 
 .week_switcher_buttons:disabled {

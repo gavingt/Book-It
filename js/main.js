@@ -2,7 +2,6 @@
 //TODO: make UI elements bigger on mobile
 
 //TODO: use other properties from initial setup wizard
-//TODO: change proportions of everything to look good at 100% zoom
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -44,7 +43,7 @@ if (screen.width > 750 && screen.height > 750) {
 else {
     document.getElementById("logo").style.width = "18%";
     document.getElementById("settings_div").style.right = "10px";
-    document.getElementById("settings_button").style.width = "80%";
+    document.getElementById("settings_button").style.width = "85%";
     document.getElementById("main_content_wrapper").style.marginTop = "0px";
     document.getElementById("current_semester_text").style.display = "none";
     document.getElementById("current_week_text").style.float = "left";
@@ -147,10 +146,11 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
             newTaskInput.focus();
 
             var newTaskButtonContainerDiv = document.createElement('div');
+            newTaskButtonContainerDiv.style.marginTop = "3px";
 
             var newTaskSaveButton = document.createElement("button");
             newTaskSaveButton.textContent = "Add task";
-            newTaskSaveButton.className = "new_task_save_button";
+            newTaskSaveButton.className = "new_task_save_button generic_button";
             newTaskButtonContainerDiv.appendChild(newTaskSaveButton);
             newTaskSaveButton.addEventListener("click", function () {
                 if (newTaskInput.value !== "") {  //don't save task if text field is left blank
@@ -163,6 +163,7 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
 
             var newTaskCancelButton = document.createElement("button");
             newTaskCancelButton.textContent = "Cancel";
+            newTaskCancelButton.className = "generic_button";
             newTaskButtonContainerDiv.appendChild(newTaskCancelButton);
             newTaskCancelButton.addEventListener("click", function () {
                 classDiv.appendChild(addTaskButton);      //Moves addTaskButton back to the bottom of dayDiv
@@ -268,10 +269,11 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
         editTaskDiv.appendChild(editTaskInput);
 
         var editTaskButtonContainerDiv = document.createElement('div');
+        editTaskButtonContainerDiv.style.marginTop = "3px";
 
         var editTaskSaveButton = document.createElement("button");
         editTaskSaveButton.textContent = "Save";
-        editTaskSaveButton.className = "new_task_save_button";
+        editTaskSaveButton.className = "new_task_save_button generic_button";
         editTaskButtonContainerDiv.appendChild(editTaskSaveButton);
         editTaskSaveButton.addEventListener("click", function () {
             if (editTaskInput.value !== "") {
@@ -285,6 +287,7 @@ function createAddedTaskDiv(addedTaskText, dayIndex, classDivIndex) {
 
         var editTaskCancelButton = document.createElement("button");
         editTaskCancelButton.textContent = "Cancel";
+        editTaskCancelButton.className = "generic_button";
         editTaskButtonContainerDiv.appendChild(editTaskCancelButton);
         editTaskCancelButton.addEventListener("click", function () {
             addedTaskDiv.style.display = "block";

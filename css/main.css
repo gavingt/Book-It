@@ -394,6 +394,10 @@ body {
     margin-right: 1px;
 }
 
+.generic_button {
+    padding: 5px 10px 5px 10px;
+}
+
 
 .added_task_div {
     padding: 5px 0 5px 0;

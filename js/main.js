@@ -556,6 +556,12 @@ function readTaskData() {
                                         hideOrShowDayDivs();
                                         hideOrShowOverdueClassDivs();
                                         spinner.style.display = "none";
+
+                                        //TODO: in eventListeners for week switcher buttons below, set fetchingPreviousWeek and fetchingNextWeek to true
+                                        //TODO: here and also below where we call hideOrShowDayDivs(), if fetching flags are true, set them to false and then run a slideOutDayDivWrapper function
+
+                                        fetchingOtherWeeks();
+
                                     }
                                 }
                             ));
@@ -563,6 +569,7 @@ function readTaskData() {
 
                     if (i === 7 && currentlyActiveWeekIndex !== 0) {
                         hideOrShowDayDivs();
+                        fetchingOtherWeeks();
                     }
                 }
             ));
@@ -570,7 +577,35 @@ function readTaskData() {
     }  //end FOR loop
 }
 
+function fetchingOtherWeeks() {
 
+    var dayDivWrapper = $('#day_div_wrapper');
+
+    if (fetchingPreviousWeek) {
+        fetchingPreviousWeek = false;
+        console.log("previous");
+
+
+        dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
+            left: '0'
+        }, 400);
+
+
+
+
+    }
+    if (fetchingNextWeek) {
+        fetchingNextWeek = false;
+        console.log("next");
+
+
+        dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
+            left: '0'
+        }, 400);
+
+
+    }
+}
 
 
 
@@ -863,13 +898,11 @@ function initializeWeekSwitcherButtons() {
 
         var dayDivWrapper = $('#day_div_wrapper');
 
+        fetchingPreviousWeek = true;
         dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
             left: '110%'
         }, 400, function() {  //Do this callback function after the above animation is finished. Instantly move element to specified position, and then animate it back to its starting position of left:0.
-            $(this).css('left', '-110%');
-            dayDivWrapper.animate({
-                left: '0'
-            }, 400);
+            dayDivWrapper.css('left', '-110%');
         });
 
         snackbar.style.visibility = "hidden";
@@ -891,7 +924,7 @@ function initializeWeekSwitcherButtons() {
             readTaskData();  //read user data for new week
             setDaysOfWeek(currentlyActiveWeekDates);
             resetDomElements();
-        }, 300); //hides snackbar after waiting 500 ms for fadeout animation to run
+        }, 400);
     });
 
     previousWeekButton.addEventListener("mouseenter", function () {
@@ -923,14 +956,14 @@ function initializeWeekSwitcherButtons() {
 
         var dayDivWrapper = $('#day_div_wrapper');
 
+        fetchingNextWeek = true;
         dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
             left: '-110%'
         }, 400, function() {   //Do this callback function after the above animation is finished. Instantly move element to specified position, and then animate it back to its starting position of left:0.
-            $(this).css('left', '110%');
-            dayDivWrapper.animate({
-                left: '0'
-            }, 400);
+            dayDivWrapper.css('left', '110%');
         });
+
+
 
         currentlyActiveWeekIndex++; //increment currentlyActiveWeekIndex
         document.getElementById("previous_week_button").disabled = false;
@@ -947,7 +980,7 @@ function initializeWeekSwitcherButtons() {
             readTaskData();  //read user data for new week
             setDaysOfWeek(currentlyActiveWeekDates);
             resetDomElements();
-        }, 300); //hides snackbar after waiting 500 ms for fadeout animation to run
+        }, 400);
 
     });
 

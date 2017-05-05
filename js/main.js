@@ -22,6 +22,8 @@ var name, email, photoUrl; // these will hold the name, email, and PhotoUrl prov
 var spinner = document.getElementById("spinner"); //progress spinner
 var lastCheckedForOverdueTasksDate = '1000000000001'; //Holds date of the last time we checked for overdue tasks. This gets updated every time the user pulls data from Firebase, so its initial value is basically meaningless.
 
+var fetchingPreviousWeek, fetchingNextWeek = false;
+
 
 // Initialize Firebase. This code should stay at the top of main.js
 var config = {

@@ -1,7 +1,8 @@
 //TODO: GPS functionality
-//TODO: make UI elements bigger on mobile
 
 //TODO: use other properties from initial setup wizard
+
+//TODO: use flags to only slide in new week once data is loaded for it
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -41,7 +42,7 @@ if (screen.width > 750 && screen.height > 750) {
     document.getElementById('greeting').style.display = "inline";
 }
 else {
-    document.getElementById("logo").style.width = "18%";
+    document.getElementById("logo").style.width = "20%";
     document.getElementById("settings_div").style.right = "10px";
     document.getElementById("settings_button").style.width = "85%";
     document.getElementById("main_content_wrapper").style.marginTop = "0px";

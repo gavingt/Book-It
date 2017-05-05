@@ -44,7 +44,7 @@ if (screen.width > 750 && screen.height > 750) {
 else {
     document.getElementById("logo").style.width = "20%";
     document.getElementById("settings_div").style.right = "10px";
-    document.getElementById("settings_button").style.width = "85%";
+    document.getElementById("settings_button").style.width = "95%";
     document.getElementById("main_content_wrapper").style.marginTop = "0px";
     document.getElementById("current_semester_text").style.display = "none";
     document.getElementById("current_week_text").style.float = "left";

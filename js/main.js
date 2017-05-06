@@ -1,9 +1,5 @@
 //TODO: GPS functionality
-
 //TODO: use other properties from initial setup wizard
-
-//TODO: use flags to only slide in new week once data is loaded for it
-
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
 var googleProvider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization
@@ -21,9 +17,7 @@ var bInitialReadComplete = false; //boolean value that stores whether or not we'
 var name, email, photoUrl; // these will hold the name, email, and PhotoUrl provided by Google or Facebook after a user logs in
 var spinner = document.getElementById("spinner"); //progress spinner
 var lastCheckedForOverdueTasksDate = '1000000000001'; //Holds date of the last time we checked for overdue tasks. This gets updated every time the user pulls data from Firebase, so its initial value is basically meaningless.
-
 var fetchingPreviousWeek, fetchingNextWeek = false;
-
 
 // Initialize Firebase. This code should stay at the top of main.js
 var config = {
@@ -36,7 +30,6 @@ var config = {
 firebase.initializeApp(config);
 
 preloadImagesAndText();
-
 initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
 
 //Customize layout based on device size. We check both width and height because we have to account for both portrait and landscape mode.
@@ -353,7 +346,6 @@ function hideOrShowOverdueClassDivs () {
 
 //Resets various DOM elements to their original states.
 function resetDomElements() {
-
     var addedTaskDivsToShow = document.getElementsByClassName("added_task_div");
     for (var i = 0; i < addedTaskDivsToShow.length; i++) {
         addedTaskDivsToShow[i].style.display = "block";
@@ -376,7 +368,6 @@ function resetDomElements() {
         classDivs[m].appendChild(addTaskButtonsToShow[m]);
         addTaskButtonsToShow[m].style.display = "table";
     }
-
 }
 
 
@@ -405,7 +396,6 @@ function editTaskData(taskClassIndex, taskText, dayIndex, taskIndex) {
     };
 
     var userId = firebase.auth().currentUser.uid;
-
     firebase.database().ref('users/' + userId + "/tasks/" + currentlyActiveWeekDates[dayIndex] + "/" + taskIndex).set(dayTaskJsonArray[dayIndex][taskIndex]); //write edited task data
 
 }
@@ -416,13 +406,9 @@ function editTaskData(taskClassIndex, taskText, dayIndex, taskIndex) {
 function removeTaskData(dayIndex, taskIndex) {
 
     dayTaskJsonArray[dayIndex].splice(taskIndex,1);
-
     var userId = firebase.auth().currentUser.uid;
-
     firebase.database().ref('users/' + userId + "/tasks/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]); //saves a given day's tasks with the completed task removed
-
     hideOrShowOverdueClassDivs();
-
 }
 
 
@@ -444,14 +430,12 @@ function undoRemoveTaskData(completedTaskJson, taskIndex, dayIndex) {
 
 //write new task to database
 function writeUserData(taskClassIndex, taskText, dayIndex) {
-
     dayTaskJsonArray[dayIndex].push({
         taskClassIndex: taskClassIndex,
         taskText: taskText
     });
 
     var userId = firebase.auth().currentUser.uid;
-
     firebase.database().ref('users/' + userId + "/tasks/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]);  //write new task data
 }
 
@@ -556,10 +540,6 @@ function readTaskData() {
                                         hideOrShowDayDivs();
                                         hideOrShowOverdueClassDivs();
                                         spinner.style.display = "none";
-
-                                        //TODO: in eventListeners for week switcher buttons below, set fetchingPreviousWeek and fetchingNextWeek to true
-                                        //TODO: here and also below where we call hideOrShowDayDivs(), if fetching flags are true, set them to false and then run a slideOutDayDivWrapper function
-
                                         fetchingOtherWeeks();
 
                                     }
@@ -578,32 +558,26 @@ function readTaskData() {
 }
 
 function fetchingOtherWeeks() {
-
+    var previousWeekButtonImage = document.getElementById("previous_week_button_image");
+    var nextWeekButtonImage = document.getElementById("next_week_button_image");
     var dayDivWrapper = $('#day_div_wrapper');
 
     if (fetchingPreviousWeek) {
         fetchingPreviousWeek = false;
-        console.log("previous");
-
-
         dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
             left: '0'
-        }, 400);
-
-
-
-
+        }, 400, function() {
+            previousWeekButtonImage.src = "img/left_arrow.png";
+        });
     }
+
     if (fetchingNextWeek) {
         fetchingNextWeek = false;
-        console.log("next");
-
-
         dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
             left: '0'
-        }, 400);
-
-
+        }, 400, function() {
+            nextWeekButtonImage.src = "img/right_arrow.png";
+        });
     }
 }
 
@@ -696,9 +670,7 @@ document.getElementById("wizard_submit_button").addEventListener("click", functi
     ];
 
     var userId = firebase.auth().currentUser.uid;
-
     firebase.database().ref('users/' + userId).update({lastCheckedForOverdueTasksDate: moment().startOf('day').format('x')}) ;
-
 
     //write class data to Firebase
     firebase.database().ref('users/' + userId + "/classes").set(classJsonObject).then(function() {
@@ -728,12 +700,10 @@ function initializeDates() {
     currentlyActiveWeekDates[0] = '1000000000000';
 
     for (var i=1; i<8; i++) {
-
         currentlyActiveWeekDates[i] = moment().startOf('isoWeek').add(i-1, 'days');
     }
 
     todaysDateIndex = moment().isoWeekday() - 1;  //Stores  a number 0-6 indicating the current day of the week from Monday to Sunday. For instance, Monday = 0 and Thursday = 3.
-
     setDaysOfWeek(currentlyActiveWeekDates);
 }
 
@@ -863,7 +833,6 @@ function initializeSettingsButton(bUserSignedIn) {
         }
     });
 
-
     // Close the dropdown menu if the user clicks outside of it
     window.onclick = function (event) {
         if (!event.target.matches('.settings_button')) {
@@ -872,7 +841,6 @@ function initializeSettingsButton(bUserSignedIn) {
         }
     };
 
-
     document.getElementById("settings_item_initial_setup_wizard").addEventListener("click", function () {
         document.getElementById("initial_setup_wizard_div").style.display = "block";
     });
@@ -880,7 +848,6 @@ function initializeSettingsButton(bUserSignedIn) {
     document.getElementById("settings_item_about_this_app").addEventListener("click", function () {
         alert("Created by Gavin and Adam Wright, 2017");
     });
-
 }
 
 
@@ -896,6 +863,7 @@ function initializeWeekSwitcherButtons() {
     //Sets up eventListeners the "Previous week" button
     previousWeekButton.addEventListener("click", function () {
 
+        previousWeekButtonImage.src = "img/left_arrow_hover.png";
         var dayDivWrapper = $('#day_div_wrapper');
 
         fetchingPreviousWeek = true;
@@ -910,8 +878,7 @@ function initializeWeekSwitcherButtons() {
 
         if (currentlyActiveWeekIndex === 0) {
             previousWeekButton.disabled = true;  //If user is viewing the current week, disable Previous week button.
-            previousWeekButton.childNodes[0].src = "img/left_arrow.png";
-
+            previousWeekButtonImage.src = "img/left_arrow.png";
         }
 
         for (var i=1; i<currentlyActiveWeekDates.length; i++) {
@@ -927,31 +894,12 @@ function initializeWeekSwitcherButtons() {
         }, 400);
     });
 
-    previousWeekButton.addEventListener("mouseenter", function () {
-        if (!previousWeekButtonTouched) {
-            previousWeekButtonImage.src = "img/left_arrow_hover.png";
-        }
-        previousWeekButtonTouched = false;
-    });
-
-    previousWeekButton.addEventListener("mouseout", function () {
-        previousWeekButtonImage.src = "img/left_arrow.png";
-    });
-
-    previousWeekButton.addEventListener("touchstart", function() {
-        previousWeekButtonTouched = true;
-    });
-
-    previousWeekButton.addEventListener("touchend", function() {
-        previousWeekButtonTouched = true;
-    });
-
-
 
 
     //Sets up eventListeners the "Next week" button
     nextWeekButton.addEventListener("click", function () {
 
+        nextWeekButtonImage.src = "img/right_arrow_hover.png";
         var dayDivWrapper = $('#day_div_wrapper');
 
         fetchingNextWeek = true;
@@ -960,8 +908,6 @@ function initializeWeekSwitcherButtons() {
         }, 400, function() {   //Do this callback function after the above animation is finished. Instantly move element to specified position, and then animate it back to its starting position of left:0.
             dayDivWrapper.css('left', '110%');
         });
-
-
 
         currentlyActiveWeekIndex++; //increment currentlyActiveWeekIndex
         document.getElementById("previous_week_button").disabled = false;
@@ -979,26 +925,6 @@ function initializeWeekSwitcherButtons() {
             setDaysOfWeek(currentlyActiveWeekDates);
             resetDomElements();
         }, 400);
-
-    });
-
-    nextWeekButton.addEventListener("mouseenter", function () {
-        if (!nextWeekButtonTouched) {
-            nextWeekButtonImage.src = "img/right_arrow_hover.png";
-        }
-        nextWeekButtonTouched = false;
-    });
-
-    nextWeekButton.addEventListener("mouseout", function () {
-        nextWeekButtonImage.src = "img/right_arrow.png";
-    });
-
-    nextWeekButton.addEventListener("touchstart", function() {
-        nextWeekButtonTouched = true;
-    });
-
-    nextWeekButton.addEventListener("touchend", function() {
-        nextWeekButtonTouched = true;
     });
 }
 

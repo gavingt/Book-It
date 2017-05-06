@@ -940,12 +940,10 @@ function initializeWeekSwitcherButtons() {
 
     previousWeekButton.addEventListener("touchstart", function() {
         previousWeekButtonTouched = true;
-        previousWeekButtonImage.src = "img/left_arrow_hover.png";
     });
 
     previousWeekButton.addEventListener("touchend", function() {
         previousWeekButtonTouched = true;
-        previousWeekButtonImage.src = "img/left_arrow.png";
     });
 
 
@@ -997,12 +995,10 @@ function initializeWeekSwitcherButtons() {
 
     nextWeekButton.addEventListener("touchstart", function() {
         nextWeekButtonTouched = true;
-        nextWeekButtonImage.src = "img/right_arrow_hover.png";
     });
 
     nextWeekButton.addEventListener("touchend", function() {
         nextWeekButtonTouched = true;
-        nextWeekButtonImage.src = "img/right_arrow.png";
     });
 }
 

@@ -1,8 +1,7 @@
 //TODO: GPS functionality
 //TODO: use other properties from initial setup wizard
 
-//TODO: for current semester input, automatically fill it with "Spring 2017" or "Fall 2017"
-//TODO: remove X button so that "Let's get started..." text is centered
+//TODO: if on mobile, replace myModal with a mobile-friendly version (create a function called appendMobileFriendlyModal)
 
 
 

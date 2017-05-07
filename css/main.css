@@ -292,7 +292,7 @@ body {
 }
 
 #modal_header_text {
-
+    font-size: 18px;
 }
 
 
@@ -314,7 +314,7 @@ body {
 
 
 #current_semester_input_wrapper {
-    margin: 20px 0 0 0;
+    margin: 17px 0 20px 0;
     text-align: center;
 }
 

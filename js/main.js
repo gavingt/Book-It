@@ -1,6 +1,11 @@
 //TODO: GPS functionality
 //TODO: use other properties from initial setup wizard
 
+//TODO: for current semester input, automatically fill it with "Spring 2017" or "Fall 2017"
+//TODO: remove X button so that "Let's get started..." text is centered
+
+
+
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
 var googleProvider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization
 var currentlyActiveWeekDates = new Array(8); //stores an array of the dates for the currently visible week
@@ -557,30 +562,6 @@ function readTaskData() {
     }  //end FOR loop
 }
 
-function fetchingOtherWeeks() {
-    var previousWeekButtonImage = document.getElementById("previous_week_button_image");
-    var nextWeekButtonImage = document.getElementById("next_week_button_image");
-    var dayDivWrapper = $('#day_div_wrapper');
-
-    if (fetchingPreviousWeek) {
-        fetchingPreviousWeek = false;
-        dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
-            left: '0'
-        }, 400, function() {
-            previousWeekButtonImage.src = "img/left_arrow.png";
-        });
-    }
-
-    if (fetchingNextWeek) {
-        fetchingNextWeek = false;
-        dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
-            left: '0'
-        }, 400, function() {
-            nextWeekButtonImage.src = "img/right_arrow.png";
-        });
-    }
-}
-
 
 
 document.getElementById("sign_in_google_button").addEventListener("click", function() {
@@ -791,6 +772,35 @@ function preloadImagesAndText() {
 }
 
 
+
+
+function fetchingOtherWeeks() {
+    var previousWeekButtonImage = document.getElementById("previous_week_button_image");
+    var nextWeekButtonImage = document.getElementById("next_week_button_image");
+    var dayDivWrapper = $('#day_div_wrapper');
+
+    if (fetchingPreviousWeek) {
+        fetchingPreviousWeek = false;
+        dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
+            left: '0'
+        }, 400, function() {
+            previousWeekButtonImage.src = "img/left_arrow.png";
+        });
+    }
+
+    if (fetchingNextWeek) {
+        fetchingNextWeek = false;
+        dayDivWrapper.animate({  //Do this first. Animate element from its starting position to this newly specified position.
+            left: '0'
+        }, 400, function() {
+            nextWeekButtonImage.src = "img/right_arrow.png";
+        });
+    }
+}
+
+
+
+
 //Adds various eventListeners to make the Settings button work.
 function initializeSettingsButton(bUserSignedIn) {
 
@@ -927,6 +937,45 @@ function initializeWeekSwitcherButtons() {
         }, 400);
     });
 }
+
+
+
+// Get the modal
+var modal = document.getElementById('myModal');
+
+// Get the button that opens the modal
+var btn = document.getElementById("myBtn");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks on the button, open the modal
+btn.onclick = function() {
+    modal.style.display = "block";
+
+    var currentSemesterInput = document.getElementById("current_semester_input");
+    if (moment().month() <= 4) {
+        currentSemesterInput.value = "Spring " + moment().year();
+    }
+    else if(moment().month() <= 6) {
+        currentSemesterInput.value = "Summer " + moment().year();
+    }
+    else {
+        currentSemesterInput.value = "Fall " + moment().year();
+    }
+};
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
+};
+
+// When the user clicks anywhere outside of the modal, close it
+document.onclick = function(event) {
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+};
 
 
 /************************************************************/

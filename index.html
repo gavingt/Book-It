@@ -90,8 +90,26 @@
             <span class="close">&times;</span>
         </div>
         <div id="current_semester_input_wrapper">
-            <input id=current_semester_input placeholder='Session name'>
+            <input id=current_semester_input placeholder='Session name' maxlength="20">
         </div>
+
+        <input class="class_div_wizard_input" placeholder="Class name" maxlength="35">
+
+
+        <div id="list1" class="dropdown-check-list">
+            <span class="anchor" id="dropdown_title">Select days of week</span>
+            <ul id="day_picker_items" class="day-picker-items">
+                <li><input type="checkbox" id="first_dropdown_checkbox"/>Monday</li>
+                <li><input type="checkbox" id="second_dropdown_checkbox"/>Tuesday</li>
+                <li><input type="checkbox" id="third_dropdown_checkbox"/>Wednesday</li>
+                <li><input type="checkbox" id="fourth_dropdown_checkbox"/>Thursday</li>
+                <li><input type="checkbox" id="fifth_dropdown_checkbox"/>Friday</li>
+                <li><input type="checkbox" id="sixth_dropdown_checkbox"/>Saturday</li>
+                <li><input type="checkbox" id="seventh_dropdown_checkbox"/>Sunday</li>
+            </ul>
+        </div>
+
+        <button id="submit_button_initial_setup_wizard">Submit</button>
     </div>
 
 </div>

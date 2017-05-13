@@ -262,7 +262,7 @@ body {
 
 
 
-/* The Modal (background) */
+/* the modal's background) */
 .modal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
@@ -276,19 +276,24 @@ body {
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
-/* Modal Content/Box */
+/* modal's main content */
 .modal-main-content {
     margin: 15% auto; /* 15% from the top and centered */
     border: 1px solid black;
     position: relative;
     background-color: white;
-    width: 80%; /* Could be more or less, depending on screen size */
+    /*overflow: hidden;*/
+    text-align: center;
+    width: 450px;
+    max-width: 90%;
+    height: 300px;
 }
 
 #modal_header {
     background-color: beige;
     text-align: center;
     border-bottom: 1px solid black;
+    padding: 2px 0;
 }
 
 #modal_header_text {
@@ -324,9 +329,79 @@ body {
     box-sizing: border-box; /* These border-box values force the input to behave like a block element. Left and right margin must be set in new_task_div, which is the parent node of new_task_input. */
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
-    text-align: center;
+    padding-left: 8px;
+
 }
 
+
+
+
+
+.dropdown-check-list {
+
+    display: inline-block;
+    position: relative;
+    z-index: 3;
+    width: 250px;
+    text-align: left;
+}
+
+#day_picker_items {
+    position: absolute;
+    width: 250px;
+    background-color: white;
+    border: 1px;
+}
+
+
+.dropdown-check-list .anchor {
+    position: relative;
+    cursor: pointer;
+    width: 100%;
+    display: inline-block;
+    padding: 5px 50px 5px 10px;
+    border: 1px solid #ccc;
+}
+.dropdown-check-list .anchor:after {
+    position: absolute;
+    content: "";
+    border-left: 2px solid black;
+    border-top: 2px solid black;
+    padding: 5px;
+    right: 10px;
+    top: 20%;
+    -moz-transform: rotate(-135deg);
+    -ms-transform: rotate(-135deg);
+    -o-transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+    transform: rotate(-135deg);
+}
+.dropdown-check-list .anchor:active:after {
+    right: 8px;
+    top: 21%;
+}
+.dropdown-check-list ul.day-picker-items {
+    padding: 2px;
+    display: none;
+    margin: 0;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+.dropdown-check-list ul.day-picker-items li {
+    list-style: none;
+}
+
+
+
+
+
+#submit_button_initial_setup_wizard {
+    padding: 3px 6px;
+    display: block;
+    margin: 10px auto;
+    position: relative;
+    z-index: 2;
+}
 
 
 

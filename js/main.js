@@ -1,7 +1,7 @@
 //TODO: GPS functionality
 //TODO: use other properties from initial setup wizard
 
-//TODO: if on mobile, replace myModal with a mobile-friendly version (create a function called appendMobileFriendlyModal)
+//TODO: if on mobile, replace myModal with a mobile-friendly version (create both in HTML and only show the relevant one)
 
 
 
@@ -945,6 +945,8 @@ var modal = document.getElementById('myModal');
 // Get the button that opens the modal
 var btn = document.getElementById("myBtn");
 
+initializeDayPickerDropdown();
+
 // Get the <span> element that closes the modal
 var span = document.getElementsByClassName("close")[0];
 
@@ -975,6 +977,63 @@ document.onclick = function(event) {
         modal.style.display = "none";
     }
 };
+
+
+
+
+function setUpModalWizard () {
+
+
+    //document.getElementById("myModal").
+}
+
+
+
+
+function initializeDayPickerDropdown() {
+
+    var dropdownTitle = document.getElementById("dropdown_title");
+    var checkList = document.getElementById('list1');
+    var items = document.getElementById('day_picker_items');
+    checkList.getElementsByClassName('anchor')[0].onclick = function (evt) {
+        if (items.classList.contains('visible')){
+            items.classList.remove('visible');
+            items.style.display = "none";
+
+
+            dropdownTitle.textContent = "";
+            //TODO: change dropdown_title textContent to be concatenation of days selected
+
+            if (document.getElementById("first_dropdown_checkbox").checked) {
+                dropdownTitle.textContent = "M";
+            }
+            if (document.getElementById("second_dropdown_checkbox").checked) {
+                dropdownTitle.textContent = dropdownTitle.textContent + " Tu";
+            }
+            if (document.getElementById("third_dropdown_checkbox").checked) {
+                dropdownTitle.textContent = dropdownTitle.textContent + " W";
+            }
+
+            if (dropdownTitle.textContent === "") {
+                dropdownTitle.textContent = "Select days of week";
+            }
+
+
+
+        }
+
+        else{
+            items.classList.add('visible');
+            items.style.display = "block";
+        }
+
+    };
+
+    items.onblur = function(evt) {
+        items.classList.remove('visible');
+    }
+
+}
 
 
 /************************************************************/

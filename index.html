@@ -29,6 +29,7 @@
 
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/wickedpicker.css">  <!--//TODO: change to .min file after tweaking-->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -77,7 +78,6 @@
 </div>
 
 
-
 <!-- Trigger/Open The Modal -->
 <button id="myBtn">Open Modal</button>
 
@@ -95,19 +95,27 @@
 
         <input class="class_div_wizard_input" placeholder="Class name" maxlength="35">
 
-
-        <div id="list1" class="dropdown-check-list">
-            <span class="anchor" id="dropdown_title">Select days of week</span>
+        <div id="dropdown_check_list" class="dropdown-check-list">
+            <span class="anchor" id="day_picker_dropdown_title">Select days class is held</span>
             <ul id="day_picker_items" class="day-picker-items">
-                <li><input type="checkbox" id="first_dropdown_checkbox"/>Monday</li>
-                <li><input type="checkbox" id="second_dropdown_checkbox"/>Tuesday</li>
-                <li><input type="checkbox" id="third_dropdown_checkbox"/>Wednesday</li>
-                <li><input type="checkbox" id="fourth_dropdown_checkbox"/>Thursday</li>
-                <li><input type="checkbox" id="fifth_dropdown_checkbox"/>Friday</li>
-                <li><input type="checkbox" id="sixth_dropdown_checkbox"/>Saturday</li>
-                <li><input type="checkbox" id="seventh_dropdown_checkbox"/>Sunday</li>
+                <li><input type="checkbox" class="day_picker_list_item" id="monday_dropdown_checkbox"/> Monday</li>
+                <li><input type="checkbox" class="day_picker_list_item" id="tuesday_dropdown_checkbox"/> Tuesday</li>
+                <li><input type="checkbox" class="day_picker_list_item" id="wednesday_dropdown_checkbox"/> Wednesday</li>
+                <li><input type="checkbox" class="day_picker_list_item" id="thursday_dropdown_checkbox"/> Thursday</li>
+                <li><input type="checkbox" class="day_picker_list_item" id="friday_dropdown_checkbox"/> Friday</li>
+                <li><input type="checkbox" class="day_picker_list_item" id="saturday_dropdown_checkbox"/> Saturday</li>
+                <li><input type="checkbox" class="day_picker_list_item" id="sunday_dropdown_checkbox"/> Sunday</li>
             </ul>
         </div>
+
+        <div id="time_of_day_div">
+            <span>Time: &nbsp;</span>
+            <input type="text" name="beginning_timepicker" class="beginning-timepicker" id="beginning_timepicker"/>
+            <span> - </span>
+            <input type="text" name="ending_timepicker" class="ending-timepicker" id="ending_timepicker"/>
+        </div>
+
+
 
         <button id="submit_button_initial_setup_wizard">Submit</button>
     </div>
@@ -163,8 +171,12 @@
 
 <script src="js/moment.min.js"></script> <!-- this needs to go after the firebase.js import or it'll cause problems with Firebase constantly sending refresh tokens-->
 
+
+
 <!-- jQuery library -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+
+<script type="text/javascript" src="js/wickedpicker.js"></script> <!--Time picker-->
 
 
 <!-- Latest compiled JavaScript -->

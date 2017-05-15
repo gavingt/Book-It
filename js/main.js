@@ -35,6 +35,7 @@ firebase.initializeApp(config);
 
 preloadImagesAndText();
 initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
+setUpModalWizard();
 
 //Customize layout based on device size. We check both width and height because we have to account for both portrait and landscape mode.
 if (screen.width > 750 && screen.height > 750) {
@@ -938,88 +939,108 @@ function initializeWeekSwitcherButtons() {
 }
 
 
-
-// Get the modal
-var modal = document.getElementById('myModal');
-
-// Get the button that opens the modal
-var btn = document.getElementById("myBtn");
-
-initializeDayPickerDropdown();
-
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
-
-// When the user clicks on the button, open the modal
-btn.onclick = function() {
-    modal.style.display = "block";
-
-    var currentSemesterInput = document.getElementById("current_semester_input");
-    if (moment().month() <= 4) {
-        currentSemesterInput.value = "Spring " + moment().year();
-    }
-    else if(moment().month() <= 6) {
-        currentSemesterInput.value = "Summer " + moment().year();
-    }
-    else {
-        currentSemesterInput.value = "Fall " + moment().year();
-    }
-};
-
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-    modal.style.display = "none";
-};
-
-// When the user clicks anywhere outside of the modal, close it
-document.onclick = function(event) {
-    if (event.target === modal) {
-        modal.style.display = "none";
-    }
-};
-
-
-
-
 function setUpModalWizard () {
 
+    // Get the modal
+    var modal = document.getElementById('myModal');
 
-    //document.getElementById("myModal").
+    // Get the button that opens the modal
+    var btn = document.getElementById("myBtn");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on the button, open the modal
+    btn.onclick = function() {
+        modal.style.display = "block";
+
+        var currentSemesterInput = document.getElementById("current_semester_input");
+        if (moment().month() <= 4) {
+            currentSemesterInput.value = "Spring " + moment().year();
+        }
+        else if(moment().month() <= 6) {
+            currentSemesterInput.value = "Summer " + moment().year();
+        }
+        else {
+            currentSemesterInput.value = "Fall " + moment().year();
+        }
+    };
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    };
+
+    // When the user clicks anywhere outside of the modal, close it
+    document.onclick = function(event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
+
+    initializeDayPickerDropdown();
+    initializeTimePickers();
 }
 
 
 
+function initializeTimePickers() {
+    var timepickers = $('.timepicker').wickedpicker();
+
+/*    document.getElementById('beginning_timepicker').addEventListener('click', function() {
+        document.getElementsByClassName('wickedpicker__title')[0].innerHTML = "Start time";
+    });
+
+    document.getElementById('ending_timepicker').addEventListener('click', function() {
+        document.getElementsByClassName('wickedpicker__title')[0].innerHTML = "End time";
+    });*/
+
+
+
+    var beginningTimepicker = $('.beginning-timepicker').wickedpicker();
+    var endingTimepicker = $('.ending-timepicker').wickedpicker({title: 'End time'});
+
+    console.log(timepickers.wickedpicker('time', 0));
+    console.log(timepickers.wickedpicker('time', 1));
+
+}
+
 
 function initializeDayPickerDropdown() {
-
-    var dropdownTitle = document.getElementById("dropdown_title");
-    var checkList = document.getElementById('list1');
+    var dropdownTitle = document.getElementById("day_picker_dropdown_title");
+    var checkList = document.getElementById('dropdown_check_list');
     var items = document.getElementById('day_picker_items');
     checkList.getElementsByClassName('anchor')[0].onclick = function (evt) {
         if (items.classList.contains('visible')){
             items.classList.remove('visible');
             items.style.display = "none";
 
-
             dropdownTitle.textContent = "";
-            //TODO: change dropdown_title textContent to be concatenation of days selected
 
-            if (document.getElementById("first_dropdown_checkbox").checked) {
+            if (document.getElementById("monday_dropdown_checkbox").checked) {
                 dropdownTitle.textContent = "M";
             }
-            if (document.getElementById("second_dropdown_checkbox").checked) {
+            if (document.getElementById("tuesday_dropdown_checkbox").checked) {
                 dropdownTitle.textContent = dropdownTitle.textContent + " Tu";
             }
-            if (document.getElementById("third_dropdown_checkbox").checked) {
+            if (document.getElementById("wednesday_dropdown_checkbox").checked) {
                 dropdownTitle.textContent = dropdownTitle.textContent + " W";
             }
-
-            if (dropdownTitle.textContent === "") {
-                dropdownTitle.textContent = "Select days of week";
+            if (document.getElementById("thursday_dropdown_checkbox").checked) {
+                dropdownTitle.textContent = dropdownTitle.textContent + " Th";
             }
-
-
-
+            if (document.getElementById("friday_dropdown_checkbox").checked) {
+                dropdownTitle.textContent = dropdownTitle.textContent + " F";
+            }
+            if (document.getElementById("saturday_dropdown_checkbox").checked) {
+                dropdownTitle.textContent = dropdownTitle.textContent + " Sa";
+            }
+            if (document.getElementById("sunday_dropdown_checkbox").checked) {
+                dropdownTitle.textContent = dropdownTitle.textContent + " Su";
+            }
+            if (dropdownTitle.textContent === "") {
+                dropdownTitle.textContent = "Select days class is held";
+            }
         }
 
         else{

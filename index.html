@@ -89,18 +89,26 @@
         <div id="modal_header"><span id="modal_header_text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Let's get started...</span>
             <span class="close">&times;</span>
         </div>
+
         <div id="current_semester_input_wrapper">
             <input id=current_semester_input placeholder='Session name' maxlength="20">
         </div>
 
-        <div id="class_name_wrapper">
-            <span>Class name</span>
-            <input class="class_div_wizard_input" maxlength="35">
+        <div class="modal-labels">
+                <div>Class name</div>
+                <div>Days</div>
+                <div>Time</div>
+                <div>Choose a color</div>
         </div>
 
-        <div id="daypicker_dropdown_wrapper">
-            <span>Days of the week</span>
-            <div id="daypicker_dropdown" class="daypicker-dropdown modal-inputs">
+        <div class="modal-inputs">
+
+            <div>
+                <input id="class_name_input" maxlength="35">
+            </div>
+
+
+            <div id="daypicker_dropdown" class="daypicker-dropdown">
                 <span class="anchor" id="day_picker_dropdown_title">&nbsp;</span>
                 <ul id="day_picker_items" class="day-picker-items">
                     <li><input type="checkbox" class="day_picker_list_item" id="monday_dropdown_checkbox"/> Monday</li>
@@ -112,17 +120,17 @@
                     <li><input type="checkbox" class="day_picker_list_item" id="sunday_dropdown_checkbox"/> Sunday</li>
                 </ul>
             </div>
-        </div>
 
-        <div id="time_of_day_div">
-            <span>Time: &nbsp;</span>
-            <input type="text" name="beginning_timepicker" class="beginning-timepicker" id="beginning_timepicker" readonly/>
-            <span> - </span>
-            <input type="text" name="ending_timepicker" class="ending-timepicker" id="ending_timepicker" readonly/>
-        </div>
+            <div id="time_of_day_div">
+                <input type="text" name="beginning_timepicker" class="beginning-timepicker" id="beginning_timepicker" readonly/>
+                <span> - </span>
+                <input type="text" name="ending_timepicker" class="ending-timepicker" id="ending_timepicker" readonly/>
+            </div>
 
-        <div id="color_picker">Choose color:
-            <input type="color" id="html5colorpicker" onchange="clickColor(0, -1, -1, 5)" value="#ff0000" style="width:65px;">
+            <div>
+                <input type="color" id="color_picker" onchange="clickColor(0, -1, -1, 5)" value="#ff0000">
+            </div>
+
         </div>
 
         <button id="submit_button_initial_setup_wizard">Submit</button>

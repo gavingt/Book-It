@@ -323,8 +323,23 @@ body.modal {
     cursor: pointer;
 }
 
+.modal-labels {
+    float: left;
+    width: 38%;
+}
+
+.modal-labels div {
+    height: 45px;
+    margin-left: 15px;
+}
+
 .modal-inputs {
-    float: right;
+    float: left;
+    width: 62%;
+}
+
+.modal-inputs > * {
+    height: 45px;
 }
 
 
@@ -342,14 +357,16 @@ body.modal {
     padding-left: 8px;
 }
 
+#class_name_input {
+    width: 200px;
+}
+
 
 .daypicker-dropdown {
-    display: inline-block;
     position: relative;
     z-index: 30000;
-    width: 175px;
+    width: 200px;
     text-align: left;
-    margin-top: 10px;
 }
 
 #day_picker_dropdown_title {
@@ -416,18 +433,19 @@ input[type=checkbox] {
     list-style: none;
 }
 
-#time_of_day_div {
-    padding: 10px 0;
-}
 
 .beginning-timepicker, .ending-timepicker {
-    width: 140px;
+    width: 120px;
     display: inline-block;
 
     color: transparent;
     text-shadow: 0 0 0 black;
     text-align: center;
 
+}
+
+#color_picker {
+    width: 100px;
 }
 
 #submit_button_initial_setup_wizard {

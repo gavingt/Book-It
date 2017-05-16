@@ -34,13 +34,13 @@
 
     var pluginName = "wickedpicker",
         defaults = {
-            now: today.getHours() + ':' + today.getMinutes(),
+            now: "12:00",
             twentyFour: false,
             upArrow: 'wickedpicker__controls__control-up',
             downArrow: 'wickedpicker__controls__control-down',
             close: 'wickedpicker__close',
             hoverState: 'hover-state',
-            title: 'Start time',
+            title: 'Class time',
             showSeconds: false,
             timeSeparator: ' : ',
             secondsInterval: 1,
@@ -97,12 +97,13 @@
         showPicker: function (element) {
             //If there is a beforeShow function, then call it with the input calling the timepicker and the
             // timepicker itself
+
             if (typeof this.options.beforeShow === 'function') {
                 this.options.beforeShow(element, this.timepicker);
             }
             var timepickerPos = $(element).offset();
 
-            $(element).attr({'aria-showingpicker': 'true', 'tabindex': -1});
+            $(element).attr({'aria-showingpicker': 'true'});
             this.setText(element);
             this.showHideMeridiemControl();
             if (this.getText(element) !== this.getTime()) {
@@ -157,26 +158,21 @@
                 }
             };
 
-            function setTabIndex(index) {
-                setTimeout(function () {
-                    $('[aria-showingpicker="false"]').attr('tabindex', index);
-                }, 400);
-            }
 
-            pickerHidden.start().then(setTabIndex(0));
         },
 
         /*
          * Create a new timepicker. A single timepicker per page
          */
         createPicker: function () {
-            if ($('.wickedpicker').length < 2) {
-                var picker = '<div class="wickedpicker"><p class="wickedpicker__title">' + this.options.title + '<span class="wickedpicker__close"></span></p><ul class="wickedpicker__controls"><li class="wickedpicker__controls__control"><span class="' + this.options.upArrow + '"></span><span class="wickedpicker__controls__control--hours" tabindex="-1">00</span><span class="' + this.options.downArrow + '"></span></li><li class="wickedpicker__controls__control--separator"><span class="wickedpicker__controls__control--separator-inner">:</span></li><li class="wickedpicker__controls__control"><span class="' + this.options.upArrow + '"></span><span class="wickedpicker__controls__control--minutes" tabindex="-1">00</span><span class="' + this.options.downArrow + '"></span></li>';
+            if ($('.wickedpicker').length === 0) {
+                var picker = '<div class="wickedpicker"><p class="wickedpicker__title">' + this.options.title + '<span class="wickedpicker__close"></span></p><ul class="wickedpicker__controls"><li class="wickedpicker__controls__control"><span class="' + this.options.upArrow + '"></span><span class="wickedpicker__controls__control--hours">00</span><span class="' + this.options.downArrow + '"></span></li><li class="wickedpicker__controls__control--separator"><span class="wickedpicker__controls__control--separator-inner">:</span></li><li class="wickedpicker__controls__control"><span class="' + this.options.upArrow + '"></span><span class="wickedpicker__controls__control--minutes">00</span><span class="' + this.options.downArrow + '"></span></li>';
                 if (this.options.showSeconds) {
-                    picker += '<li class="wickedpicker__controls__control--separator"><span class="wickedpicker__controls__control--separator-inner">:</span></li><li class="wickedpicker__controls__control"><span class="' + this.options.upArrow + '"></span><span class="wickedpicker__controls__control--seconds" tabindex="-1">00</span><span class="' + this.options.downArrow + '"></span> </li>';
+                    picker += '<li class="wickedpicker__controls__control--separator"><span class="wickedpicker__controls__control--separator-inner">:</span></li><li class="wickedpicker__controls__control"><span class="' + this.options.upArrow + '"></span><span class="wickedpicker__controls__control--seconds">00</span><span class="' + this.options.downArrow + '"></span> </li>';
                 }
-                picker += '<li class="wickedpicker__controls__control"><span class="' + this.options.upArrow + '"></span><span class="wickedpicker__controls__control--meridiem" tabindex="-1">AM</span><span class="' + this.options.downArrow + '"></span></li></ul></div>';
+                picker += '<li class="wickedpicker__controls__control"><span class="' + this.options.upArrow + '"></span><span class="wickedpicker__controls__control--meridiem">AM</span><span class="' + this.options.downArrow + '"></span></li></ul></div>';
                 $('body').append(picker);
+
                 this.attachKeyboardEvents();
             }
         },
@@ -217,13 +213,15 @@
                 self.makePickerInputClearable(element);
             }
 
-            $(element).attr('tabindex', 0);
-            $(element).on('click focus', function (event) {
+            $(element).on('click', function (event) {
                 //Prevent multiple firings
                 if ($(self.timepicker).is(':hidden')) {
                   self.showPicker($(this));
                   window.lastTimePickerControl = $(this); //Put the reference on this timepicker into global scope for unsing that in afterShow function
                   $(self.hoursElem).focus();
+                }
+                else {
+                    self.hideTimepicker(window.lastTimePickerControl);
                 }
             });
 
@@ -231,12 +229,15 @@
             //Handle click events for closing Wickedpicker
             var clickHandler = function (event) {
                 //Only fire the hide event when you have to
+
                 if ($(self.timepicker).is(':visible')) {
                     //Clicking the X
+
                     if ($(event.target).is(self.close)) {
                       self.hideTimepicker(window.lastTimePickerControl);
                     } else if ($(event.target).closest(self.timepicker).length || $(event.target).closest($('.hasWickedpicker')).length) { //Clicking the Wickedpicker or one of it's inputs
                       event.stopPropagation();
+
                     } else {   //Everything else
                       if (typeof self.options.onClickOutside === 'function') {
                         self.options.onClickOutside();
@@ -475,7 +476,7 @@
                 } else {
                     passedData.Wickedpicker.changeValue(operator, passedData.input, this);
                 }
-            }).bind('mouseup touchend', function () {
+            }).bind('mouseup touchend mouseleave', function () {
                 clearInterval(timeOut);
             });
         },

@@ -1,7 +1,9 @@
 //TODO: GPS functionality
 //TODO: use other properties from initial setup wizard
 
-//TODO: if on mobile, replace myModal with a mobile-friendly version (create both in HTML and only show the relevant one)
+//TODO: minify all scripts
+//TODO: closing modal should close daypicker
+//TODO: closing modal at initial setup should reload page?
 
 
 
@@ -941,6 +943,8 @@ function initializeWeekSwitcherButtons() {
 
 function setUpModalWizard () {
 
+    var html = $('html');
+
     // Get the modal
     var modal = document.getElementById('myModal');
 
@@ -953,6 +957,10 @@ function setUpModalWizard () {
     // When the user clicks on the button, open the modal
     btn.onclick = function() {
         modal.style.display = "block";
+        if ($(document).height() > $(window).height()) {
+            var scrollTop = (html.scrollTop()) ? html.scrollTop() : $('body').scrollTop(); //prevents body scrolling when modal visible
+            html.addClass('noscroll').css('top',-scrollTop);
+        }
 
         var currentSemesterInput = document.getElementById("current_semester_input");
         if (moment().month() <= 4) {
@@ -969,92 +977,110 @@ function setUpModalWizard () {
     // When the user clicks on <span> (x), close the modal
     span.onclick = function() {
         modal.style.display = "none";
+        var scrollTop = parseInt(html.css('top')); //allows scrolling again when modal dismissed
+        html.removeClass('noscroll');
+        $('html,body').scrollTop(-scrollTop);
     };
 
     // When the user clicks anywhere outside of the modal, close it
     document.onclick = function(event) {
         if (event.target === modal) {
             modal.style.display = "none";
+            var scrollTop = parseInt(html.css('top')); //allows scrolling again when modal dismissed
+            html.removeClass('noscroll');
+            $('html,body').scrollTop(-scrollTop);
         }
     };
 
-    initializeDayPickerDropdown();
+    initializeDayPicker();
     initializeTimePickers();
+}
+
+
+function initializeDayPicker() {
+    var dropdownTitle = document.getElementById("day_picker_dropdown_title");
+    var checkList = document.getElementById('daypicker_dropdown');
+    var items = document.getElementById('day_picker_items');
+    checkList.getElementsByClassName('anchor')[0].onclick = function() {
+        buildDaypickerTitle(items, dropdownTitle);
+    };
+
+    items.onblur = function(evt) {
+        items.classList.remove('visible');
+    };
+
+    $(document).click(function(){
+        buildDaypickerTitle(items, dropdownTitle);
+        $(".day-picker-items").hide();
+        items.classList.remove('visible');
+    });
+
+    $(".daypicker-dropdown").click(function(e){
+        e.stopPropagation();  //clicks within the dropdown won't make it pas the dropdown itself
+    });
+
+}
+
+
+
+function buildDaypickerTitle (items, dropdownTitle) {
+    if (items.classList.contains('visible')){
+        items.classList.remove('visible');
+        items.style.display = "none";
+
+        dropdownTitle.textContent = "";
+
+        if (document.getElementById("monday_dropdown_checkbox").checked) {
+            dropdownTitle.textContent = "M";
+        }
+        if (document.getElementById("tuesday_dropdown_checkbox").checked) {
+            dropdownTitle.textContent = dropdownTitle.textContent + " Tu";
+        }
+        if (document.getElementById("wednesday_dropdown_checkbox").checked) {
+            dropdownTitle.textContent = dropdownTitle.textContent + " W";
+        }
+        if (document.getElementById("thursday_dropdown_checkbox").checked) {
+            dropdownTitle.textContent = dropdownTitle.textContent + " Th";
+        }
+        if (document.getElementById("friday_dropdown_checkbox").checked) {
+            dropdownTitle.textContent = dropdownTitle.textContent + " F";
+        }
+        if (document.getElementById("saturday_dropdown_checkbox").checked) {
+            dropdownTitle.textContent = dropdownTitle.textContent + " Sa";
+        }
+        if (document.getElementById("sunday_dropdown_checkbox").checked) {
+            dropdownTitle.textContent = dropdownTitle.textContent + " Su";
+        }
+        if (dropdownTitle.textContent === "") {
+            dropdownTitle.textContent = "Select days class is held";
+        }
+    }
+
+    else{
+        items.classList.add('visible');
+        items.style.display = "block";
+    }
 }
 
 
 
 function initializeTimePickers() {
-    var timepickers = $('.timepicker').wickedpicker();
-
-/*    document.getElementById('beginning_timepicker').addEventListener('click', function() {
-        document.getElementsByClassName('wickedpicker__title')[0].innerHTML = "Start time";
-    });
-
-    document.getElementById('ending_timepicker').addEventListener('click', function() {
-        document.getElementsByClassName('wickedpicker__title')[0].innerHTML = "End time";
-    });*/
-
-
+    //var timepickers = $('.timepicker').wickedpicker();
 
     var beginningTimepicker = $('.beginning-timepicker').wickedpicker();
-    var endingTimepicker = $('.ending-timepicker').wickedpicker({title: 'End time'});
+    var endingTimepicker = $('.ending-timepicker').wickedpicker({now: "13:30"});
 
-    console.log(timepickers.wickedpicker('time', 0));
-    console.log(timepickers.wickedpicker('time', 1));
-
-}
+    document.getElementById('beginning_timepicker').addEventListener('mousedown', function(e){ e.preventDefault(); }, false);  //prevent highlighting of timepicker text
+    document.getElementById('ending_timepicker').addEventListener('mousedown', function(e){ e.preventDefault(); }, false);  //prevent highlighting of timepicker text
 
 
-function initializeDayPickerDropdown() {
-    var dropdownTitle = document.getElementById("day_picker_dropdown_title");
-    var checkList = document.getElementById('dropdown_check_list');
-    var items = document.getElementById('day_picker_items');
-    checkList.getElementsByClassName('anchor')[0].onclick = function (evt) {
-        if (items.classList.contains('visible')){
-            items.classList.remove('visible');
-            items.style.display = "none";
-
-            dropdownTitle.textContent = "";
-
-            if (document.getElementById("monday_dropdown_checkbox").checked) {
-                dropdownTitle.textContent = "M";
-            }
-            if (document.getElementById("tuesday_dropdown_checkbox").checked) {
-                dropdownTitle.textContent = dropdownTitle.textContent + " Tu";
-            }
-            if (document.getElementById("wednesday_dropdown_checkbox").checked) {
-                dropdownTitle.textContent = dropdownTitle.textContent + " W";
-            }
-            if (document.getElementById("thursday_dropdown_checkbox").checked) {
-                dropdownTitle.textContent = dropdownTitle.textContent + " Th";
-            }
-            if (document.getElementById("friday_dropdown_checkbox").checked) {
-                dropdownTitle.textContent = dropdownTitle.textContent + " F";
-            }
-            if (document.getElementById("saturday_dropdown_checkbox").checked) {
-                dropdownTitle.textContent = dropdownTitle.textContent + " Sa";
-            }
-            if (document.getElementById("sunday_dropdown_checkbox").checked) {
-                dropdownTitle.textContent = dropdownTitle.textContent + " Su";
-            }
-            if (dropdownTitle.textContent === "") {
-                dropdownTitle.textContent = "Select days class is held";
-            }
-        }
-
-        else{
-            items.classList.add('visible');
-            items.style.display = "block";
-        }
-
-    };
-
-    items.onblur = function(evt) {
-        items.classList.remove('visible');
-    }
+    /*    console.log(timepickers.wickedpicker('time', 0));
+        console.log(timepickers.wickedpicker('time', 1));*/
 
 }
+
+
+
 
 
 /************************************************************/

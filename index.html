@@ -85,7 +85,7 @@
 <div id="myModal" class="modal">
 
     <!-- Modal content -->
-    <div class="modal-main-content">
+    <div class="modal-main-content" id="modal_main_content">
         <div id="modal_header"><span id="modal_header_text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Let's get started...</span>
             <span class="close">&times;</span>
         </div>
@@ -95,7 +95,7 @@
 
         <input class="class_div_wizard_input" placeholder="Class name" maxlength="35">
 
-        <div id="dropdown_check_list" class="dropdown-check-list">
+        <div id="daypicker_dropdown" class="daypicker-dropdown">
             <span class="anchor" id="day_picker_dropdown_title">Select days class is held</span>
             <ul id="day_picker_items" class="day-picker-items">
                 <li><input type="checkbox" class="day_picker_list_item" id="monday_dropdown_checkbox"/> Monday</li>
@@ -110,9 +110,9 @@
 
         <div id="time_of_day_div">
             <span>Time: &nbsp;</span>
-            <input type="text" name="beginning_timepicker" class="beginning-timepicker" id="beginning_timepicker"/>
+            <input type="text" name="beginning_timepicker" class="beginning-timepicker" id="beginning_timepicker" readonly/>
             <span> - </span>
-            <input type="text" name="ending_timepicker" class="ending-timepicker" id="ending_timepicker"/>
+            <input type="text" name="ending_timepicker" class="ending-timepicker" id="ending_timepicker" readonly/>
         </div>
 
 

@@ -292,7 +292,7 @@ body.modal {
     position: relative;
     background-color: white;
     width: 450px;
-    max-width: 90%;
+    max-width: 98%;
     height: 400px;
 }
 
@@ -330,7 +330,7 @@ body.modal {
 
 .modal-labels div {
     height: 45px;
-    margin-left: 15px;
+    margin-left: 9px;
 }
 
 .modal-inputs {
@@ -358,14 +358,16 @@ body.modal {
 }
 
 #class_name_input {
-    width: 200px;
+    width: 214px;
+    max-width: 85%;
 }
 
 
 .daypicker-dropdown {
     position: relative;
     z-index: 30000;
-    width: 200px;
+    width: 214px;
+    max-width: 85%;
     text-align: left;
 }
 
@@ -379,7 +381,8 @@ body.modal {
 
 #day_picker_items {
     position: absolute;
-    width: 175px;
+    width: 214px;
+    max-width: 85%;
     background-color: white;
     border: 1px solid;
     padding-left: 10px;
@@ -435,7 +438,7 @@ input[type=checkbox] {
 
 
 .beginning-timepicker, .ending-timepicker {
-    width: 120px;
+    width: 84px;
     display: inline-block;
 
     color: transparent;

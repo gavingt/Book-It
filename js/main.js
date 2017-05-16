@@ -1016,7 +1016,8 @@ function initializeDayPicker() {
     });
 
     $(".daypicker-dropdown").click(function(e){
-        e.stopPropagation();  //clicks within the dropdown won't make it pas the dropdown itself
+        $('.wickedpicker').hide();
+        e.stopPropagation();  //clicks within the dropdown will prevent click events from bubbling up any further
     });
 
 }

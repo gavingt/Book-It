@@ -418,7 +418,11 @@ input[type=checkbox] {
 .beginning-timepicker, .ending-timepicker {
     width: 140px;
     display: inline-block;
-    padding-left: 6px;
+
+    color: transparent;
+    text-shadow: 0 0 0 black;
+    text-align: center;
+
 }
 
 #submit_button_initial_setup_wizard {

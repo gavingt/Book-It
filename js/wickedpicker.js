@@ -157,8 +157,6 @@
                     return setShowPickerFalse.promise();
                 }
             };
-
-
         },
 
         /*
@@ -221,7 +219,7 @@
                   $(self.hoursElem).focus();
                 }
                 else {
-                    self.hideTimepicker(window.lastTimePickerControl);
+                    self.hideTimepicker(window.lastTimePickerControl); //Hides visible timepicker if you click on the input box of any visible timepicker
                 }
             });
 
@@ -235,7 +233,7 @@
 
                     if ($(event.target).is(self.close)) {
                       self.hideTimepicker(window.lastTimePickerControl);
-                    } else if ($(event.target).closest(self.timepicker).length || $(event.target).closest($('.hasWickedpicker')).length) { //Clicking the Wickedpicker or one of it's inputs
+                    } else if ($(event.target).closest(self.timepicker).length || $(event.target).closest($('.hasWickedpicker')).length) { //Clicking the Wickedpicker or one of its inputs
                       event.stopPropagation();
 
                     } else {   //Everything else

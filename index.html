@@ -93,19 +93,25 @@
             <input id=current_semester_input placeholder='Session name' maxlength="20">
         </div>
 
-        <input class="class_div_wizard_input" placeholder="Class name" maxlength="35">
+        <div id="class_name_wrapper">
+            <span>Class name</span>
+            <input class="class_div_wizard_input" maxlength="35">
+        </div>
 
-        <div id="daypicker_dropdown" class="daypicker-dropdown">
-            <span class="anchor" id="day_picker_dropdown_title">Select days class is held</span>
-            <ul id="day_picker_items" class="day-picker-items">
-                <li><input type="checkbox" class="day_picker_list_item" id="monday_dropdown_checkbox"/> Monday</li>
-                <li><input type="checkbox" class="day_picker_list_item" id="tuesday_dropdown_checkbox"/> Tuesday</li>
-                <li><input type="checkbox" class="day_picker_list_item" id="wednesday_dropdown_checkbox"/> Wednesday</li>
-                <li><input type="checkbox" class="day_picker_list_item" id="thursday_dropdown_checkbox"/> Thursday</li>
-                <li><input type="checkbox" class="day_picker_list_item" id="friday_dropdown_checkbox"/> Friday</li>
-                <li><input type="checkbox" class="day_picker_list_item" id="saturday_dropdown_checkbox"/> Saturday</li>
-                <li><input type="checkbox" class="day_picker_list_item" id="sunday_dropdown_checkbox"/> Sunday</li>
-            </ul>
+        <div id="daypicker_dropdown_wrapper">
+            <span>Days of the week</span>
+            <div id="daypicker_dropdown" class="daypicker-dropdown modal-inputs">
+                <span class="anchor" id="day_picker_dropdown_title">&nbsp;</span>
+                <ul id="day_picker_items" class="day-picker-items">
+                    <li><input type="checkbox" class="day_picker_list_item" id="monday_dropdown_checkbox"/> Monday</li>
+                    <li><input type="checkbox" class="day_picker_list_item" id="tuesday_dropdown_checkbox"/> Tuesday</li>
+                    <li><input type="checkbox" class="day_picker_list_item" id="wednesday_dropdown_checkbox"/> Wednesday</li>
+                    <li><input type="checkbox" class="day_picker_list_item" id="thursday_dropdown_checkbox"/> Thursday</li>
+                    <li><input type="checkbox" class="day_picker_list_item" id="friday_dropdown_checkbox"/> Friday</li>
+                    <li><input type="checkbox" class="day_picker_list_item" id="saturday_dropdown_checkbox"/> Saturday</li>
+                    <li><input type="checkbox" class="day_picker_list_item" id="sunday_dropdown_checkbox"/> Sunday</li>
+                </ul>
+            </div>
         </div>
 
         <div id="time_of_day_div">

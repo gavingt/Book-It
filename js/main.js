@@ -2,8 +2,9 @@
 //TODO: use other properties from initial setup wizard
 
 //TODO: minify all scripts
-//TODO: closing modal should close daypicker
 //TODO: closing modal at initial setup should reload page?
+
+//TODO: session name should be prompted for first and have the whole modal to itself
 
 
 
@@ -1019,7 +1020,6 @@ function initializeDayPicker() {
         $('.wickedpicker').hide();
         e.stopPropagation();  //clicks within the dropdown will prevent click events from bubbling up any further
     });
-
 }
 
 
@@ -1053,7 +1053,7 @@ function buildDaypickerTitle (items, dropdownTitle) {
             dropdownTitle.textContent = dropdownTitle.textContent + " Su";
         }
         if (dropdownTitle.textContent === "") {
-            dropdownTitle.textContent = "Select days class is held";
+            dropdownTitle.textContent = "\xa0";
         }
     }
 

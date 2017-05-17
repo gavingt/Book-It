@@ -126,7 +126,6 @@ body.modal {
 
 input {
     border: 1px solid #999999;
-    border: 1px solid #999999;
 }
 
 
@@ -152,7 +151,7 @@ input {
     right: 112px;
 }
 
-#dummy_text {
+#dummy_text_fa, #dummy_text_arrows {
     position: absolute;
     right: 110%;
 }
@@ -296,7 +295,7 @@ input {
     border: 1px solid black;
     position: relative;
     background-color: white;
-    width: 385px;
+    width: 350px;
     max-width: 98%;
     height: 400px;
 }
@@ -328,19 +327,26 @@ input {
     cursor: pointer;
 }
 
+#add_class_instructions {
+    margin: 0 8px;
+    font-size: 11pt;
+    text-align: center;
+}
+
 .modal-labels {
     float: left;
-    width: 38%;
+    width: 33%;
 }
 
 .modal-labels div {
     height: 45px;
-    margin-left: 9px;
+    margin-left: 8px;
+    font-size: 13pt;
 }
 
 .modal-inputs {
     float: left;
-    width: 62%;
+    width: 67%;
 }
 
 .modal-inputs > * {
@@ -452,18 +458,14 @@ input[type=checkbox] {
 
 }
 
-input[type="color"] {
-    -webkit-appearance: none;
-    border: 2px solid #999999;
-    width: 84px;
 
+.color-div {
+    width: 25px;
+    display: inline-block;
+    border: 1px solid #acacac;
 }
-input[type="color"]::-webkit-color-swatch-wrapper {
-    padding: 0;
-}
-input[type="color"]::-webkit-color-swatch {
-    border: none;
-}
+
+
 
 #submit_button_initial_setup_wizard {
     padding: 3px 6px;

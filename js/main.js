@@ -2,7 +2,7 @@
 //TODO: use other properties from initial setup wizard
 
 //TODO: minify all scripts
-//TODO: closing modal at initial setup should reload page?
+//TODO: don't allow user to close modal upon first load
 
 //TODO: session name should be prompted for first and have the whole modal to itself
 
@@ -770,8 +770,12 @@ function preloadImagesAndText() {
     image5.src = "img/settings_black.png";
 
     //These lines eliminate Flash of Invisible Text (FOIT) as Font Awesome plus sign loads in.
-    document.getElementById('dummy_text').className = "fa fa-plus";
-    document.getElementById('dummy_text').style.visibility = "hidden";
+    document.getElementById('dummy_text_fa').className = "fa fa-plus";
+    document.getElementById('dummy_text_fa').style.visibility = "hidden";
+
+    //These lines eliminate Flash of Invisible Text (FOIT) as timepicker arrows load in.
+    document.getElementById('dummy_text_arrows').className = "wickedpicker__controls__control-up wickedpicker__controls__control-down";
+    document.getElementById('dummy_text_arrows').style.visibility = "hidden";
 }
 
 
@@ -1016,10 +1020,19 @@ function initializeDayPicker() {
         items.classList.remove('visible');
     });
 
-    $(".daypicker-dropdown").click(function(e){
+    $('.daypicker-dropdown').click(function(e){
         $('.wickedpicker').hide();
         e.stopPropagation();  //clicks within the dropdown will prevent click events from bubbling up any further
     });
+
+
+    $('.color-div').click(function() {
+        $('.color-div').css('outline', 'none');
+        $(this).css('outline', '3px solid dodgerblue');
+    });
+
+
+
 }
 
 

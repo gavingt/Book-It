@@ -91,18 +91,27 @@
             <span class="close">&times;</span>
         </div>
 
-        <div id="current_semester_prompt_div"></div>
+        <div id="current_session_prompt_div">
+            <div class="modal-instructions">Enter a name to identify your current school session, such as "Fall 2017".</div>
 
-        <div id="current_semester_input_wrapper">
-            <input id=current_semester_input placeholder='Session name' maxlength="20">
+            <div class="modal-labels">
+                <div>Session</div>
+            </div>
+
+            <div class="modal-inputs">
+                <div>
+                    <input id='current_session_input' maxlength="20">
+                </div>
+            </div>
+
+
+            <button id="continue_button_current_session">Continue</button>
         </div>
-
 
 
         <div id="add_class_prompt_div">
 
-            <div id="add_class_instructions">Fill out the fields below to add a new class.</div>
-            <br>
+            <div class="modal-instructions">Fill out the fields below to add a new class from your schedule. Choose the days of the week that the class is held, the time the class takes place, and a color that will be associated with this class.</div>
 
             <div class="modal-labels">
                     <div>Class name</div>
@@ -149,7 +158,10 @@
 
             </div>
 
-            <button id="submit_button_initial_setup_wizard">Submit</button>
+            <div id="add_class_prompt_buttons_div">
+                <button id="save_class_button">Save class</button>
+                <button id="cancel_class_button">Cancel</button>
+            </div>
 
         </div>
     </div>
@@ -169,7 +181,7 @@
 <div id="main_content_wrapper" hidden>
 
     <div id="week_switcher_wrapper">
-        <span id="current_semester_text">Spring 2017</span>
+        <span id="current_session_text">Spring 2017</span>
         <div id="week_switcher_div">
             <span id="current_week_text">current week</span>
             <button id="previous_week_button" class="week_switcher_buttons" disabled><img id="previous_week_button_image" src="img/left_arrow.png"></button>

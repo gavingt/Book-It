@@ -101,7 +101,7 @@
             if (typeof this.options.beforeShow === 'function') {
                 this.options.beforeShow(element, this.timepicker);
             }
-            var timepickerPos = $(element).offset();
+            var timepickerPos = $(element);
 
             $(element).attr({'aria-showingpicker': 'true'});
             this.setText(element);
@@ -125,9 +125,9 @@
             }
             this.timepicker.css({
                 'z-index': 1050,
-                position: 'fixed',
-                left: timepickerPos.left - 17,
-                top: timepickerPos.top + $(element)[0].offsetHeight
+                position: 'absolute',
+                left: timepickerPos.position().left - 17,
+                top: timepickerPos.position().top + $(element)[0].offsetHeight
             }).show();
             //If there is a show function, then call it with the input calling the timepicker and the
             // timepicker itself
@@ -169,7 +169,7 @@
                     picker += '<li class="wickedpicker__controls__control--separator"><span class="wickedpicker__controls__control--separator-inner">:</span></li><li class="wickedpicker__controls__control"><span class="' + this.options.upArrow + '"></span><span class="wickedpicker__controls__control--seconds">00</span><span class="' + this.options.downArrow + '"></span> </li>';
                 }
                 picker += '<li class="wickedpicker__controls__control"><span class="' + this.options.upArrow + '"></span><span class="wickedpicker__controls__control--meridiem">AM</span><span class="' + this.options.downArrow + '"></span></li></ul></div>';
-                $('body').append(picker);
+                $('#add_class_prompt_div').append(picker);
 
                 this.attachKeyboardEvents();
             }

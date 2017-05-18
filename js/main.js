@@ -49,7 +49,7 @@ else {
     document.getElementById("settings_div").style.right = "10px";
     document.getElementById("settings_button").style.width = "95%";
     document.getElementById("main_content_wrapper").style.marginTop = "0px";
-    document.getElementById("current_semester_text").style.display = "none";
+    document.getElementById("current_session_text").style.display = "none";
     document.getElementById("current_week_text").style.float = "left";
     document.getElementById("week_switcher_wrapper").appendChild(document.getElementById("current_week_text"));
 }
@@ -953,6 +953,8 @@ function setUpModalWizard () {
     // Get the modal
     var modal = document.getElementById('myModal');
 
+    var modalMainContent = document.getElementById('modal_main_content');
+
     // Get the button that opens the modal
     var btn = document.getElementById("myBtn");
 
@@ -965,17 +967,6 @@ function setUpModalWizard () {
         if ($(document).height() > $(window).height()) {
             var scrollTop = (html.scrollTop()) ? html.scrollTop() : $('body').scrollTop(); //prevents body scrolling when modal visible
             html.addClass('noscroll').css('top',-scrollTop);
-        }
-
-        var currentSemesterInput = document.getElementById("current_semester_input");
-        if (moment().month() <= 4) {
-            currentSemesterInput.value = "Spring " + moment().year();
-        }
-        else if(moment().month() <= 6) {
-            currentSemesterInput.value = "Summer " + moment().year();
-        }
-        else {
-            currentSemesterInput.value = "Fall " + moment().year();
         }
     };
 
@@ -996,6 +987,19 @@ function setUpModalWizard () {
             $('html,body').scrollTop(-scrollTop);
         }
     };
+
+    document.getElementById("continue_button_current_session").addEventListener('click', function () {
+        document.getElementById('current_session_prompt_div').style.display = "none";
+
+        document.getElementById('add_class_prompt_div').style.display = "block";
+        if ($(window).height() > 500) {
+            modalMainContent.style.top = "calc(50% - 235px)";
+        }
+        else {
+            modalMainContent.style.top = "5px";
+        }
+        modalMainContent.style.height = "470px";
+    });
 
     initializeDayPicker();
     initializeTimePickers();

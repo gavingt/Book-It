@@ -4,8 +4,8 @@
 //TODO: minify all scripts
 //TODO: don't allow user to close modal upon first load
 
-//TODO: session name should be prompted for first and have the whole modal to itself
-
+//TODO: add class location to modal!
+//TODO: fix tabbing for add_class_prompt_div
 
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
@@ -25,6 +25,8 @@ var name, email, photoUrl; // these will hold the name, email, and PhotoUrl prov
 var spinner = document.getElementById("spinner"); //progress spinner
 var lastCheckedForOverdueTasksDate = '1000000000001'; //Holds date of the last time we checked for overdue tasks. This gets updated every time the user pulls data from Firebase, so its initial value is basically meaningless.
 var fetchingPreviousWeek, fetchingNextWeek = false;
+var classScheduleData = []; //An array that holds the class schedule data that was input by the user in the modal. Each class is an object.
+var idOfColorElementSelected;
 
 // Initialize Firebase. This code should stay at the top of main.js
 var config = {
@@ -948,12 +950,13 @@ function initializeWeekSwitcherButtons() {
 
 function setUpModalWizard () {
 
+    var currentSessionText;
+    var currentSessionInput = document.getElementById('current_session_input');
+
     var html = $('html');
 
     // Get the modal
     var modal = document.getElementById('myModal');
-
-    var modalMainContent = document.getElementById('modal_main_content');
 
     // Get the button that opens the modal
     var btn = document.getElementById("myBtn");
@@ -988,21 +991,124 @@ function setUpModalWizard () {
         }
     };
 
-    document.getElementById("continue_button_current_session").addEventListener('click', function () {
-        document.getElementById('current_session_prompt_div').style.display = "none";
+    $('.color-div').click(function() {
+        $('.color-div').css('outline', 'none');
+        $(this).css('outline', '3px solid dodgerblue');
+        idOfColorElementSelected = $(this).attr('id'); //classColorSelected is the value that will be saved to the classScheduleData object when user hits Save class button
+    });
 
-        document.getElementById('add_class_prompt_div').style.display = "block";
-        if ($(window).height() > 500) {
-            modalMainContent.style.top = "calc(50% - 235px)";
+    //TODO: if user deletes a class, find the div with that color and unhide it
+
+    document.getElementById("continue_button_current_session").addEventListener('click', function () {
+        if (currentSessionInput.value.length === 0) {
+            document.getElementById('current_session_prompt_input_validation_text').style.visibility = "visible";
         }
         else {
-            modalMainContent.style.top = "5px";
+            classScheduleData[0] = currentSessionInput.value;
+            showAddClassPrompt();
         }
-        modalMainContent.style.height = "470px";
+    });
+
+    document.getElementById("save_class_button").addEventListener('click', function () {
+        if (document.getElementById('class_name_input').value.length === 0 || document.getElementById("day_picker_dropdown_title").textContent === " ") {
+            document.getElementById('add_class_prompt_input_validation_text').style.visibility = "visible";
+        }
+        else {
+            classScheduleData[classScheduleData.length] = {
+                   className: document.getElementById('class_name_input').value,
+                   classDays: document.getElementById("day_picker_dropdown_title").textContent,
+                   classTime: $('.beginning-timepicker').wickedpicker('time') + " - " + $('.ending-timepicker').wickedpicker('time'),
+                   idOfColorElementSelected: idOfColorElementSelected
+            };
+
+            //TODO: here's how to get background color from idOfColorElementSelected
+            //document.getElementById(idOfColorElementSelected).style.backgroundColor
+
+            document.getElementById('class_name_input').value = "";
+            document.getElementById("day_picker_dropdown_title").textContent = " ";
+            $(':checkbox').prop('checked', false); //unchecks all checkboxes in daypicker dropdown
+            document.getElementById(idOfColorElementSelected).style.display = "none";
+
+            showClassSummary();
+        }
+    });
+
+    document.getElementById("cancel_class_button").addEventListener('click', function () {
+        showClassSummary();
+    });
+
+    document.getElementById("add_class_button").addEventListener('click', function () {
+        document.getElementById('add_class_prompt_input_validation_text').style.visibility = "hidden";
+        showAddClassPrompt();
     });
 
     initializeDayPicker();
     initializeTimePickers();
+}
+
+
+
+function showAddClassPrompt() {
+    var modalMainContent = document.getElementById('modal_main_content');
+    document.getElementById('current_session_prompt_div').style.display = "none";
+    document.getElementById('add_class_prompt_div').style.display = "block";
+    document.getElementById('class_summary_div').style.display = "none";
+
+    if ($(window).height() > 500) {
+        modalMainContent.style.top = "calc(50% - 235px)";
+    }
+    else {
+        modalMainContent.style.top = "5px";
+    }
+    modalMainContent.style.height = "500px";
+
+
+    var firstVisibleColorDiv =  $('.color-div:visible:first');
+    firstVisibleColorDiv.css('outline', '3px solid dodgerblue'); //find first visible color-div and outline it
+    idOfColorElementSelected = firstVisibleColorDiv.attr('id'); //classColorSelected is the value that will be saved to the classScheduleData object when user hits Save class button
+}
+
+
+
+function showClassSummary() {
+    var modalMainContent = document.getElementById('modal_main_content');
+    var classSummaryDiv = document.getElementById('class_summary_div');
+    classSummaryDiv.style.display = "block";
+    document.getElementById('add_class_prompt_div').style.display = "none";
+
+    if ($(window).height() > 500) {
+        modalMainContent.style.top = "calc(50% - 235px)";
+    }
+    else {
+        modalMainContent.style.top = "5px";
+    }
+    modalMainContent.style.height = "470px";
+
+    console.log(classSummaryDiv.child);
+
+    $('.class-summary-row').remove();
+
+    for (var i=1; i<classScheduleData.length; i++) {
+        var classSummaryRow = document.createElement('div');
+        classSummaryRow.className = "class-summary-row";
+
+        var classNameSummary = document.createElement('span');
+        classNameSummary.textContent = classScheduleData[i].className;
+        classSummaryRow.appendChild(classNameSummary);
+
+        var classDaysSummary = document.createElement('span');
+        classDaysSummary.textContent = classScheduleData[i].classDays;
+        classSummaryRow.appendChild(classDaysSummary);
+
+        var classTimeSummary = document.createElement('span');
+        classTimeSummary.textContent = classScheduleData[i].classTime;
+        classSummaryRow.appendChild(classTimeSummary);
+
+
+
+
+        classSummaryDiv.insertBefore(classSummaryRow, classSummaryDiv.lastElementChild);
+    }
 }
 
 
@@ -1028,15 +1134,6 @@ function initializeDayPicker() {
         $('.wickedpicker').hide();
         e.stopPropagation();  //clicks within the dropdown will prevent click events from bubbling up any further
     });
-
-
-    $('.color-div').click(function() {
-        $('.color-div').css('outline', 'none');
-        $(this).css('outline', '3px solid dodgerblue');
-    });
-
-
-
 }
 
 

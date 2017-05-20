@@ -100,12 +100,14 @@
 
             <div class="modal-inputs">
                 <div>
-                    <input id='current_session_input' maxlength="20">
+                    <input id='current_session_input' maxlength="20" required>
                 </div>
             </div>
 
-
-            <button id="continue_button_current_session">Continue</button>
+            <div id="current_sesion_prompt_button_div">
+                <div id="current_session_prompt_input_validation_text" class="input-validation-text">Please fill out all fields</div>
+                <button id="continue_button_current_session">Continue</button>
+            </div>
         </div>
 
 
@@ -117,7 +119,7 @@
                     <div>Class name</div>
                     <div>Days</div>
                     <div>Time</div>
-                    <div>Color</div>
+                    <div style="margin-top: 17px">Color</div>
             </div>
 
             <div class="modal-inputs">
@@ -150,23 +152,40 @@
                     <div id="color_div_1" class="color-div" style="background-color:lightblue;">&nbsp;</div>
                     <div id="color_div_2" class="color-div" style="background-color:#FFA197;">&nbsp;</div>
                     <div id="color_div_3" class="color-div" style="background-color:rgba(152,251,152,0.76);">&nbsp;</div>
-                    <div id="color_div_4" class="color-div" style="background-color:rgba(244,164,96,0.6);">&nbsp;</div>
                     <div id="color_div_5" class="color-div" style="background-color:rgba(218,165,32,0.55);">&nbsp;</div>
                     <div id="color_div_6" class="color-div" style="background-color:rgba(221,160,221,0.57);">&nbsp;</div>
                     <div id="color_div_7" class="color-div" style="background-color:rgba(68,68,68,0.09);">&nbsp;</div>
+                    <div style="margin-top: 5px"></div>
+                    <div id="color_div_8" class="color-div" style="background-color:paleturquoise;">&nbsp;</div>
+                    <div id="color_div_9" class="color-div" style="background-color:tomato;">&nbsp;</div>
+                    <div id="color_div_10" class="color-div" style="background-color:rgba(65,178,133,0.62);">&nbsp;</div>
+                    <div id="color_div 11" class="color-div" style="background-color:lemonchiffon;">&nbsp;</div>
+                    <div id="color_div_13" class="color-div" style="background-color:seashell;">&nbsp;</div>
+                    <div id="color_div_14" class="color-div" style="background-color:#d3d3d3;">&nbsp;</div>
                 </div>
 
             </div>
 
             <div id="add_class_prompt_buttons_div">
+                <div id="add_class_prompt_input_validation_text" class="input-validation-text">Please fill out all fields</div>
                 <button id="save_class_button">Save class</button>
                 <button id="cancel_class_button">Cancel</button>
             </div>
 
         </div>
+
+        <div id="class_summary_div">
+            <div id="current_session_summary_text">Spring 2017</div>
+            <!--class summaries go here -->
+
+            <button id="add_class_button">Add a class</button>
+        </div>
+
     </div>
 
 </div>
+
+
 
 
 

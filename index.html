@@ -100,7 +100,7 @@
 
             <div class="modal-inputs">
                 <div>
-                    <input id='current_session_input' maxlength="20" required>
+                    <input id='current_session_input' maxlength="20">
                 </div>
             </div>
 
@@ -113,10 +113,11 @@
 
         <div id="add_class_prompt_div">
 
-            <div class="modal-instructions">Fill out the fields below to add a new class from your schedule. Choose the days of the week that the class is held, the time the class takes place, and a color that will be associated with this class.</div>
+            <div class="modal-instructions">Fill out the fields below to add a new class from your schedule. Choose the days, location, and time for the class, as well as a color that will be associated with the class.</div>
 
             <div class="modal-labels">
                     <div>Class name</div>
+                    <div>Location</div>
                     <div>Days</div>
                     <div>Time</div>
                     <div style="margin-top: 17px">Color</div>
@@ -125,7 +126,11 @@
             <div class="modal-inputs">
 
                 <div>
-                    <input id="class_name_input" maxlength="35">
+                    <input id="class_name_input" maxlength="28">
+                </div>
+
+                <div>
+                    <input id="class_location_input" maxlength="28">
                 </div>
 
                 <div id="daypicker_dropdown" class="daypicker-dropdown">
@@ -171,7 +176,6 @@
                 <button id="save_class_button">Save class</button>
                 <button id="cancel_class_button">Cancel</button>
             </div>
-
         </div>
 
         <div id="class_summary_div">

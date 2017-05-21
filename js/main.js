@@ -1010,12 +1010,15 @@ function setUpModalWizard () {
     });
 
     document.getElementById("save_class_button").addEventListener('click', function () {
-        if (document.getElementById('class_name_input').value.length === 0 || document.getElementById("day_picker_dropdown_title").textContent === " ") {
+        if (document.getElementById('class_name_input').value.length === 0 ||
+            document.getElementById("day_picker_dropdown_title").textContent === " " ||
+            document.getElementById('class_location_input').value.length === 0 ) {
             document.getElementById('add_class_prompt_input_validation_text').style.visibility = "visible";
         }
         else {
             classScheduleData[classScheduleData.length] = {
                    className: document.getElementById('class_name_input').value,
+                   classLocation: document.getElementById('class_location_input').value,
                    classDays: document.getElementById("day_picker_dropdown_title").textContent,
                    classTime: $('.beginning-timepicker').wickedpicker('time') + " - " + $('.ending-timepicker').wickedpicker('time'),
                    idOfColorElementSelected: idOfColorElementSelected
@@ -1084,23 +1087,38 @@ function showClassSummary() {
     }
     modalMainContent.style.height = "470px";
 
-    console.log(classSummaryDiv.child);
-
-    $('.class-summary-row').remove();
+    $('.class-summary-row').remove(); //remove any existing class-summary-rows from DOM, since we're repopulating them every time
 
     for (var i=1; i<classScheduleData.length; i++) {
         var classSummaryRow = document.createElement('div');
         classSummaryRow.className = "class-summary-row";
 
-        var classNameSummary = document.createElement('span');
+        var classNameSummary = document.createElement('div');
+        classNameSummary.className = "class-summary-name";
         classNameSummary.textContent = classScheduleData[i].className;
         classSummaryRow.appendChild(classNameSummary);
 
-        var classDaysSummary = document.createElement('span');
+        var expandSummaryDetailsImage = document.createElement("img");
+        expandSummaryDetailsImage.src = "img/expand_summary_details.png";
+        expandSummaryDetailsImage.className = "expand-summary-details-image";
+        classSummaryRow.appendChild(expandSummaryDetailsImage);
+
+        expandSummaryDetailsImage.addEventListener('click', function() {
+           $(this).siblings('.class-summary-details').css('display', 'block');
+        });
+
+        var classLocationSummary = document.createElement('div');
+        classLocationSummary.className = "class-summary-details";
+        classLocationSummary.textContent = classScheduleData[i].classLocation;
+        classSummaryRow.appendChild(classLocationSummary);
+
+        var classDaysSummary = document.createElement('div');
+        classDaysSummary.className = "class-summary-details";
         classDaysSummary.textContent = classScheduleData[i].classDays;
         classSummaryRow.appendChild(classDaysSummary);
 
-        var classTimeSummary = document.createElement('span');
+        var classTimeSummary = document.createElement('div');
+        classTimeSummary.className = "class-summary-details";
         classTimeSummary.textContent = classScheduleData[i].classTime;
         classSummaryRow.appendChild(classTimeSummary);
 

@@ -955,6 +955,16 @@ function setUpModalWizard () {
 
     var html = $('html');
 
+    var image6 = new Image();
+    image6.src = "img/expand_summary_details.png";
+
+    var image7 = new Image();
+    image7.src = "img/collapse_summary_details.png";
+
+    var image8 = new Image();
+    image8.src = "img/class_delete_summary.png";
+
+
     // Get the modal
     var modal = document.getElementById('myModal');
 
@@ -1056,6 +1066,7 @@ function showAddClassPrompt() {
     document.getElementById('current_session_prompt_div').style.display = "none";
     document.getElementById('add_class_prompt_div').style.display = "block";
     document.getElementById('class_summary_div').style.display = "none";
+    document.getElementById('class_summary_button_div').style.display = "none";
 
     if ($(window).height() > 500) {
         modalMainContent.style.top = "calc(50% - 235px)";
@@ -1075,6 +1086,7 @@ function showAddClassPrompt() {
 
 function showClassSummary() {
     var modalMainContent = document.getElementById('modal_main_content');
+    document.getElementById('class_summary_button_div').style.display = "block";
     var classSummaryDiv = document.getElementById('class_summary_div');
     classSummaryDiv.style.display = "block";
     document.getElementById('add_class_prompt_div').style.display = "none";
@@ -1143,28 +1155,53 @@ function showClassSummary() {
         classDeleteSummary.src = "img/class_delete_summary.png";
         classSummaryRow.appendChild(classDeleteSummary);
 
-        classSummaryDiv.insertBefore(classSummaryRow, classSummaryDiv.lastElementChild);
+        classSummaryDiv.appendChild(classSummaryRow);
     }
 }
 
-$("input[type='checkbox']").click(function() {
-    alert("you click one of the listed checkbox?");
-});
+
 
 function initializeDayPicker() {
-    var dropdownTitle = document.getElementById("day_picker_dropdown_title");
     var checkList = document.getElementById('daypicker_dropdown');
     var items = document.getElementById('day_picker_items');
+
     checkList.getElementsByClassName('anchor')[0].onclick = function() {
-        buildDaypickerTitle(items, dropdownTitle);
+        if (items.classList.contains('visible')) {
+            items.classList.remove('visible');
+            items.style.display = "none";
+        }
+        else {
+            items.classList.add('visible');
+            items.style.display = "block";
+        }
     };
+
+
+    $(':checkbox').click(function(e) {
+        e.stopPropagation();
+    });
+
+    $('.day_picker_list_item').click(function() {
+       var currentCheckbox = $(this).find(">:first-child");
+
+       if (!currentCheckbox.prop('checked')) {
+           currentCheckbox.prop('checked', true);
+       }
+       else {
+           currentCheckbox.prop('checked', false);
+       }
+       buildDaypickerTitle();
+    });
+
+    $("input[type='checkbox']").click(function() {
+        buildDaypickerTitle();
+    });
 
     items.onblur = function(evt) {
         items.classList.remove('visible');
     };
 
     $(document).click(function(){
-        buildDaypickerTitle(items, dropdownTitle);
         $(".day-picker-items").hide();
         items.classList.remove('visible');
     });
@@ -1177,42 +1214,33 @@ function initializeDayPicker() {
 
 
 
-function buildDaypickerTitle (items, dropdownTitle) {
-    if (items.classList.contains('visible')){
-        items.classList.remove('visible');
-        items.style.display = "none";
+function buildDaypickerTitle () {
+    var dropdownTitle = document.getElementById("day_picker_dropdown_title");
+    dropdownTitle.textContent = "";
 
-        dropdownTitle.textContent = "";
-
-        if (document.getElementById("monday_dropdown_checkbox").checked) {
-            dropdownTitle.textContent = "M";
-        }
-        if (document.getElementById("tuesday_dropdown_checkbox").checked) {
-            dropdownTitle.textContent = dropdownTitle.textContent + " Tu";
-        }
-        if (document.getElementById("wednesday_dropdown_checkbox").checked) {
-            dropdownTitle.textContent = dropdownTitle.textContent + " W";
-        }
-        if (document.getElementById("thursday_dropdown_checkbox").checked) {
-            dropdownTitle.textContent = dropdownTitle.textContent + " Th";
-        }
-        if (document.getElementById("friday_dropdown_checkbox").checked) {
-            dropdownTitle.textContent = dropdownTitle.textContent + " F";
-        }
-        if (document.getElementById("saturday_dropdown_checkbox").checked) {
-            dropdownTitle.textContent = dropdownTitle.textContent + " Sa";
-        }
-        if (document.getElementById("sunday_dropdown_checkbox").checked) {
-            dropdownTitle.textContent = dropdownTitle.textContent + " Su";
-        }
-        if (dropdownTitle.textContent === "") {
-            dropdownTitle.textContent = "\xa0";
-        }
+    if (document.getElementById("monday_dropdown_checkbox").checked) {
+        dropdownTitle.textContent = "M";
     }
-
-    else{
-        items.classList.add('visible');
-        items.style.display = "block";
+    if (document.getElementById("tuesday_dropdown_checkbox").checked) {
+        dropdownTitle.textContent = dropdownTitle.textContent + " Tu";
+    }
+    if (document.getElementById("wednesday_dropdown_checkbox").checked) {
+        dropdownTitle.textContent = dropdownTitle.textContent + " W";
+    }
+    if (document.getElementById("thursday_dropdown_checkbox").checked) {
+        dropdownTitle.textContent = dropdownTitle.textContent + " Th";
+    }
+    if (document.getElementById("friday_dropdown_checkbox").checked) {
+        dropdownTitle.textContent = dropdownTitle.textContent + " F";
+    }
+    if (document.getElementById("saturday_dropdown_checkbox").checked) {
+        dropdownTitle.textContent = dropdownTitle.textContent + " Sa";
+    }
+    if (document.getElementById("sunday_dropdown_checkbox").checked) {
+        dropdownTitle.textContent = dropdownTitle.textContent + " Su";
+    }
+    if (dropdownTitle.textContent === "") {
+        dropdownTitle.textContent = "\xa0";
     }
 }
 

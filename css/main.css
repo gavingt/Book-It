@@ -282,6 +282,10 @@ input {
 Start modal CSS
 */
 
+body.modal-open {  /*prevents body from scrolling when modal is open*/
+    overflow: hidden;
+    position: fixed;
+}
 
 .input-validation-text {
     color: red;
@@ -381,7 +385,7 @@ Start modal CSS
 }
 
 #current_sesion_prompt_button_div {
-    margin: 40px auto;
+    margin: 90px auto 0 auto;
 }
 
 #continue_button_current_session {
@@ -428,13 +432,19 @@ Start modal CSS
     background-color: white;
     border: 1px solid;
     padding-left: 10px;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 input[type=checkbox] {
     zoom: 1.5;
 }
 
-.day_picker_list_item {
+.day_picker_list_item_text {
     vertical-align: text-bottom;
 }
 
@@ -501,6 +511,12 @@ input[type=checkbox] {
 
 #class_summary_div {
     margin: 5px auto 0 auto;
+    height: 80%;
+    overflow-y: auto;
+}
+
+#current_session_summary_text {
+    text-align: center;
 }
 
 .class-summary-details {
@@ -536,6 +552,13 @@ input[type=checkbox] {
     font-size: 13pt;
 }
 
+
+#class_summary_button_div {
+    margin: 0 auto;
+    height: 10%;
+    display: none;
+    text-align: center ;
+}
 
 /*
 End modal CSS

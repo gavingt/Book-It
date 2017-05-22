@@ -314,6 +314,7 @@ Start modal CSS
     width: 350px;
     max-width: 98%;
     height: 260px;
+    overflow-y: auto;
 }
 
 #modal_header {
@@ -380,7 +381,7 @@ Start modal CSS
 }
 
 #current_sesion_prompt_button_div {
-    margin: 85px auto;
+    margin: 40px auto;
 }
 
 #continue_button_current_session {
@@ -513,6 +514,11 @@ input[type=checkbox] {
 .expand-summary-details-image {
     float: right;
     width: 30px;
+}
+
+#class_delete_summary {
+    float: right;
+    bottom: 5px;
 }
 
 .class-summary-row {

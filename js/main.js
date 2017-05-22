@@ -1104,7 +1104,17 @@ function showClassSummary() {
         classSummaryRow.appendChild(expandSummaryDetailsImage);
 
         expandSummaryDetailsImage.addEventListener('click', function() {
-           $(this).siblings('.class-summary-details').css('display', 'block');
+
+            //TODO: instead of using toggle(), toggle a class which contains display: inline-block property. This will make trash can not take up its own line
+
+           $(this).siblings('.class-summary-details').toggle();
+           if ($(this).siblings('.class-summary-details').css('display') === "block") {
+               expandSummaryDetailsImage.src = "img/collapse_summary_details.png";
+           }
+           else {
+               expandSummaryDetailsImage.src = "img/expand_summary_details.png";
+           }
+
         });
 
         var classLocationSummary = document.createElement('div');
@@ -1122,13 +1132,24 @@ function showClassSummary() {
         classTimeSummary.textContent = classScheduleData[i].classTime;
         classSummaryRow.appendChild(classTimeSummary);
 
+        var classColorSummary = document.createElement('div');
+        classColorSummary.className = "class-summary-details";
+        classColorSummary.textContent = " ";
+        classSummaryRow.appendChild(classColorSummary);
 
-
+        var classDeleteSummary = document.createElement('img');
+        classDeleteSummary.className = "class-summary-details";
+        classDeleteSummary.id = "class_delete_summary";
+        classDeleteSummary.src = "img/class_delete_summary.png";
+        classSummaryRow.appendChild(classDeleteSummary);
 
         classSummaryDiv.insertBefore(classSummaryRow, classSummaryDiv.lastElementChild);
     }
 }
 
+$("input[type='checkbox']").click(function() {
+    alert("you click one of the listed checkbox?");
+});
 
 function initializeDayPicker() {
     var dropdownTitle = document.getElementById("day_picker_dropdown_title");

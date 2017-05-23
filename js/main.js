@@ -4,6 +4,7 @@
 //TODO: minify all scripts
 //TODO: don't allow user to close modal upon first load
 
+//TODO: remove all traces of initial_setup_wizar
 //TODO: fix tabbing for add_class_prompt_div
 
 
@@ -498,24 +499,31 @@ function readClassData() {
         }
     ));
 
-
     //Fetch class data
     firebase.database().ref('/users/' + userId + "/classes").once('value', (function (snapshot) {
             if (snapshot.val() !== null) {   // if there are no tasks for the day it'll return null and we move onto the next day
-                classJsonArray = snapshot.val(); //Store entire "classes" JSON object from Firebase as classJsonArray.
+                classScheduleData = snapshot.val(); //Store entire "classes" JSON object from Firebase as classScheduleData.
                 for (var i = 0; i < 8; i++) {
 
-                    for (var j = 0; j < classJsonArray.length; j++) {
-                        var classDiv = createClassDiv(classJsonArray[j].classColor, classJsonArray[j].classTime, classJsonArray[j].classLocation, classJsonArray[j].className, classJsonArray[j].classTime, i, j);
-                        dayDivArray[i].append(classDiv);
+                    for (var j = 0; j < classScheduleData.length; j++) {
+                        if (j===0) {
+                            document.getElementById("current_session_text").textContent = classScheduleData[0];
+                        }
+                        else {
+                            var classDiv = createClassDiv(document.getElementById(classScheduleData[j].idOfColorElementSelected).style.backgroundColor, classScheduleData[j].classTime, classScheduleData[j].classLocation, classScheduleData[j].className, classScheduleData[j].classTime, i, j-1);
+                            dayDivArray[i].append(classDiv);
+                        }
                     }
                 }
                 readTaskData(); //If user has pre-existing class data, execute readTaskData() after reading class data
             }
             else {
-                document.getElementById("initial_setup_wizard_div").style.display = "block"; //If no class data is saved, show initial setup wizard
+                //document.getElementById("initial_setup_wizard_div").style.display = "block"; //If no class data is saved, show initial setup wizard
+                var modal = document.getElementById('myModal');
+                modal.style.display = "block";
                 document.getElementById("main_content_wrapper").style.display = "none";
                 spinner.style.display = "none";
+
             }
         }
     ));
@@ -978,10 +986,10 @@ function setUpModalWizard () {
     // When the user clicks on the button, open the modal
     btn.onclick = function() {
         modal.style.display = "block";
-        if ($(document).height() > $(window).height()) {
+/*        if ($(document).height() > $(window).height()) {
             var scrollTop = (html.scrollTop()) ? html.scrollTop() : $('body').scrollTop(); //prevents body scrolling when modal visible
             html.addClass('noscroll').css('top',-scrollTop);
-        }
+        }*/
     };
 
     // When the user clicks on <span> (x), close the modal
@@ -1059,8 +1067,13 @@ function setUpModalWizard () {
             document.getElementById('class_summary_input_validation_text').style.visibility = "visible";
         }
         else {
-            alert("save");
-            //TODO: write classScheduleData to Firebase and then reload page
+            var userId = firebase.auth().currentUser.uid;
+            firebase.database().ref('users/' + userId).update({lastCheckedForOverdueTasksDate: moment().startOf('day').format('x')}) ;
+
+            //write class data to Firebase
+            firebase.database().ref('users/' + userId + "/classes").set(classScheduleData).then(function() {
+                window.location.reload(); //Reload the page after user submits class data.
+            });
         }
     });
 

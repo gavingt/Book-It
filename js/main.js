@@ -15,7 +15,7 @@ var dayDivArray = new Array(8); //dayDivArray[] will hold the 7 dayDiv objects. 
 var addedTaskDivArray = new Array(8); //This will be an array of arrays that holds the addedTaskDiv objects for each day of the currently visible week
 var dayTaskJsonArray = new Array(8); //This will be an array of arrays that holds the JSON data for the tasks of each day of the currently visible week
 var classDivArray = []; //This will be an array of arrays that stores the classDivs inside each dayDiv.
-var classJsonArray = []; //Stores the JSON data for each class the user added in the initial setup wizard.
+//var classJsonArray = []; //Stores the JSON data for each class the user added in the initial setup wizard.
 var snackbarTimeoutId;  //Stores the timeout ID associated with the timeout function used for the snackbar.
 var snackbar = document.getElementById("snackbar"); //gets a reference to the snackbar div
 var todaysDateIndex; //Stores a number from 0-6, corresponding to the 7 days Sunday through Saturday, indicating which day of the week is today. For instance, if today is Sunday it equals 0, and if it's Tuesday it equals 2.
@@ -38,7 +38,6 @@ var config = {
 };
 firebase.initializeApp(config);
 
-//preloadImagesAndText();
 initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
 setUpModalWizard();
 
@@ -435,22 +434,18 @@ function resetDomElements() {
 
 //edit existing task in database
 function editTaskData(taskClassIndex, taskText, dayIndex, taskIndex) {
-
     dayTaskJsonArray[dayIndex][taskIndex] = {
         taskClassIndex: taskClassIndex,
         taskText: taskText
     };
-
     var userId = firebase.auth().currentUser.uid;
     firebase.database().ref('users/' + userId + "/tasks/" + currentlyActiveWeekDates[dayIndex] + "/" + taskIndex).set(dayTaskJsonArray[dayIndex][taskIndex]); //write edited task data
-
 }
 
 
 
 //remove existing task in database
 function removeTaskData(dayIndex, taskIndex) {
-
     dayTaskJsonArray[dayIndex].splice(taskIndex,1);
     var userId = firebase.auth().currentUser.uid;
     firebase.database().ref('users/' + userId + "/tasks/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]); //saves a given day's tasks with the completed task removed
@@ -461,12 +456,9 @@ function removeTaskData(dayIndex, taskIndex) {
 
 //write a task back into the database if it was marked complete and then the UNDO button in snackbar was pressed
 function undoRemoveTaskData(completedTaskJson, taskIndex, dayIndex) {
-
-
     dayTaskJsonArray[dayIndex].splice(taskIndex, 0, completedTaskJson);
 
     var userId = firebase.auth().currentUser.uid;
-
     firebase.database().ref('users/' + userId + "/tasks/" + currentlyActiveWeekDates[dayIndex]).set(dayTaskJsonArray[dayIndex]); //write deleted task back into Firebase
 
     hideOrShowOverdueClassDivs();
@@ -518,12 +510,9 @@ function readClassData() {
                 readTaskData(); //If user has pre-existing class data, execute readTaskData() after reading class data
             }
             else {
-                //document.getElementById("initial_setup_wizard_div").style.display = "block"; //If no class data is saved, show initial setup wizard
-                var modal = document.getElementById('myModal');
-                modal.style.display = "block";
+                document.getElementById('myModal').style.display = "block";
                 document.getElementById("main_content_wrapper").style.display = "none";
                 spinner.style.display = "none";
-
             }
         }
     ));

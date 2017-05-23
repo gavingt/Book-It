@@ -3,10 +3,9 @@
 
 //TODO: minify all scripts
 //TODO: don't allow user to close modal upon first load
-
-//TODO: remove all traces of initial_setup_wizar
 //TODO: fix tabbing for add_class_prompt_div
 
+//TODO: make class divs only appear on days when that class is in session
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
 var googleProvider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization
@@ -15,7 +14,6 @@ var dayDivArray = new Array(8); //dayDivArray[] will hold the 7 dayDiv objects. 
 var addedTaskDivArray = new Array(8); //This will be an array of arrays that holds the addedTaskDiv objects for each day of the currently visible week
 var dayTaskJsonArray = new Array(8); //This will be an array of arrays that holds the JSON data for the tasks of each day of the currently visible week
 var classDivArray = []; //This will be an array of arrays that stores the classDivs inside each dayDiv.
-//var classJsonArray = []; //Stores the JSON data for each class the user added in the initial setup wizard.
 var snackbarTimeoutId;  //Stores the timeout ID associated with the timeout function used for the snackbar.
 var snackbar = document.getElementById("snackbar"); //gets a reference to the snackbar div
 var todaysDateIndex; //Stores a number from 0-6, corresponding to the 7 days Sunday through Saturday, indicating which day of the week is today. For instance, if today is Sunday it equals 0, and if it's Tuesday it equals 2.
@@ -510,7 +508,7 @@ function readClassData() {
                 readTaskData(); //If user has pre-existing class data, execute readTaskData() after reading class data
             }
             else {
-                document.getElementById('myModal').style.display = "block";
+                document.getElementById('class_modal').style.display = "block";
                 document.getElementById("main_content_wrapper").style.display = "none";
                 spinner.style.display = "none";
             }
@@ -659,45 +657,6 @@ document.getElementById("settings_item_sign_out").addEventListener("click", func
 
 
 
-
-//Write class data from initial setup wizard
-document.getElementById("wizard_submit_button").addEventListener("click", function() {
-
-    var classJsonObject = [
-        {
-            classColor: "lightblue",
-            classDays: "M W F",
-            classLocation: "Wexler Hall A119",
-            className: document.getElementById("wizard_class_1_input").value,
-            classTime: "6:00pm-7:15pm"
-        },
-        {
-            classColor: "#ffa197",
-            classDays: "Tu Th",
-            classLocation: "Physical Science Bldg. 112",
-            className: document.getElementById("wizard_class_2_input").value,
-            classTime: "5:00pm-7:00pm"
-        },
-        {
-            classColor: "palegreen",
-            classDays: "M W F",
-            classLocation: "Goldwater 334",
-            className: document.getElementById("wizard_class_3_input").value,
-            classTime: "7:45pm-8:30pm"
-        }
-    ];
-
-    var userId = firebase.auth().currentUser.uid;
-    firebase.database().ref('users/' + userId).update({lastCheckedForOverdueTasksDate: moment().startOf('day').format('x')}) ;
-
-    //write class data to Firebase
-    firebase.database().ref('users/' + userId + "/classes").set(classJsonObject).then(function() {
-        window.location.reload(); //Reload the page after user submits class data.
-    });
-});
-
-
-
 /************************************************************/
 /**********************END FIREBASE CODE*********************/
 /************************************************************/
@@ -786,12 +745,6 @@ function initialize2dArrays(bIncludeClassDivArray) {
 
 
 
-function preloadImagesAndText() {
-
-}
-
-
-
 
 function fetchingOtherWeeks() {
     var previousWeekButtonImage = document.getElementById("previous_week_button_image");
@@ -831,13 +784,13 @@ function initializeSettingsButton(bUserSignedIn) {
         if (bUserSignedIn) {
             settingsList.classList.toggle('show');
             document.getElementById('settings_item_profile_info').style.display = "block";
-            document.getElementById('settings_item_initial_setup_wizard').style.display = "block";
+            document.getElementById('settings_item_open_modal').style.display = "block";
             document.getElementById('settings_item_sign_out').style.display = "block";
         }
         else {
             settingsList.classList.toggle('show');
             document.getElementById('settings_item_profile_info').style.display = "none";
-            document.getElementById('settings_item_initial_setup_wizard').style.display = "none";
+            document.getElementById('settings_item_open_modal').style.display = "none";
             document.getElementById('settings_item_sign_out').style.display = "none";
         }
 
@@ -870,8 +823,8 @@ function initializeSettingsButton(bUserSignedIn) {
         }
     };
 
-    document.getElementById("settings_item_initial_setup_wizard").addEventListener("click", function () {
-        document.getElementById("initial_setup_wizard_div").style.display = "block";
+    document.getElementById("settings_item_open_modal").addEventListener("click", function () {
+        document.getElementById("class_modal").style.display = "block";
     });
 
     document.getElementById("settings_item_about_this_app").addEventListener("click", function () {
@@ -964,7 +917,7 @@ function setUpModalWizard () {
     var html = $('html');
 
     // Get the modal
-    var modal = document.getElementById('myModal');
+    var modal = document.getElementById('class_modal');
 
     // Get the button that opens the modal
     var btn = document.getElementById("myBtn");

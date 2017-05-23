@@ -4,7 +4,6 @@
 //TODO: minify all scripts
 //TODO: don't allow user to close modal upon first load
 
-//TODO: add class location to modal!
 //TODO: fix tabbing for add_class_prompt_div
 
 
@@ -38,9 +37,45 @@ var config = {
 };
 firebase.initializeApp(config);
 
-preloadImagesAndText();
+//preloadImagesAndText();
 initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
 setUpModalWizard();
+
+
+//The below lines force these images to be preloaded so that they they're ready when we need to display them.
+var image1 = new Image();
+image1.src = "img/checkbox_gray.png";
+
+var image2 = new Image();
+image2.src = "img/checkbox_black.png";
+
+var image3 = new Image();
+image3.src = "img/left_arrow_hover.png";
+
+var image4 = new Image();
+image4.src = "img/right_arrow_hover.png";
+
+var image5 = new Image();
+image5.src = "img/settings_black.png";
+
+var image6 = new Image();
+image6.src = "img/expand_summary_details.png";
+
+var image7 = new Image();
+image7.src = "img/collapse_summary_details.png";
+
+var image8 = new Image();
+image8.src = "img/class_delete_summary.png";
+
+//These lines eliminate Flash of Invisible Text (FOIT) as Font Awesome plus sign loads in.
+document.getElementById('dummy_text_fa').className = "fa fa-plus";
+document.getElementById('dummy_text_fa').style.visibility = "hidden";
+
+//These lines eliminate Flash of Invisible Text (FOIT) as timepicker arrows load in.
+document.getElementById('dummy_text_arrows').className = "wickedpicker__controls__control-up wickedpicker__controls__control-down";
+document.getElementById('dummy_text_arrows').style.visibility = "hidden";
+
+
 
 //Customize layout based on device size. We check both width and height because we have to account for both portrait and landscape mode.
 if (screen.width > 750 && screen.height > 750) {
@@ -755,29 +790,7 @@ function initialize2dArrays(bIncludeClassDivArray) {
 
 
 function preloadImagesAndText() {
-    //The below lines force these images to be preloaded so that they they're ready when we need to display them.
-    var image1 = new Image();
-    image1.src = "img/checkbox_gray.png";
 
-    var image2 = new Image();
-    image2.src = "img/checkbox_black.png";
-
-    var image3 = new Image();
-    image3.src = "img/left_arrow_hover.png";
-
-    var image4 = new Image();
-    image4.src = "img/right_arrow_hover.png";
-
-    var image5 = new Image();
-    image5.src = "img/settings_black.png";
-
-    //These lines eliminate Flash of Invisible Text (FOIT) as Font Awesome plus sign loads in.
-    document.getElementById('dummy_text_fa').className = "fa fa-plus";
-    document.getElementById('dummy_text_fa').style.visibility = "hidden";
-
-    //These lines eliminate Flash of Invisible Text (FOIT) as timepicker arrows load in.
-    document.getElementById('dummy_text_arrows').className = "wickedpicker__controls__control-up wickedpicker__controls__control-down";
-    document.getElementById('dummy_text_arrows').style.visibility = "hidden";
 }
 
 
@@ -949,21 +962,9 @@ function initializeWeekSwitcherButtons() {
 
 
 function setUpModalWizard () {
-
-    var currentSessionText;
     var currentSessionInput = document.getElementById('current_session_input');
 
     var html = $('html');
-
-    var image6 = new Image();
-    image6.src = "img/expand_summary_details.png";
-
-    var image7 = new Image();
-    image7.src = "img/collapse_summary_details.png";
-
-    var image8 = new Image();
-    image8.src = "img/class_delete_summary.png";
-
 
     // Get the modal
     var modal = document.getElementById('myModal');
@@ -1007,8 +1008,6 @@ function setUpModalWizard () {
         idOfColorElementSelected = $(this).attr('id'); //classColorSelected is the value that will be saved to the classScheduleData object when user hits Save class button
     });
 
-    //TODO: if user deletes a class, find the div with that color and unhide it
-
     document.getElementById("continue_button_current_session").addEventListener('click', function () {
         if (currentSessionInput.value.length === 0) {
             document.getElementById('current_session_prompt_input_validation_text').style.visibility = "visible";
@@ -1034,10 +1033,8 @@ function setUpModalWizard () {
                    idOfColorElementSelected: idOfColorElementSelected
             };
 
-            //TODO: here's how to get background color from idOfColorElementSelected
-            //document.getElementById(idOfColorElementSelected).style.backgroundColor
-
             document.getElementById('class_name_input').value = "";
+            document.getElementById('class_location_input').value = "";
             document.getElementById("day_picker_dropdown_title").textContent = " ";
             $(':checkbox').prop('checked', false); //unchecks all checkboxes in daypicker dropdown
             document.getElementById(idOfColorElementSelected).style.display = "none";
@@ -1052,7 +1049,19 @@ function setUpModalWizard () {
 
     document.getElementById("add_class_button").addEventListener('click', function () {
         document.getElementById('add_class_prompt_input_validation_text').style.visibility = "hidden";
+        document.getElementById('class_summary_input_validation_text').style.visibility = "hidden";
+
         showAddClassPrompt();
+    });
+
+    document.getElementById('save_and_finish_button').addEventListener('click', function() {
+        if (classScheduleData.length === 1) {
+            document.getElementById('class_summary_input_validation_text').style.visibility = "visible";
+        }
+        else {
+            alert("save");
+            //TODO: write classScheduleData to Firebase and then reload page
+        }
     });
 
     initializeDayPicker();
@@ -1067,6 +1076,7 @@ function showAddClassPrompt() {
     document.getElementById('add_class_prompt_div').style.display = "block";
     document.getElementById('class_summary_div').style.display = "none";
     document.getElementById('class_summary_button_div').style.display = "none";
+    document.getElementById('modal_header_text').textContent = "\xa0\xa0\xa0\xa0\xa0Add a class";
 
     if ($(window).height() > 500) {
         modalMainContent.style.top = "calc(50% - 235px)";
@@ -1089,6 +1099,7 @@ function showClassSummary() {
     document.getElementById('class_summary_button_div').style.display = "block";
     var classSummaryDiv = document.getElementById('class_summary_div');
     classSummaryDiv.style.display = "block";
+    document.getElementById('modal_header_text').textContent = "\xa0\xa0\xa0Class summary - " + classScheduleData[0];
     document.getElementById('add_class_prompt_div').style.display = "none";
 
     if ($(window).height() > 500) {
@@ -1102,64 +1113,62 @@ function showClassSummary() {
     $('.class-summary-row').remove(); //remove any existing class-summary-rows from DOM, since we're repopulating them every time
 
     for (var i=1; i<classScheduleData.length; i++) {
-        var classSummaryRow = document.createElement('div');
-        classSummaryRow.className = "class-summary-row";
+        (function (i) {   //Solves closure problem described here: http://stackoverflow.com/questions/13343340/calling-an-asynchronous-function-within-a-for-loop-in-javascript.
+            var classSummaryRow = document.createElement('div');
+            classSummaryRow.style.backgroundColor = document.getElementById(classScheduleData[i].idOfColorElementSelected).style.backgroundColor;
+            classSummaryRow.className = "class-summary-row";
 
-        var classNameSummary = document.createElement('div');
-        classNameSummary.className = "class-summary-name";
-        classNameSummary.textContent = classScheduleData[i].className;
-        classSummaryRow.appendChild(classNameSummary);
+            var classNameSummary = document.createElement('div');
+            classNameSummary.className = "class-summary-name";
+            classNameSummary.textContent = classScheduleData[i].className;
+            classSummaryRow.appendChild(classNameSummary);
 
-        var expandSummaryDetailsImage = document.createElement("img");
-        expandSummaryDetailsImage.src = "img/expand_summary_details.png";
-        expandSummaryDetailsImage.className = "expand-summary-details-image";
-        classSummaryRow.appendChild(expandSummaryDetailsImage);
+            var expandSummaryDetailsImage = document.createElement("img");
+            expandSummaryDetailsImage.src = "img/expand_summary_details.png";
+            expandSummaryDetailsImage.className = "expand-summary-details-image";
+            classSummaryRow.appendChild(expandSummaryDetailsImage);
 
-        expandSummaryDetailsImage.addEventListener('click', function() {
+            expandSummaryDetailsImage.addEventListener('click', function() {
+               $(this).siblings('.class-summary-details').toggle();
+               if ($(this).siblings('.class-summary-details').css('display') === "block") {
+                   expandSummaryDetailsImage.src = "img/collapse_summary_details.png";
+               }
+               else {
+                   expandSummaryDetailsImage.src = "img/expand_summary_details.png";
+               }
+            });
 
-            //TODO: instead of using toggle(), toggle a class which contains display: inline-block property. This will make trash can not take up its own line
+            var classLocationSummary = document.createElement('div');
+            classLocationSummary.className = "class-summary-details";
+            classLocationSummary.textContent = classScheduleData[i].classLocation;
+            classSummaryRow.appendChild(classLocationSummary);
 
-           $(this).siblings('.class-summary-details').toggle();
-           if ($(this).siblings('.class-summary-details').css('display') === "block") {
-               expandSummaryDetailsImage.src = "img/collapse_summary_details.png";
-           }
-           else {
-               expandSummaryDetailsImage.src = "img/expand_summary_details.png";
-           }
+            var classDaysSummary = document.createElement('div');
+            classDaysSummary.className = "class-summary-details";
+            classDaysSummary.textContent = classScheduleData[i].classDays;
+            classSummaryRow.appendChild(classDaysSummary);
 
-        });
+            var classTimeSummary = document.createElement('div');
+            classTimeSummary.className = "class-summary-details";
+            classTimeSummary.textContent = classScheduleData[i].classTime;
+            classSummaryRow.appendChild(classTimeSummary);
 
-        var classLocationSummary = document.createElement('div');
-        classLocationSummary.className = "class-summary-details";
-        classLocationSummary.textContent = classScheduleData[i].classLocation;
-        classSummaryRow.appendChild(classLocationSummary);
+            var classDeleteSummary = document.createElement('img');
+            classDeleteSummary.className = "class-summary-details";
+            classDeleteSummary.id = "class_delete_summary";
+            classDeleteSummary.src = "img/class_delete_summary.png";
+            classSummaryRow.appendChild(classDeleteSummary);
 
-        var classDaysSummary = document.createElement('div');
-        classDaysSummary.className = "class-summary-details";
-        classDaysSummary.textContent = classScheduleData[i].classDays;
-        classSummaryRow.appendChild(classDaysSummary);
+            classDeleteSummary.addEventListener('click', function() {
+               this.parentNode.parentNode.removeChild(this.parentNode);
+               document.getElementById(classScheduleData[i].idOfColorElementSelected).style.display = "inline-block";
+               classScheduleData.splice(i, 1);
+            });
 
-        var classTimeSummary = document.createElement('div');
-        classTimeSummary.className = "class-summary-details";
-        classTimeSummary.textContent = classScheduleData[i].classTime;
-        classSummaryRow.appendChild(classTimeSummary);
-
-        var classColorSummary = document.createElement('div');
-        classColorSummary.className = "class-summary-details";
-        classColorSummary.textContent = " ";
-        classSummaryRow.appendChild(classColorSummary);
-
-        var classDeleteSummary = document.createElement('img');
-        classDeleteSummary.className = "class-summary-details";
-        classDeleteSummary.id = "class_delete_summary";
-        classDeleteSummary.src = "img/class_delete_summary.png";
-        classSummaryRow.appendChild(classDeleteSummary);
-
-        classSummaryDiv.appendChild(classSummaryRow);
+            classSummaryDiv.appendChild(classSummaryRow);
+        }(i));  //This is the end of the function that exists solely to solve closure problem. It's also where we pass in the value of i so that it's accessible within the above code.
     }
 }
-
-
 
 function initializeDayPicker() {
     var checkList = document.getElementById('daypicker_dropdown');
@@ -1247,18 +1256,11 @@ function buildDaypickerTitle () {
 
 
 function initializeTimePickers() {
-    //var timepickers = $('.timepicker').wickedpicker();
-
     var beginningTimepicker = $('.beginning-timepicker').wickedpicker();
     var endingTimepicker = $('.ending-timepicker').wickedpicker({now: "13:30"});
 
     document.getElementById('beginning_timepicker').addEventListener('mousedown', function(e){ e.preventDefault(); }, false);  //prevent highlighting of timepicker text
     document.getElementById('ending_timepicker').addEventListener('mousedown', function(e){ e.preventDefault(); }, false);  //prevent highlighting of timepicker text
-
-
-    /*    console.log(timepickers.wickedpicker('time', 0));
-        console.log(timepickers.wickedpicker('time', 1));*/
-
 }
 
 

@@ -329,7 +329,7 @@ body.modal-open {  /*prevents body from scrolling when modal is open*/
 }
 
 #modal_header_text {
-    font-size: 18px;
+    font-size: 17px;
 }
 
 #add_class_prompt_div, #class_summary_div {
@@ -511,16 +511,13 @@ input[type=checkbox] {
 
 #class_summary_div {
     margin: 5px auto 0 auto;
-    height: 80%;
+    height: 76%;
     overflow-y: auto;
-}
-
-#current_session_summary_text {
-    text-align: center;
 }
 
 .class-summary-details {
     display: none;
+    margin-left: 25px;
 }
 
 .class-summary-name {
@@ -535,11 +532,13 @@ input[type=checkbox] {
 #class_delete_summary {
     float: right;
     bottom: 5px;
+    padding-right: 2px;
+    width: 28px;
 }
 
 .class-summary-row {
     border: 1px solid rgba(0, 0, 0, 0.63);
-    margin: 5px 10px;
+    margin: 5px 15px;
     padding: 3px;
     overflow: hidden;
 }
@@ -559,6 +558,16 @@ input[type=checkbox] {
     display: none;
     text-align: center ;
 }
+
+#add_class_button, #save_and_finish_button {
+    padding: 3px 6px;
+    font-size: 13pt;
+}
+
+#save_and_finish_button, #cancel_class_button {
+    margin-left: 4px;
+}
+
 
 /*
 End modal CSS

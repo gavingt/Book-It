@@ -100,7 +100,7 @@
 
             <div class="modal-inputs">
                 <div>
-                    <input id='current_session_input' maxlength="20">
+                    <input id='current_session_input' maxlength="16">
                 </div>
             </div>
 
@@ -179,10 +179,12 @@
         </div>
 
         <div id="class_summary_div">
-            <div id="current_session_summary_text">Spring 2017</div>
+            <div class="modal-instructions">The classes you've added so far are listed below. Use the buttons at the bottom to add more classes or finish the setup process.</div>
+
             <!--class summaries go here -->
         </div>
         <div id="class_summary_button_div">
+            <div id="class_summary_input_validation_text" class="input-validation-text">You must add at least one class</div>
             <button id="add_class_button">Add another class</button>
             <button id="save_and_finish_button">Save and finish</button>
         </div>

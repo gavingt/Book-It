@@ -253,6 +253,32 @@ input {
     display: block;
 }
 
+.class_info_div {
+    float: right;
+    padding: 2px 2px 0 0;
+
+/*    position: absolute;*/
+    display: inline-block;
+    right: 17px;
+    bottom: 8px;
+}
+
+.class_info_button {
+
+}
+
+.class_info_list {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 180px;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    right: 0;
+}
+
+
+
 #sign_in_button_group_wrapper {
     margin-top: 175px;
     text-align: center;
@@ -670,6 +696,11 @@ End modal CSS
     padding: 1px 4px 1px 4px;
     margin-bottom: 10px;
 }
+
+
+
+
+
 
 .fa-before:before {
     display: inline-block;

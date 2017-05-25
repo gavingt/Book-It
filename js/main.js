@@ -829,15 +829,21 @@ function initializeSettingsButton(bUserSignedIn) {
     });
 
     // Close the dropdown menu if the user clicks outside of it
-    window.onclick = function (event) {
+/*    window.onclick = function (event) {
         if (!event.target.matches('.settings_button')) {
             settingsList.classList.remove('show');
             settingsButton.src = "img/settings_gray.png";
         }
-    };
+    };*/
 
     document.getElementById("settings_item_open_modal").addEventListener("click", function () {
         document.getElementById("class_modal").style.display = "block";
+        var html = $('html');
+
+        if ($(document).height() > $(window).height()) {
+            var scrollTop = (html.scrollTop()) ? html.scrollTop() : $('body').scrollTop(); //prevents body scrolling when modal visible
+            html.addClass('noscroll').css('top',-scrollTop);
+        }
     });
 
     document.getElementById("settings_item_about_this_app").addEventListener("click", function () {
@@ -870,18 +876,25 @@ function initializeClassInfoButtons(classInfoButton, classInfoList, classColor, 
     });
 
     classInfoButton.addEventListener('click', function() {
-         //alert(classDays + " " + classLocation + " " + classTime);
+        $('.class_info_list').removeClass('show');
         classInfoList.classList.toggle('show');
-
     });
 
-    //TODO: using the below code breaks this functionality for the Settings menu
-    // Close the dropdown menu if the user clicks outside of it
-/*    window.onclick = function (event) {
-        if (!event.target.matches(classInfoButton)) {
+
+
+    window.onclick = function (event) {  //close dropdown menus if the user clicks outside of them
+
+        // || (event.target.matches('.class_info_button') && !event.target.classList.contains('show'))
+        if (!event.target.matches('.class_info_button')) {
+            $('.class_info_list').removeClass('show');
             classInfoButton.src = "img/class_info_button_gray.png";
         }
-    };*/
+
+        if (!event.target.matches('.settings_button')) {
+            document.getElementById('settings_list').classList.remove('show');
+            document.getElementById('settings_button').src = "img/settings_gray.png";
+        }
+    };
 }
 
 
@@ -963,26 +976,13 @@ function initializeWeekSwitcherButtons() {
 
 function setUpModalWizard () {
     var currentSessionInput = document.getElementById('current_session_input');
-
     var html = $('html');
 
     // Get the modal
     var modal = document.getElementById('class_modal');
 
-    // Get the button that opens the modal
-    var btn = document.getElementById("myBtn");
-
     // Get the <span> element that closes the modal
     var span = document.getElementsByClassName("close")[0];
-
-    // When the user clicks on the button, open the modal
-    btn.onclick = function() {
-        modal.style.display = "block";
-/*        if ($(document).height() > $(window).height()) {
-            var scrollTop = (html.scrollTop()) ? html.scrollTop() : $('body').scrollTop(); //prevents body scrolling when modal visible
-            html.addClass('noscroll').css('top',-scrollTop);
-        }*/
-    };
 
     // When the user clicks on <span> (x), close the modal
     span.onclick = function() {

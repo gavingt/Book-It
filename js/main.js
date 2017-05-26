@@ -62,6 +62,12 @@ image7.src = "img/collapse_summary_details.png";
 var image8 = new Image();
 image8.src = "img/class_delete_summary.png";
 
+var image9 = new Image();
+image9.src = "img/class_info_button_gray.png";
+
+var image10 = new Image();
+image10.src = "img/class_info_button_black.png";
+
 //These lines eliminate Flash of Invisible Text (FOIT) as Font Awesome plus sign loads in.
 document.getElementById('dummy_text_fa').className = "fa fa-plus";
 document.getElementById('dummy_text_fa').style.visibility = "hidden";
@@ -164,7 +170,7 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
 
     var classInfoList = document.createElement('div');
     classInfoList.className = "class_info_list";
-    classInfoList.textContent = classDays + " " + classLocation + " " + classTime;
+    classInfoList.innerHTML = "<span class='bold-text'>Days:</span> &nbsp;" + classDays + "<br/><span class='bold-text'>Location:</span> &nbsp;"  + classLocation + "<br/><span class='bold-text'>Time:</span> &nbsp;" + classTime;
     classInfoDiv.appendChild(classInfoList);
 
     classDiv.appendChild(classInfoDiv);
@@ -861,33 +867,40 @@ function initializeClassInfoButtons(classInfoButton, classInfoList, classColor, 
     });
 
     classInfoButton.addEventListener("mouseout", function () {
-        //if (!settingsList.classList.contains('show')) {
+        if (!classInfoList.classList.contains('show')) {
             classInfoButton.src = "img/class_info_button_gray.png";
-        //}
+        }
     });
 
     classInfoButton.addEventListener("touchstart", function() {
-        //if (settingsList.classList.contains("show")) {
+        $('.class_info_button').not(this).attr('src', 'img/class_info_button_gray.png');
+
+        if (classInfoList.classList.contains("show")) {
             classInfoButton.src = "img/class_info_button_gray.png";
-        //}
-        //else {
+        }
+        else {
             classInfoButton.src = "img/class_info_button_black.png";
-       // }
+        }
     });
 
     classInfoButton.addEventListener('click', function() {
-        $('.class_info_list').removeClass('show');
+        $('.class_info_button').not(this).attr('src', 'img/class_info_button_gray.png');
+        if(classInfoButton.nextElementSibling.classList.contains('show')) {
+            $('.class_info_list').removeClass('show');
+            classInfoButton.nextElementSibling.className = "class_info_list show";
+        }
+        else {
+            $('.class_info_list').removeClass('show');
+        }
         classInfoList.classList.toggle('show');
     });
 
 
 
     window.onclick = function (event) {  //close dropdown menus if the user clicks outside of them
-
-        // || (event.target.matches('.class_info_button') && !event.target.classList.contains('show'))
         if (!event.target.matches('.class_info_button')) {
             $('.class_info_list').removeClass('show');
-            classInfoButton.src = "img/class_info_button_gray.png";
+            $('.class_info_button').attr('src', 'img/class_info_button_gray.png');
         }
 
         if (!event.target.matches('.settings_button')) {

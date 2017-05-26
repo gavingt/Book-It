@@ -256,11 +256,8 @@ input {
 .class_info_div {
     float: right;
     padding: 2px 2px 0 0;
-
-/*    position: absolute;*/
+    position: relative;
     display: inline-block;
-    right: 17px;
-    bottom: 8px;
 }
 
 .class_info_button {
@@ -271,10 +268,17 @@ input {
     display: none;
     position: absolute;
     background-color: white;
-    min-width: 180px;
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
     z-index: 1;
-    right: 0;
+    right: -10px;
+    border: 1px solid black;
+    padding: 5px 10px;
+    text-align: justify;
+    white-space: nowrap;
+}
+
+.bold-text {
+    font-weight: bold;
 }
 
 

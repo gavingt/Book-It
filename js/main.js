@@ -2,7 +2,8 @@
 //TODO: don't allow user to close modal upon first load
 //TODO: fix tabbing for add_class_prompt_div
 
-//TODO: make info button to right of each class name (float right in classDiv), and it opens a dropdown box with extra class info
+//TODO: Put in max text sizes for class names and class locations and test clasInfoList across all devices
+//TODO: Edit classes option in Settings menu should bring up class summary div
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
 var googleProvider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization
@@ -158,24 +159,29 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
     var classNameDiv = document.createElement("div");
     classNameDiv.className = "class_name_div";
     classNameDiv.textContent = className;
-    classDiv.appendChild(classNameDiv);
+
+/*    var fontAwesomeIcon = document.createElement('span');
+    fontAwesomeIcon.className = "font_awesome_icon fa-before fa-angle-down";*/
+    //classNameDiv.appendChild(fontAwesomeIcon);
+
 
     var classInfoDiv = document.createElement('div');
     classInfoDiv.className = "class_info_div";
 
-    var classInfoButton = document.createElement('img');
-    classInfoButton.className = "class_info_button";
-    classInfoButton.src = "img/class_info_button_gray.png";
+    var classInfoButton = document.createElement('span');
+    classInfoButton.className = "class_info_button font_awesome_icon fa-before fa-angle-down";
     classInfoDiv.appendChild(classInfoButton);
+
+    classDiv.appendChild(classNameDiv);
 
     var classInfoList = document.createElement('div');
     classInfoList.className = "class_info_list";
     classInfoList.innerHTML = "<span class='bold-text'>Days:</span> &nbsp;" + classDays + "<br/><span class='bold-text'>Location:</span> &nbsp;"  + classLocation + "<br/><span class='bold-text'>Time:</span> &nbsp;" + classTime;
     classInfoDiv.appendChild(classInfoList);
 
-    classDiv.appendChild(classInfoDiv);
+    classNameDiv.appendChild(classInfoDiv);
 
-    initializeClassInfoButtons(classInfoButton, classInfoList, classColor, classDays, classLocation, className, classTime);
+    initializeClassInfoButtons(classNameDiv);
 
     var addTaskButton = document.createElement("p");
     addTaskButton.className = "add_task_button fa-before fa-plus"; //Gives each addTaskButton a class name and also assigns a Font Awesome icon to it.
@@ -860,47 +866,33 @@ function initializeSettingsButton(bUserSignedIn) {
 
 
 
-function initializeClassInfoButtons(classInfoButton, classInfoList, classColor, classDays, classLocation, className, classTime) {
-
-    classInfoButton.addEventListener("mouseover", function () {
-        classInfoButton.src = "img/class_info_button_black.png";
+function initializeClassInfoButtons(classNameDiv) {
+    classNameDiv.addEventListener('mousedown', function() {
+        classNameDiv.childNodes[1].style.top = "2px";
     });
 
-    classInfoButton.addEventListener("mouseout", function () {
-        if (!classInfoList.classList.contains('show')) {
-            classInfoButton.src = "img/class_info_button_gray.png";
-        }
+    classNameDiv.addEventListener('mouseup', function() {
+        classNameDiv.childNodes[1].style.top = "0";
     });
 
-    classInfoButton.addEventListener("touchstart", function() {
-        $('.class_info_button').not(this).attr('src', 'img/class_info_button_gray.png');
+    classNameDiv.addEventListener('click', function() {
+        var thisClassInfoList = classNameDiv.lastChild.lastChild;
 
-        if (classInfoList.classList.contains("show")) {
-            classInfoButton.src = "img/class_info_button_gray.png";
-        }
-        else {
-            classInfoButton.src = "img/class_info_button_black.png";
-        }
-    });
-
-    classInfoButton.addEventListener('click', function() {
-        $('.class_info_button').not(this).attr('src', 'img/class_info_button_gray.png');
-        if(classInfoButton.nextElementSibling.classList.contains('show')) {
+        if(thisClassInfoList.classList.contains('show')) {
             $('.class_info_list').removeClass('show');
-            classInfoButton.nextElementSibling.className = "class_info_list show";
+            thisClassInfoList.className = "class_info_list show";
         }
         else {
             $('.class_info_list').removeClass('show');
         }
-        classInfoList.classList.toggle('show');
+        thisClassInfoList.classList.toggle('show');
     });
 
 
 
     window.onclick = function (event) {  //close dropdown menus if the user clicks outside of them
-        if (!event.target.matches('.class_info_button')) {
+        if (!event.target.matches('.class_name_div,.class_info_button,.class_info_div')) {
             $('.class_info_list').removeClass('show');
-            $('.class_info_button').attr('src', 'img/class_info_button_gray.png');
         }
 
         if (!event.target.matches('.settings_button')) {

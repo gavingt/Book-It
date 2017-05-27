@@ -169,7 +169,7 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
     classInfoDiv.className = "class_info_div";
 
     var classInfoButton = document.createElement('span');
-    classInfoButton.className = "class_info_button font_awesome_icon fa-before fa-angle-down";
+    classInfoButton.className = "class_info_button font_awesome_info_icon fa-before fa-angle-down";
     classInfoDiv.appendChild(classInfoButton);
 
     classDiv.appendChild(classNameDiv);
@@ -868,7 +868,10 @@ function initializeSettingsButton(bUserSignedIn) {
 
 function initializeClassInfoButtons(classNameDiv) {
     classNameDiv.addEventListener('mousedown', function() {
-        classNameDiv.childNodes[1].style.top = "2px";
+        var thisClassInfoList = classNameDiv.lastChild.lastChild;
+        if (!thisClassInfoList.classList.contains('show')) {
+            classNameDiv.childNodes[1].style.top = "2px";
+        }
     });
 
     classNameDiv.addEventListener('mouseup', function() {

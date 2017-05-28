@@ -266,7 +266,6 @@ input {
     background-color: white;
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
     z-index: 1;
-    right: -75px;
     border: 1px solid black;
     padding: 5px 10px;
     text-align: justify;
@@ -754,7 +753,7 @@ End modal CSS
 }
 
 .mark_task_finished_image {
-    padding: 0 5px 0 5px;
+    padding: 0 7px 0 5px;
     margin-bottom: 2px;
 }
 

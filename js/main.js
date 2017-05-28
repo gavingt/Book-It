@@ -1,4 +1,6 @@
-//TODO: Put in max text sizes for class names and class locations and test clasInfoList across all devices
+//TODO: when using Edit classes button, make it so that previously used colors are hidden and can't be chosen by user
+
+
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
 var googleProvider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization
@@ -161,9 +163,7 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
     var classInfoList = document.createElement('div');
     classInfoList.className = "class_info_list";
     classInfoList.innerHTML = "<span class='bold-text'>Days:</span> &nbsp;" + classDays + "<br/><span class='bold-text'>Location:</span> &nbsp;"  + classLocation + "<br/><span class='bold-text'>Time:</span> &nbsp;" + classTime;
-    classInfoDiv.appendChild(classInfoList);
-
-    //TODO: append classInfoList to classNameDiv instead of classInfoDiv
+    classNameDiv.appendChild(classInfoList);
 
     classNameDiv.appendChild(classInfoDiv);
 
@@ -848,19 +848,8 @@ function initializeSettingsButton(bUserSignedIn) {
 
 
 function initializeClassInfoButtons(classNameDiv) {
-    classNameDiv.addEventListener('mousedown', function() {
-        var thisClassInfoList = classNameDiv.lastChild.lastChild;
-        if (!thisClassInfoList.classList.contains('show')) {
-            classNameDiv.childNodes[1].style.top = "2px";
-        }
-    });
-
-    classNameDiv.addEventListener('mouseup', function() {
-        classNameDiv.childNodes[1].style.top = "0";
-    });
-
     classNameDiv.addEventListener('click', function() {
-        var thisClassInfoList = classNameDiv.lastChild.lastChild;
+        var thisClassInfoList = classNameDiv.childNodes[1];
 
         if(thisClassInfoList.classList.contains('show')) {
             $('.class_info_list').removeClass('show');
@@ -995,6 +984,11 @@ function setUpModalWizard (bIsFirstLoad) {
             }
         };
         showClassSummary();
+
+        for (var i=1; i<classScheduleData.length; i++) {
+            document.getElementById(classScheduleData[i].idOfColorElementSelected).style.display = "none";
+        }
+
         document.getElementById('current_session_prompt_div').style.display = "none";
         document.getElementById('class_summary_div').style.display = "block";
     }
@@ -1087,7 +1081,6 @@ function showAddClassPrompt() {
         modalMainContent.style.top = "5px";
     }
     modalMainContent.style.height = "500px";
-
 
     var firstVisibleColorDiv =  $('.color-div:visible:first');
     firstVisibleColorDiv.css('outline', '3px solid dodgerblue'); //find first visible color-div and outline it

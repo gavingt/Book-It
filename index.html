@@ -29,7 +29,7 @@
 
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/wickedpicker.css">  <!--//TODO: change to .min file after tweaking-->
+    <link rel="stylesheet" href="css/wickedpicker.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -75,7 +75,7 @@
 
     <!-- Modal content -->
     <div class="modal-main-content" id="modal_main_content">
-        <div id="modal_header"><span id="modal_header_text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Let's get started...</span>
+        <div id="modal_header"><span id="modal_header_text">&nbsp;Let's get started...</span>
             <span class="close">&times;</span>
         </div>
 
@@ -114,15 +114,15 @@
             <div class="modal-inputs">
 
                 <div>
-                    <input id="class_name_input" maxlength="28">
+                    <input id="class_name_input" maxlength="23" tabindex="1" autofocus>
                 </div>
 
                 <div>
-                    <input id="class_location_input" maxlength="28">
+                    <input id="class_location_input" maxlength="23" tabindex="2">
                 </div>
 
                 <div id="daypicker_dropdown" class="daypicker-dropdown">
-                    <span class="anchor" id="day_picker_dropdown_title">&nbsp;</span>
+                    <span class="anchor" id="day_picker_dropdown_title" tabindex="3">&nbsp;</span>
                     <ul id="day_picker_items" class="day-picker-items">
                         <li class="day_picker_list_item"><input type="checkbox" class="day_picker_list_item_text" id="monday_dropdown_checkbox"/> Monday</li>
                         <li class="day_picker_list_item"><input type="checkbox" class="day_picker_list_item_text" id="tuesday_dropdown_checkbox"/> Tuesday</li>
@@ -239,9 +239,6 @@
 
 <script type="text/javascript" src="js/wickedpicker.js"></script> <!--Time picker-->
 
-
-<!-- Latest compiled JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 
 <script src="js/plugins.js"></script>

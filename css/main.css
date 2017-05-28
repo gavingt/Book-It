@@ -266,7 +266,7 @@ input {
     background-color: white;
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
     z-index: 1;
-    right: -110px;
+    right: -75px;
     border: 1px solid black;
     padding: 5px 10px;
     text-align: justify;
@@ -705,7 +705,7 @@ End modal CSS
 
 .font_awesome_info_icon {
     padding-left: 7px;
-    color: #a5a5a5;
+    color: #b8b8b8;
 }
 
 

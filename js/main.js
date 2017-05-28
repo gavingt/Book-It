@@ -1,9 +1,4 @@
-//TODO: minify all scripts
-//TODO: don't allow user to close modal upon first load
-//TODO: fix tabbing for add_class_prompt_div
-
 //TODO: Put in max text sizes for class names and class locations and test clasInfoList across all devices
-//TODO: Edit classes option in Settings menu should bring up class summary div
 
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
 var googleProvider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization
@@ -35,7 +30,7 @@ var config = {
 firebase.initializeApp(config);
 
 initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
-setUpModalWizard();
+//setUpModalWizard();
 
 
 //The below lines force these images to be preloaded so that they they're ready when we need to display them.
@@ -62,12 +57,6 @@ image7.src = "img/collapse_summary_details.png";
 
 var image8 = new Image();
 image8.src = "img/class_delete_summary.png";
-
-var image9 = new Image();
-image9.src = "img/class_info_button_gray.png";
-
-var image10 = new Image();
-image10.src = "img/class_info_button_black.png";
 
 //These lines eliminate Flash of Invisible Text (FOIT) as Font Awesome plus sign loads in.
 document.getElementById('dummy_text_fa').className = "fa fa-plus";
@@ -103,7 +92,7 @@ firebase.auth().onAuthStateChanged(function(user) {
             spinner.style.display = "block";
             createDayDivs();  //creates a dayDiv for each day when user first loads page
             initializeDates(); //gets the dates for the current week when user first loads page
-            readClassData(); //Reads class data if it exists for current user, followed by reading task data. If class data doesn't exist, it opens initial setup wizard.
+            readClassData(); //Reads class data if it exists for current user, followed by reading task data. If class data doesn't exist, it opens class setup wizard.
             initializeSettingsButton(true);
             initializeWeekSwitcherButtons();
             bInitialReadComplete = true;
@@ -160,11 +149,6 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
     classNameDiv.className = "class_name_div";
     classNameDiv.textContent = className;
 
-/*    var fontAwesomeIcon = document.createElement('span');
-    fontAwesomeIcon.className = "font_awesome_icon fa-before fa-angle-down";*/
-    //classNameDiv.appendChild(fontAwesomeIcon);
-
-
     var classInfoDiv = document.createElement('div');
     classInfoDiv.className = "class_info_div";
 
@@ -178,6 +162,8 @@ function createClassDiv(classColor, classDays, classLocation, className, classTi
     classInfoList.className = "class_info_list";
     classInfoList.innerHTML = "<span class='bold-text'>Days:</span> &nbsp;" + classDays + "<br/><span class='bold-text'>Location:</span> &nbsp;"  + classLocation + "<br/><span class='bold-text'>Time:</span> &nbsp;" + classTime;
     classInfoDiv.appendChild(classInfoList);
+
+    //TODO: append classInfoList to classNameDiv instead of classInfoDiv
 
     classNameDiv.appendChild(classInfoDiv);
 
@@ -534,6 +520,7 @@ function readClassData() {
                 readTaskData(); //If user has pre-existing class data, execute readTaskData() after reading class data
             }
             else {
+                setUpModalWizard(true);
                 document.getElementById('class_modal').style.display = "block";
                 document.getElementById("main_content_wrapper").style.display = "none";
                 spinner.style.display = "none";
@@ -840,15 +827,9 @@ function initializeSettingsButton(bUserSignedIn) {
         }
     });
 
-    // Close the dropdown menu if the user clicks outside of it
-/*    window.onclick = function (event) {
-        if (!event.target.matches('.settings_button')) {
-            settingsList.classList.remove('show');
-            settingsButton.src = "img/settings_gray.png";
-        }
-    };*/
 
     document.getElementById("settings_item_open_modal").addEventListener("click", function () {
+        setUpModalWizard(false);
         document.getElementById("class_modal").style.display = "block";
         var html = $('html');
 
@@ -982,7 +963,7 @@ function initializeWeekSwitcherButtons() {
 }
 
 
-function setUpModalWizard () {
+function setUpModalWizard (bIsFirstLoad) {
     var currentSessionInput = document.getElementById('current_session_input');
     var html = $('html');
 
@@ -992,23 +973,31 @@ function setUpModalWizard () {
     // Get the <span> element that closes the modal
     var span = document.getElementsByClassName("close")[0];
 
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function() {
-        modal.style.display = "none";
-        var scrollTop = parseInt(html.css('top')); //allows scrolling again when modal dismissed
-        html.removeClass('noscroll');
-        $('html,body').scrollTop(-scrollTop);
-    };
-
-    // When the user clicks anywhere outside of the modal, close it
-    document.onclick = function(event) {
-        if (event.target === modal) {
+    if (bIsFirstLoad) {
+        span.style.display = "none";
+    }
+    else {
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
             modal.style.display = "none";
             var scrollTop = parseInt(html.css('top')); //allows scrolling again when modal dismissed
             html.removeClass('noscroll');
             $('html,body').scrollTop(-scrollTop);
-        }
-    };
+        };
+
+        // When the user clicks anywhere outside of the modal, close it
+        document.onclick = function (event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+                var scrollTop = parseInt(html.css('top')); //allows scrolling again when modal dismissed
+                html.removeClass('noscroll');
+                $('html,body').scrollTop(-scrollTop);
+            }
+        };
+        showClassSummary();
+        document.getElementById('current_session_prompt_div').style.display = "none";
+        document.getElementById('class_summary_div').style.display = "block";
+    }
 
     $('.color-div').click(function() {
         $('.color-div').css('outline', 'none');
@@ -1114,6 +1103,7 @@ function showClassSummary() {
     classSummaryDiv.style.display = "block";
     document.getElementById('modal_header_text').textContent = "\xa0\xa0\xa0Class summary - " + classScheduleData[0];
     document.getElementById('add_class_prompt_div').style.display = "none";
+    document.getElementById('current_session_prompt_div').style.display = "none";
 
     if ($(window).height() > 500) {
         modalMainContent.style.top = "calc(50% - 235px)";

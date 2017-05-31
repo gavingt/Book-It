@@ -1,7 +1,3 @@
-//TODO: when using Edit classes button, make it so that previously used colors are hidden and can't be chosen by user
-
-
-
 var facebookProvider = new firebase.auth.FacebookAuthProvider(); //this is for Facebook account authorization
 var googleProvider = new firebase.auth.GoogleAuthProvider(); //this is for Google account authorization
 var currentlyActiveWeekDates = new Array(8); //stores an array of the dates for the currently visible week
@@ -21,6 +17,10 @@ var fetchingPreviousWeek, fetchingNextWeek = false;
 var classScheduleData = []; //An array that holds the class schedule data that was input by the user in the modal. Each class is an object.
 var idOfColorElementSelected;
 
+
+$(document).ready(function() {
+
+
 // Initialize Firebase. This code should stay at the top of main.js
 var config = {
     apiKey: "AIzaSyAEPEyYJBvmqqwu4XSFitMUENdskmKp0fc",
@@ -32,7 +32,6 @@ var config = {
 firebase.initializeApp(config);
 
 initialize2dArrays(true); //calls initialize2dArrays() function when user first loads page
-//setUpModalWizard();
 
 
 //The below lines force these images to be preloaded so that they they're ready when we need to display them.
@@ -113,6 +112,8 @@ firebase.auth().onAuthStateChanged(function(user) {
 });
 
 
+
+}); //end $(document).ready
 
 /****************************************************/
 /************START DOM MANIPULATION CODE*************/
